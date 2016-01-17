@@ -1,2 +1,5 @@
 <resources>
+
+    <style name="Forum.Widget.Button.Borderless" parent="@android:style/Widget.Material.Button.Borderless" />
+
 </resources>

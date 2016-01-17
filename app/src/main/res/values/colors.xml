@@ -8,4 +8,12 @@
     <color name="secondary_text">#727272</color>
     <color name="icons">#FFFFFF</color>
     <color name="divider">#B6B6B6</color>
+    <color name="half_opacity_gray">#80888888</color>
+    <color name="scrim">#99323232</color>
+
+    <array name="swipe_refresh_colors">
+        <item>@color/primary</item>
+        <item>@color/primary_dark</item>
+        <item>@color/primary_light</item>
+    </array>
 </resources>

@@ -3,12 +3,16 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="miles.forum" >
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
-        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
+        android:name=".ForumApplication"
         android:theme="@style/Forum" >
+
         <activity
             android:name=".ui.activity.HomeActivity"
             android:label="@string/app_name" >
@@ -17,6 +21,30 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.activity.AuthenticateActivity"
+            android:theme="@style/Forum.Authenticate"
+            android:label="@string/app_name" >
+        </activity>
+
+        <activity
+            android:name=".ui.activity.PostActivity"
+            android:windowSoftInputMode="stateHidden|adjustResize"
+            android:theme="@style/Forum.Post" >
+        </activity>
+
+        <meta-data
+            android:name="com.parse.APPLICATION_ID"
+            android:value="@string/parse_application_id" />
+        <meta-data
+            android:name="com.parse.CLIENT_KEY"
+            android:value="@string/parse_client_key" />
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="0868d9b0c625e6e7444fd594124826702c89255d" />
     </application>
+
 
 </manifest>

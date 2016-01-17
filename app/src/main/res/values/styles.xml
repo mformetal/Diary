@@ -10,8 +10,38 @@
         <item name="icon">@color/icons</item>
     </style>
 
+    <style name="Forum.Authenticate" parent="Forum" >
+    </style>
+
+    <style name="Forum.Post" >
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:divider">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowCloseOnTouchOutside">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
+    <style name="Forum.Widget" parent="android:Widget" />
+
     <style name="Forum.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Forum.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="Forum.Dialog" parent="@style/Theme.AppCompat.Light.Dialog" />
+
+    <style name="Forum.Dialog.Title" parent="Forum.Widget" >
+        <item name="android:textSize">25sp</item>
+        <item name="android:layout_gravity">start|center_vertical</item>
+        <item name="android:textColor">@color/primary_text</item>
+        <item name="android:layout_margin">20dp</item>
+    </style>
+
+    <style name="Forum.Dialog.Button" parent="Forum.Widget.Button.Borderless" >
+        <item name="android:text">@string/dialog_default_button</item>
+        <item name="colorButtonNormal">@color/icons</item>
+        <item name="colorAccent">@color/primary_dark</item>
+    </style>
+
+    <style name="Forum.Widget.Button.Borderless" parent="Widget.AppCompat.Button.Borderless" />
 
 </resources>

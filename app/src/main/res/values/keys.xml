@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="parse_application_id">SK9E6O8DvQnZ3piJhMlOdlrtZAXxhfA7Kj1rivMv</string>
+    <string name="parse_client_key">8qLbDDl1wgjCWzjEAmhqDdXwTXSy2TO4JXsXFrZG</string>
+    <string name="parse_rest_key">O5WMNoSnbwSQXzIqCGi1l74rVFEocfhU3KxMyplS</string>
+    <string name="parse_account_key">Bx7hSUqE5sCeObglTGVmvIT3ASLYWWaH7wIVAqm7</string>
+    <string name="twitter_key">BPDFCX6EhkhnpvNoypu1H9oRz</string>
+    <string name="twitter_secret">n4NeidmOFJG6gOQG0rA9LLgKMcEyNxXxOkyk5IZAHY8Mw2vlfz</string>
+</resources>

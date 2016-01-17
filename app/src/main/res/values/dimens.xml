@@ -1,6 +1,34 @@
 <resources>
-    <dimen name="app_bar_height">180dp</dimen>
+    <dimen name="activity_vertical_margin">20dp</dimen>
+    <dimen name="activity_horizontal_margin">20dp</dimen>
+
+    <dimen name="loading_view_dimens">100dp</dimen>
+
+    <dimen name="logo_view_top_dimen">40dp</dimen>
+    <dimen name="logo_view_bottom_dimen">40dp</dimen>
+
+    <dimen name="full_width_text_field_horizontal_margin">20dp</dimen>
+
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+
     <dimen name="toolbar_margin">16dp</dimen>
+
+    <dimen name="dialog_margin">16dp</dimen>
+    <dimen name="dialog_button_height">36dp</dimen>
+    <dimen name="dialog_min_width">300dp</dimen>
+
+    <dimen name="post_recycler_horizontal_margin">10dp</dimen>
+
+    <dimen name="adapter_post_title_text_size">20sp</dimen>
+    <dimen name="adapter_post_time_text_size">12sp</dimen>
+    <dimen name="adapter_post_horizontal_margin">20dp</dimen>
+    <dimen name="adapter_post_vertical_margin">20dp</dimen>
+    <dimen name="adapter_post_button_margin">20dp</dimen>
+
+    <dimen name="drawn_icon_text_size">15sp</dimen>
+    <dimen name="large_text_size">20sp</dimen>
+    <dimen name="subtitle_text_size">17sp</dimen>
+    <dimen name="logo_text_size">40sp</dimen>
+
 </resources>

@@ -1,0 +1,10 @@
+{
+  "applications": {
+    "Forum": {
+      "applicationId": "SK9E6O8DvQnZ3piJhMlOdlrtZAXxhfA7Kj1rivMv"
+    },
+    "_default": {
+      "link": "Forum"
+    }
+  }
+}

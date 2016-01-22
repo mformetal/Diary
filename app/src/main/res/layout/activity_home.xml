@@ -6,42 +6,25 @@
     android:id="@+id/activity_home_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="miles.forum.ui.activity.HomeActivity">
+    android:background="@color/half_opacity_gray"
+    tools:context="miles.diary.ui.activity.HomeActivity" >
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/Forum.AppBarOverlay" >
+        android:theme="@style/AppTheme.AppBarOverlay">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/activity_home_toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_scrollFlags="scroll|enterAlways"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
-
-        <android.support.design.widget.TabLayout
-            android:id="@+id/activity_home_tab_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:tabMode="fixed"
-            app:tabGravity="fill"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:layout_scrollFlags="scroll|enterAlways" />
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/activity_home_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:minHeight="?android:attr/actionBarSize"
+                app:layout_collapseMode="pin" />
 
     </android.support.design.widget.AppBarLayout>
 
-    <ProgressBar
-        android:id="@+id/activity_home_progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_anchor="@id/activity_home_root"
-        app:layout_anchorGravity="center" />
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/activity_home_recycler"
-        android:layout_marginStart="@dimen/post_recycler_horizontal_margin"
-        android:layout_marginEnd="@dimen/post_recycler_horizontal_margin"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />

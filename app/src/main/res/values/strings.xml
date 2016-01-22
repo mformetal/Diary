@@ -1,29 +1,17 @@
 <resources>
-    <string name="app_name">Forum</string>
+    <string name="app_name">Diary</string>
+    <string name="activity_entry_name">New Diary Entry</string>
+    <string name="realm_name">Realm</string>
+
+    <string name="search_widget">Search</string>
 
     <string name="activity_home_saved_post_snackbar">Saved your Post!</string>
-    <string-array name="activity_home_tabs">
-        <item>New</item>
-        <item>Top</item>
-    </string-array>
 
-    <string name="activity_authenticate_prompt">Phone number sign in makes it easy to use Forum.
-        You don\'t even have to remember your pesky email!</string>
-    <string name="activity_authenticate_phone_hint">Phone number: xxx-xxx-xxxx</string>
-    <string name="activity_authenticate_phone_error">Must be a 10-digit US phone number</string>
-    <string name="activity_authenticate_button_send_code">Send Code</string>
-    <string name="activity_authenticate_button_login">Log In</string>
-
-    <string name="action_settings">Settings</string>
+    <string name="activity_post_no_input_error">No thoughts?</string>
+    <string name="activity_post_title">New Diary Entry</string>
+    <string name="activity_post_input_title_hint">Entry Title</string>
+    <string name="activity_post_input_body_hint">Memorialize your thoughts</string>
 
     <string name="dialog_default_button">OK</string>
 
-    <string name="activity_post_title">Start a Discussion</string>
-    <string name="activity_post_hint">Share your thoughts</string>
-
-    <string name="adapter_post_like">Like</string>
-    <string name="adapter_post_reply">Reply</string>
-    <string name="adapter_post_share">Share</string>
-
-    <string name="error_no_internet">Get yo internet up!</string>
 </resources>

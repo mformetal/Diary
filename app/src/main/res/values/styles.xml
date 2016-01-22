@@ -1,19 +1,21 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="Forum" parent="Theme.AppCompat.Light.NoActionBar" >
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar" >
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
         <item name="android:textColorPrimary">@color/primary_text</item>
         <item name="android:textColorSecondary">@color/secondary_text</item>
+        <item name="android:textColorHint">@color/half_opacity_gray</item>
         <item name="icon">@color/icons</item>
     </style>
 
-    <style name="Forum.Authenticate" parent="Forum" >
+    <style name="AppTheme.Authenticate" parent="AppTheme" >
+        <item name="android:windowBackground">@android:color/black</item>
     </style>
 
-    <style name="Forum.Post" >
+    <style name="AppTheme.Post" >
         <item name="android:windowNoTitle">true</item>
         <item name="android:divider">@null</item>
         <item name="android:windowIsTranslucent">true</item>
@@ -21,15 +23,15 @@
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
-    <style name="Forum.Widget" parent="android:Widget" />
+    <style name="AppTheme.Widget" parent="android:Widget" />
 
-    <style name="Forum.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-    <style name="Forum.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="Forum.Dialog" parent="@style/Theme.AppCompat.Light.Dialog" />
+    <style name="AppTheme.Dialog" parent="@style/Theme.AppCompat.Light.Dialog" />
 
-    <style name="Forum.Dialog.Title" parent="Forum.Widget" >
+    <style name="Forum.Dialog.Title" parent="AppTheme.Widget" >
         <item name="android:textSize">25sp</item>
         <item name="android:layout_gravity">start|center_vertical</item>
         <item name="android:textColor">@color/primary_text</item>
@@ -42,6 +44,8 @@
         <item name="colorAccent">@color/primary_dark</item>
     </style>
 
-    <style name="Forum.Widget.Button.Borderless" parent="Widget.AppCompat.Button.Borderless" />
+    <style name="Forum.Widget.Button.Borderless" parent="Widget.AppCompat.Button.Borderless" >
+        <item name="android:textColor">@color/primary_text</item>
+    </style>
 
 </resources>

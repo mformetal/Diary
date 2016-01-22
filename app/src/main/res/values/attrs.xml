@@ -5,4 +5,12 @@
         <attr name="colorFilter" format="color" />
     </declare-styleable>
 
+    <declare-styleable name="TypefaceTextView">
+        <attr name="textViewFont" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="TypefaceEditText">
+        <attr name="editTextFont" format="string" />
+    </declare-styleable>
+
 </resources>

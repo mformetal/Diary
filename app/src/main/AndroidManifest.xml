@@ -1,37 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
-    package="miles.forum" >
+    package="miles.diary" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
 
     <application
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:name=".ForumApplication"
-        android:theme="@style/Forum" >
+        android:name=".DiaryApplication"
+        android:theme="@style/AppTheme" >
 
         <activity
-            android:name=".ui.activity.HomeActivity"
+            android:name="miles.diary.ui.activity.HomeActivity"
             android:label="@string/app_name" >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
         <activity
-            android:name=".ui.activity.AuthenticateActivity"
-            android:theme="@style/Forum.Authenticate"
-            android:label="@string/app_name" >
-        </activity>
-
-        <activity
-            android:name=".ui.activity.PostActivity"
-            android:windowSoftInputMode="stateHidden|adjustResize"
-            android:theme="@style/Forum.Post" >
+            android:name=".ui.activity.EntryActivity"
+            android:label="@string/activity_entry_name"
+            android:windowSoftInputMode="stateHidden|adjustPan"
+            android:theme="@style/AppTheme.Post" >
         </activity>
 
         <meta-data

@@ -5,17 +5,14 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
-import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
@@ -28,13 +25,9 @@ import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.support.v7.app.ActionBar;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
-import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -42,26 +35,19 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 
 import butterknife.Bind;
 import miles.diary.R;
 import miles.diary.ui.SimpleTextWatcher;
-import miles.diary.ui.widget.CircledCoordinatorLayout;
+import miles.diary.ui.widget.RevealingCoordinatorLayout;
 import miles.diary.ui.widget.TypefaceButton;
 import miles.diary.ui.widget.TypefaceEditText;
 import miles.diary.util.Logg;
 import miles.diary.util.PhotoFileUtils;
 import miles.diary.util.TextUtils;
 import miles.diary.util.ViewUtils;
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
 /**
  * Created by mbpeele on 1/16/16.
@@ -72,7 +58,6 @@ public class EntryActivity extends BaseActivity {
     public static final String TOP = "fabTop";
     public static final String WIDTH = "fabWidth";
     public static final String HEIGHT = "fabHeight";
-    public static final String START_COLOR = "fabStartColor";
     public static final String RESULT_TITLE = "title";
     public static final String RESULT_BODY = "body";
     public static final String RESULT_BYTES = "bytes";
@@ -81,7 +66,7 @@ public class EntryActivity extends BaseActivity {
     @Bind(R.id.activity_post_input_body) TypefaceEditText bodyInput;
     @Bind(R.id.activity_post_confirm) TypefaceButton confirm;
     @Bind(R.id.activity_post_fab) FloatingActionButton fab;
-    @Bind(R.id.activity_post_root) CircledCoordinatorLayout content;
+    @Bind(R.id.activity_post_root) RevealingCoordinatorLayout content;
     @Bind(R.id.activity_post_toolbar) Toolbar toolbar;
     @Bind(R.id.activity_entry_image) ImageView imageView;
     @Bind(R.id.activity_post_appbar) AppBarLayout appBarLayout;
@@ -94,7 +79,7 @@ public class EntryActivity extends BaseActivity {
     public static final int REQUEST_IMAGE_CAMERA = 1;
     public static final int REQUEST_IMAGE_GALLERY = 2;
     public static final int REQUEST_PERMISSION_CAMERA_CODE = 3;
-    private int fabLeft, fabTop, fabWidth, fabHeight, fabStartColor;
+    private int fabLeft, fabTop, fabWidth, fabHeight;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -118,7 +103,6 @@ public class EntryActivity extends BaseActivity {
         fabTop = bundle.getInt(TOP);
         fabWidth = bundle.getInt(WIDTH);
         fabHeight = bundle.getInt(HEIGHT);
-        fabStartColor = bundle.getInt(START_COLOR);
 
         final ViewTreeObserver observer = content.getViewTreeObserver();
         observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
@@ -185,13 +169,14 @@ public class EntryActivity extends BaseActivity {
                 if (title.isEmpty() || body.isEmpty()) {
                     Snackbar.make(content, R.string.activity_post_no_input_error,
                             Snackbar.LENGTH_SHORT).show();
+                } else if (uri == null) {
+                    Snackbar.make(content, R.string.activity_post_no_photo_error,
+                            Snackbar.LENGTH_SHORT).show();
                 } else {
                     Intent intent = new Intent();
                     intent.putExtra(RESULT_TITLE, title);
                     intent.putExtra(RESULT_BODY, body);
-                    if (uri != null) {
-                        intent.putExtra(RESULT_BYTES, uri);
-                    }
+                    intent.putExtra(RESULT_BYTES, uri);
                     setResult(RESULT_OK, intent);
                     runExitAnimation();
                 }
@@ -271,20 +256,15 @@ public class EntryActivity extends BaseActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (filePath != null) {
-            outState.putString("filePath", filePath);
-        }
-
-        if (uri != null) {
-            outState.putString("bytes", uri.toString());
-        }
+        outState.putString("filePath", filePath);
+        outState.putParcelable("uri", uri);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         filePath = savedInstanceState.getString("filePath");
-        uri = Uri.parse(savedInstanceState.getString("bytes"));
+        uri = savedInstanceState.getParcelable("uri");
     }
 
     private void runEnterAnimation() {
@@ -292,8 +272,8 @@ public class EntryActivity extends BaseActivity {
         content.setPivotX(fabCx);
         content.setPivotY(fabCy);
 
-        Animator radius = ObjectAnimator.ofFloat(content, CircledCoordinatorLayout.RADIUS, fabWidth,
-                (float) Math.hypot(fabCx, fabCy));
+        Animator radius = ObjectAnimator.ofFloat(content, RevealingCoordinatorLayout.RADIUS, fabWidth,
+                (int) Math.max(content.getHeight(), Math.hypot(fabCx, fabCy)));
         radius.setInterpolator(new DecelerateInterpolator());
         radius.setDuration(400);
 
@@ -315,7 +295,7 @@ public class EntryActivity extends BaseActivity {
     }
 
     private void runExitAnimation() {
-        Animator radius = ObjectAnimator.ofFloat(content, CircledCoordinatorLayout.RADIUS, 0f);
+        Animator radius = ObjectAnimator.ofFloat(content, RevealingCoordinatorLayout.RADIUS, 0f);
         radius.setInterpolator(new FastOutSlowInInterpolator());
         radius.setDuration(500);
 

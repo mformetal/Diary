@@ -24,4 +24,6 @@
     <dimen name="subtitle_text_size">17sp</dimen>
     <dimen name="logo_text_size">40sp</dimen>
 
+    <item name="four_by_three_aspect_ratio" type="dimen" format="float">1.7777788888</item>
+
 </resources>

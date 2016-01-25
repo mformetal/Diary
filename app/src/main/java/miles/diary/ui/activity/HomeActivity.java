@@ -14,7 +14,9 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewStub;
 import android.widget.ProgressBar;
 
 import butterknife.Bind;
@@ -28,6 +30,7 @@ import miles.diary.data.RealmUtils;
 import miles.diary.data.adapter.EntryAdapter;
 import miles.diary.data.model.Entry;
 import miles.diary.ui.GridSpacingDecoration;
+import miles.diary.ui.widget.TypefaceTextView;
 import miles.diary.util.Logg;
 import miles.diary.util.ViewUtils;
 
@@ -38,6 +41,7 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
     @Bind(R.id.activity_home_root) CoordinatorLayout coordinatorLayout;
     @Bind(R.id.fab_loading_bar) ProgressBar fabProgressBar;
     @Bind(R.id.activity_home_toolbar) Toolbar toolbar;
+    private View emptyView;
 
     private final static int RESULT_CODE_ENTRY = 1001;
 
@@ -58,8 +62,8 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
 
         entryAdapter = new EntryAdapter(this);
         recyclerView.setItemAnimator(new FadeInAnimator());
-        recyclerView.setLayoutManager(new LinearLayoutManager(this,
-                LinearLayoutManager.HORIZONTAL, false));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(entryAdapter);
         recyclerView.addItemDecoration(new GridSpacingDecoration(20));
 
@@ -74,8 +78,28 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
                     public void onNext(RealmResults<Entry> entries) {
                         if (entries.isLoaded()) {
                             ViewUtils.invisible(fabProgressBar, 350).start();
-                            for (Entry entry : entries) {
-                                entryAdapter.addData(entry);
+                            if (entries.isEmpty()) {
+                                emptyView = ((ViewStub) findViewById(R.id.activity_home_no_entries)).inflate();
+                                emptyView.setOnTouchListener(new View.OnTouchListener() {
+                                    @Override
+                                    public boolean onTouch(View v, MotionEvent event) {
+                                        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                                            Intent intent = new Intent(v.getContext(),
+                                                    EntryActivity.class);
+                                            intent.putExtra(EntryActivity.LEFT, Math.round(event.getX()));
+                                            intent.putExtra(EntryActivity.TOP, Math.round(event.getY()));
+
+                                            startActivityForResult(intent, RESULT_CODE_ENTRY);
+
+                                            overridePendingTransition(0, 0);
+                                        }
+                                        return false;
+                                    }
+                                });
+                            } else {
+                                for (Entry entry : entries) {
+                                    entryAdapter.addData(entry);
+                                }
                             }
                         }
                     }
@@ -135,6 +159,9 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
                         Uri uri = extra.getParcelable(EntryActivity.RESULT_BYTES);
 
                         Entry entry = realmUtils.addEntry(title, body, uri);
+                        if (emptyView != null) {
+                            coordinatorLayout.removeView(emptyView);
+                        }
                         entryAdapter.addData(entry);
                     }
                 }
@@ -153,7 +180,6 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
         intent.putExtra(EntryActivity.TOP, location[1]);
         intent.putExtra(EntryActivity.WIDTH, fab.getWidth());
         intent.putExtra(EntryActivity.HEIGHT, fab.getHeight());
-        intent.putExtra(EntryActivity.START_COLOR, ContextCompat.getColor(this, R.color.accent));
 
         startActivityForResult(intent, RESULT_CODE_ENTRY);
 

@@ -28,6 +28,7 @@
 
         <activity
             android:name=".ui.activity.EntryActivity"
+            android:screenOrientation="portrait"
             android:label="@string/activity_entry_name"
             android:windowSoftInputMode="stateHidden|adjustPan"
             android:theme="@style/AppTheme.Post" >

@@ -29,6 +29,17 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
+    <ViewStub
+        android:id="@+id/activity_home_no_entries"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?android:attr/actionBarSize"
+        android:layout="@layout/no_entries"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        app:layout_anchor="@id/activity_home_root"
+        app:layout_anchorGravity="center" />
+
     <include
         layout="@layout/loading_fab"
         android:layout_width="wrap_content"

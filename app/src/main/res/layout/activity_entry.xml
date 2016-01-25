@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<miles.diary.ui.widget.CircledCoordinatorLayout
+<miles.diary.ui.widget.RevealingCoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -36,11 +36,9 @@
                 android:id="@+id/activity_post_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:popupTheme="@style/AppTheme.PopupOverlay"
                 android:clipChildren="false"
-                app:layout_collapseMode="pin" >
-
-            </android.support.v7.widget.Toolbar>
+                app:popupTheme="@style/AppTheme.PopupOverlay"
+                app:layout_collapseMode="pin" />
 
         </android.support.design.widget.CollapsingToolbarLayout>
 
@@ -72,17 +70,16 @@
                 android:layout_height="?attr/actionBarSize"
                 android:inputType="textCapSentences"
                 android:hint="@string/activity_post_input_title_hint"
-                android:gravity="start"
+                android:layout_gravity="center_horizontal"
                 android:layout_margin="@dimen/full_width_text_field_horizontal_margin"
-                android:textSize="@dimen/large_text_size"
-                app:editTextFont="@string/title_font" />
+                android:textSize="@dimen/large_text_size" />
 
             <miles.diary.ui.widget.TypefaceEditText
                 android:id="@+id/activity_post_input_body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textMultiLine|textCapSentences"
-                android:gravity="start"
+                android:gravity="bottom|start"
                 android:lines="4"
                 android:layout_margin="@dimen/full_width_text_field_horizontal_margin"
                 android:hint="@string/activity_post_input_body_hint"
@@ -99,4 +96,4 @@
 
     </android.support.v4.widget.NestedScrollView>
 
-</miles.diary.ui.widget.CircledCoordinatorLayout>
+</miles.diary.ui.widget.RevealingCoordinatorLayout>

@@ -6,7 +6,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import miles.diary.data.DataStore;
+import miles.diary.data.Datastore;
 
 /**
  * Created by mbpeele on 1/16/16.
@@ -29,7 +29,7 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    public DataStore getDatastore() {
-        return new DataStore(mApplication);
+    public Datastore getDatastore() {
+        return new Datastore(mApplication);
     }
 }

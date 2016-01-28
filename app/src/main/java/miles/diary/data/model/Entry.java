@@ -15,7 +15,7 @@ public class Entry extends RealmObject {
     @Required private String title;
     @Required private String body;
     @Required private Date date;
-    private byte[] bytes;
+    @Required private byte[] bytes;
 
     public String getId() {
         return id;

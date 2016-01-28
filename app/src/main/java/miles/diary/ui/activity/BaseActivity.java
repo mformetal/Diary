@@ -61,9 +61,9 @@ public class BaseActivity extends AppCompatActivity {
         compositeSubscription.remove(subscription);
     }
 
-    public boolean checkPermissions(String[] permissions) {
+    public boolean hasPermissions(String[] permissions) {
         for (String permission: permissions) {
-            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_DENIED) {
                 return false;
             }
         }

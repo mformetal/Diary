@@ -16,6 +16,8 @@ import miles.diary.R;
  */
 public final class TextUtils {
 
+    private TextUtils() {}
+
     private static HashMap<String, Typeface> mFontMap;
 
     private static void initializeFontMap(Context context) {

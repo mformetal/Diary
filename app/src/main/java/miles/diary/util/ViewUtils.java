@@ -17,32 +17,7 @@ public class ViewUtils {
 
     private static final Rect RECT = new Rect();
 
-    public static abstract class FloatProperty<T> extends Property<T, Float> {
-        public FloatProperty(String name) {
-            super(Float.class, name);
-        }
-
-        public abstract void setValue(T object, float value);
-
-        @Override
-        final public void set(T object, Float value) {
-            setValue(object, value);
-        }
-    }
-
-    public static abstract class IntProperty<T> extends Property<T, Integer> {
-
-        public IntProperty(String name) {
-            super(Integer.class, name);
-        }
-
-        public abstract void setValue(T object, int value);
-
-        @Override
-        final public void set(T object, Integer value) {
-            setValue(object, value);
-        }
-    }
+    private ViewUtils() {}
 
     public static ObjectAnimator gone(final View view, int duration) {
         ObjectAnimator alpha = ObjectAnimator.ofFloat(view, View.ALPHA, 1f, 0f);
@@ -101,6 +76,33 @@ public class ViewUtils {
     public static Rect boundingRect(float cx, float cy, float radius) {
         RECT.set((int) (cx - radius), (int) (cy - radius), (int) (cx + radius), (int) (cy + radius));
         return RECT;
+    }
+
+    public static abstract class FloatProperty<T> extends Property<T, Float> {
+        public FloatProperty(String name) {
+            super(Float.class, name);
+        }
+
+        public abstract void setValue(T object, float value);
+
+        @Override
+        final public void set(T object, Float value) {
+            setValue(object, value);
+        }
+    }
+
+    public static abstract class IntProperty<T> extends Property<T, Integer> {
+
+        public IntProperty(String name) {
+            super(Integer.class, name);
+        }
+
+        public abstract void setValue(T object, int value);
+
+        @Override
+        final public void set(T object, Integer value) {
+            setValue(object, value);
+        }
     }
 
 }

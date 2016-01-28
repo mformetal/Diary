@@ -7,13 +7,9 @@ import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewStub;
@@ -23,18 +19,16 @@ import butterknife.Bind;
 import butterknife.OnClick;
 import io.realm.RealmResults;
 import jp.wasabeef.recyclerview.animators.FadeInAnimator;
-import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 import miles.diary.R;
 import miles.diary.data.ActivitySubscriber;
 import miles.diary.data.RealmUtils;
 import miles.diary.data.adapter.EntryAdapter;
 import miles.diary.data.model.Entry;
 import miles.diary.ui.GridSpacingDecoration;
-import miles.diary.ui.widget.TypefaceTextView;
 import miles.diary.util.Logg;
 import miles.diary.util.ViewUtils;
 
-public class HomeActivity extends BaseActivity implements View.OnClickListener {
+public class HomeActivity extends BaseActivity {
 
     @Bind(R.id.fab_loading) FloatingActionButton fab;
     @Bind(R.id.activity_home_recycler) RecyclerView recyclerView;
@@ -67,6 +61,14 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
         recyclerView.setAdapter(entryAdapter);
         recyclerView.addItemDecoration(new GridSpacingDecoration(20));
 
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), EntryActivity.class);
+                startActivityForResult(intent, RESULT_CODE_ENTRY);
+            }
+        });
+
         realmUtils.getEntries().subscribe(new ActivitySubscriber<RealmResults<Entry>>(this) {
                     @Override
                     public void onStart() {
@@ -86,12 +88,7 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
                                         if (event.getAction() == MotionEvent.ACTION_DOWN) {
                                             Intent intent = new Intent(v.getContext(),
                                                     EntryActivity.class);
-                                            intent.putExtra(EntryActivity.LEFT, Math.round(event.getX()));
-                                            intent.putExtra(EntryActivity.TOP, Math.round(event.getY()));
-
                                             startActivityForResult(intent, RESULT_CODE_ENTRY);
-
-                                            overridePendingTransition(0, 0);
                                         }
                                         return false;
                                     }
@@ -112,36 +109,6 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_home, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_home_search:
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt("fabVisibility", fab.getVisibility());
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        int visibility = savedInstanceState.getInt("fabVisibility");
-        if (visibility == View.GONE) {
-            fab.setVisibility(View.GONE);
-        }
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
         realmUtils.closeRealm();
@@ -156,7 +123,7 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
                     if (extra != null) {
                         String title = extra.getString(EntryActivity.RESULT_TITLE);
                         String body = extra.getString(EntryActivity.RESULT_BODY);
-                        Uri uri = extra.getParcelable(EntryActivity.RESULT_BYTES);
+                        Uri uri = extra.getParcelable(EntryActivity.RESULT_URI);
 
                         Entry entry = realmUtils.addEntry(title, body, uri);
                         if (emptyView != null) {
@@ -167,22 +134,5 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
                 }
                 break;
         }
-    }
-
-    @Override
-    @OnClick({R.id.fab_loading})
-    public void onClick(View v) {
-        int[] location = new int[2];
-        fab.getLocationOnScreen(location);
-
-        Intent intent = new Intent(this, EntryActivity.class);
-        intent.putExtra(EntryActivity.LEFT, location[0]);
-        intent.putExtra(EntryActivity.TOP, location[1]);
-        intent.putExtra(EntryActivity.WIDTH, fab.getWidth());
-        intent.putExtra(EntryActivity.HEIGHT, fab.getHeight());
-
-        startActivityForResult(intent, RESULT_CODE_ENTRY);
-
-        overridePendingTransition(0, 0);
     }
 }

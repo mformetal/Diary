@@ -19,16 +19,12 @@ import java.util.Locale;
  */
 public class PhotoFileUtils {
 
-    public static File createPhotoFile() throws IOException {
+    private PhotoFileUtils() {}
+
+    public static File createPhotoFile(Context context) {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES);
-        return File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
+        return new File(context.getFilesDir(), imageFileName);
     }
 
     public static Uri addFileToGallery(Context context, String filePath) {
@@ -41,20 +37,16 @@ public class PhotoFileUtils {
     }
 
     public static byte[] readBytes(InputStream inputStream) throws IOException {
-        // this dynamically extends to take the bytes you read
         ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
 
-        // this is storage overwritten on each iteration with bytes
         int bufferSize = 1024;
         byte[] buffer = new byte[bufferSize];
 
-        // we need to know how may bytes were read to write them to the byteBuffer
         int len = 0;
         while ((len = inputStream.read(buffer)) != -1) {
             byteBuffer.write(buffer, 0, len);
         }
 
-        // and then we can return your byte array.
         return byteBuffer.toByteArray();
     }
 }

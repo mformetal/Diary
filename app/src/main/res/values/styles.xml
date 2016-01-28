@@ -11,18 +11,6 @@
         <item name="icon">@color/icons</item>
     </style>
 
-    <style name="AppTheme.Authenticate" parent="AppTheme" >
-        <item name="android:windowBackground">@android:color/black</item>
-    </style>
-
-    <style name="AppTheme.Post" >
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:divider">@null</item>
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowCloseOnTouchOutside">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-    </style>
-
     <style name="AppTheme.Widget" parent="android:Widget" />
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
@@ -36,6 +24,13 @@
         <item name="android:layout_gravity">start|center_vertical</item>
         <item name="android:textColor">@color/primary_text</item>
         <item name="android:layout_margin">20dp</item>
+    </style>
+
+    <style name="AppTheme.EntryToolbar" >
+        <item name="android:background">@android:color/transparent</item>
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="colorControlNormal">@color/primary</item>
+        <item name="android:textColorPrimary">@color/primary</item>
     </style>
 
     <style name="Forum.Dialog.Button" parent="Forum.Widget.Button.Borderless" >

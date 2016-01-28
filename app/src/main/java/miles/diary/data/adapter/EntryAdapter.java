@@ -1,6 +1,7 @@
 package miles.diary.data.adapter;
 
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -21,6 +22,7 @@ import miles.diary.data.RealmUtils;
 import miles.diary.data.model.Entry;
 import miles.diary.ui.activity.HomeActivity;
 import miles.diary.ui.widget.TypefaceTextView;
+import miles.diary.util.ColorUtils;
 
 /**
  * Created by mbpeele on 1/14/16.
@@ -44,12 +46,11 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.EntryViewHol
     }
 
     @Override
-    public void onBindViewHolder(EntryViewHolder holder, int position) {
+    public void onBindViewHolder(final EntryViewHolder holder, int position) {
         final Entry entry = getItem(position);
 
         holder.time.setText(RealmUtils.formatDateString(entry));
         holder.title.setText(entry.getTitle());
-        holder.location.setText("Washington, D.C.");
 
         Glide.with(activity)
                 .fromBytes()
@@ -64,10 +65,16 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.EntryViewHol
 
                     @Override
                     public boolean onResourceReady(Bitmap resource, byte[] model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                        Palette.from(resource).generate(new Palette.PaletteAsyncListener() {
+                        Palette.from(resource)
+                                .clearFilters()
+                                .generate(new Palette.PaletteAsyncListener() {
                             @Override
                             public void onGenerated(Palette palette) {
-
+                                Palette.Swatch swatch = ColorUtils.mostPopulous(palette);
+                                if (swatch != null) {
+                                    holder.time.setTextColor(swatch.getTitleTextColor());
+                                    holder.title.setTextColor(swatch.getTitleTextColor());
+                                }
                             }
                         });
                         return false;
@@ -108,7 +115,6 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.EntryViewHol
         @Bind(R.id.adapter_entry_image) ImageView imageView;
         @Bind(R.id.adapter_entry_time) TypefaceTextView time;
         @Bind(R.id.adapter_entry_title) TypefaceTextView title;
-        @Bind(R.id.adapter_entry_location) TypefaceTextView location;
 
         public EntryViewHolder(View itemView) {
             super(itemView);

@@ -2,19 +2,20 @@
     <string name="app_name">Diary</string>
     <string name="activity_entry_name">New Diary Entry</string>
     <string name="realm_name">Realm</string>
-    <string name="activity_post_title">New Diary Entry</string>
+    <string name="activity_map_name">Diary Entry Location</string>
 
     <string name="search_widget">Search</string>
 
     <string name="activity_home_saved_post_snackbar">Saved your Post!</string>
 
-    <string name="fragment_camera_no_title_error">Your Entry must have a title and a body</string>
-    <string name="fragment_camera_no_body_error">Your Entry must have a photo</string>
-    <string name="fragment_camera_title_hint">Entry Title</string>
-    <string name="fragment_camera_body_hint">Memorialize your thoughts</string>
-    <string name="fragment_camera_permission">This sample needs camera permission.</string>
-    <string name="fragment_camera_error">This device doesn\'t support Camera.</string>
-    <string name="fragment_camera_glitch">Your camera broke bruh.</string>
+    <string name="activity_entry_no_title_error">Your Entry must have a title and a body</string>
+    <string name="activity_entry_no_body_error">Your Entry must have a photo</string>
+    <string name="activity_entry_title_hint">Entry Title</string>
+    <string name="activity_entry_body_hint">Memorialize your thoughts</string>
+    <string name="activity_entry_no_camera_error">This device doesn\'t support Camera.</string>
+    <string name="activity_entry_image_chooser_gallery">Photo</string>
+    <string name="activity_entry_image_chooser_camera">Camera</string>
+    <string name="activity_entry_image_chooser_video">Video</string>
 
     <string name="dialog_default_button">OK</string>
 

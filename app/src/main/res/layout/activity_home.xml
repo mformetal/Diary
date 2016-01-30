@@ -1,33 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_home_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/half_opacity_gray"
     tools:context="miles.diary.ui.activity.HomeActivity" >
 
-    <android.support.design.widget.AppBarLayout
+    <Toolbar
+        android:id="@+id/activity_home_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/activity_home_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:minHeight="?android:attr/actionBarSize"
-                app:layout_collapseMode="pin" />
-
-    </android.support.design.widget.AppBarLayout>
+        android:layout_height="?android:attr/actionBarSize"
+        style="@style/AppTheme.Widget.HomeToolbar" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/activity_home_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        android:layout_marginTop="?android:attr/actionBarSize" />
 
     <ViewStub
         android:id="@+id/activity_home_no_entries"
@@ -40,14 +31,4 @@
         app:layout_anchor="@id/activity_home_root"
         app:layout_anchorGravity="center" />
 
-    <include
-        layout="@layout/loading_fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="8dp"
-        app:layout_behavior="miles.forum.ui.ScalingFabBehavior"
-        app:layout_anchor="@id/activity_home_root"
-        app:layout_anchorGravity="bottom|end" />
-
-</android.support.design.widget.CoordinatorLayout>
+</FrameLayout>

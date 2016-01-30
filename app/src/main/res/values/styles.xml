@@ -11,36 +11,30 @@
         <item name="icon">@color/icons</item>
     </style>
 
+    <style name="AppTheme.Home" >
+    </style>
+
     <style name="AppTheme.Widget" parent="android:Widget" />
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" >
+    </style>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="AppTheme.Dialog" parent="@style/Theme.AppCompat.Light.Dialog" />
 
-    <style name="Forum.Dialog.Title" parent="AppTheme.Widget" >
-        <item name="android:textSize">25sp</item>
-        <item name="android:layout_gravity">start|center_vertical</item>
-        <item name="android:textColor">@color/primary_text</item>
-        <item name="android:layout_margin">20dp</item>
+    <style name="AppTheme.Widget.HomeToolbar" >
+        <item name="android:background">@color/primary</item>
+        <item name="android:theme">@android:style/ThemeOverlay.Material.Dark</item>
+        <item name="android:elevation">6dp</item>
     </style>
 
-    <style name="AppTheme.EntryToolbar" >
-        <item name="android:background">@android:color/transparent</item>
-        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
-        <item name="colorControlNormal">@color/primary</item>
-        <item name="android:textColorPrimary">@color/primary</item>
-    </style>
-
-    <style name="Forum.Dialog.Button" parent="Forum.Widget.Button.Borderless" >
-        <item name="android:text">@string/dialog_default_button</item>
-        <item name="colorButtonNormal">@color/icons</item>
-        <item name="colorAccent">@color/primary_dark</item>
-    </style>
-
-    <style name="Forum.Widget.Button.Borderless" parent="Widget.AppCompat.Button.Borderless" >
-        <item name="android:textColor">@color/primary_text</item>
+    <style name="AppTheme.DialogActivity" >
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
 </resources>

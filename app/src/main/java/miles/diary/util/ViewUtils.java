@@ -8,6 +8,7 @@ import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.Property;
+import android.util.TypedValue;
 import android.view.View;
 
 /**
@@ -16,6 +17,8 @@ import android.view.View;
 public class ViewUtils {
 
     private static final Rect RECT = new Rect();
+
+    private static int actionBarSize = -1;
 
     private ViewUtils() {}
 
@@ -53,6 +56,16 @@ public class ViewUtils {
             }
         });
         return alpha;
+    }
+
+    public static int getActionBarSize(Context context) {
+        if (actionBarSize < 0) {
+            TypedValue value = new TypedValue();
+            context.getTheme().resolveAttribute(android.R.attr.actionBarSize, value, true);
+            actionBarSize = TypedValue.complexToDimensionPixelSize(value.data, context
+                    .getResources().getDisplayMetrics());
+        }
+        return actionBarSize;
     }
 
     public static float displayHeight(Context context) {

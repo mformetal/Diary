@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <miles.diary.ui.widget.TypefaceTextView
+        android:id="@+id/dialog_from_gallery"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/activity_entry_image_chooser_gallery"
+        android:textSize="@dimen/medium_text_size"
+        android:layout_margin="@dimen/full_width_text_field_horizontal_margin"
+        android:gravity="center"
+        android:drawableStart="@drawable/ic_photo_24dp_black" />
+
+    <miles.diary.ui.widget.TypefaceTextView
+        android:id="@+id/dialog_from_camera"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/activity_entry_image_chooser_camera"
+        android:textSize="@dimen/medium_text_size"
+        android:layout_margin="@dimen/full_width_text_field_horizontal_margin"
+        android:gravity="center"
+        android:drawableStart="@drawable/ic_camera_alt_24dp_black" />
+
+    <miles.diary.ui.widget.TypefaceTextView
+        android:id="@+id/dialog_from_video"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/activity_entry_image_chooser_camera"
+        android:textSize="@dimen/medium_text_size"
+        android:layout_margin="@dimen/full_width_text_field_horizontal_margin"
+        android:gravity="center"
+        android:drawableStart="@drawable/ic_voice_chat_24dp" />
+
+</LinearLayout>

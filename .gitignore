@@ -41,3 +41,4 @@ build/
 fabric.properties
 gradle.properties
 captures/
+keys.xml

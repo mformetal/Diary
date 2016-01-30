@@ -1,22 +1,20 @@
 package miles.diary.ui.activity;
 
 import android.content.Intent;
-import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewStub;
-import android.widget.ProgressBar;
+import android.widget.FrameLayout;
+import android.widget.Toolbar;
 
 import butterknife.Bind;
-import butterknife.OnClick;
 import io.realm.RealmResults;
 import jp.wasabeef.recyclerview.animators.FadeInAnimator;
 import miles.diary.R;
@@ -24,16 +22,13 @@ import miles.diary.data.ActivitySubscriber;
 import miles.diary.data.RealmUtils;
 import miles.diary.data.adapter.EntryAdapter;
 import miles.diary.data.model.Entry;
-import miles.diary.ui.GridSpacingDecoration;
+import miles.diary.ui.SpacingDecoration;
 import miles.diary.util.Logg;
-import miles.diary.util.ViewUtils;
 
 public class HomeActivity extends BaseActivity {
 
-    @Bind(R.id.fab_loading) FloatingActionButton fab;
     @Bind(R.id.activity_home_recycler) RecyclerView recyclerView;
-    @Bind(R.id.activity_home_root) CoordinatorLayout coordinatorLayout;
-    @Bind(R.id.fab_loading_bar) ProgressBar fabProgressBar;
+    @Bind(R.id.activity_home_root) FrameLayout coordinatorLayout;
     @Bind(R.id.activity_home_toolbar) Toolbar toolbar;
     private View emptyView;
 
@@ -47,39 +42,30 @@ public class HomeActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(miles.diary.R.layout.activity_home);
 
-        setSupportActionBar(toolbar);
+        setActionBar(toolbar);
 
         realmUtils = new RealmUtils(this);
 
-        fabProgressBar.getIndeterminateDrawable().setColorFilter(
-                ContextCompat.getColor(this, R.color.icons), PorterDuff.Mode.SRC_ATOP);
-
         entryAdapter = new EntryAdapter(this);
         recyclerView.setItemAnimator(new FadeInAnimator());
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 2,
+                GridLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(entryAdapter);
-        recyclerView.addItemDecoration(new GridSpacingDecoration(20));
+        recyclerView.addItemDecoration(new SpacingDecoration(
+                getResources().getDimensionPixelSize(R.dimen.adapter_entry_spacing),
+                ContextCompat.getColor(this, R.color.accent)));
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), EntryActivity.class);
-                startActivityForResult(intent, RESULT_CODE_ENTRY);
-            }
-        });
-
-        realmUtils.getEntries().subscribe(new ActivitySubscriber<RealmResults<Entry>>(this) {
+        realmUtils.getEntries()
+                .subscribe(new ActivitySubscriber<RealmResults<Entry>>(this) {
                     @Override
                     public void onStart() {
                         entryAdapter.clear();
-                        ViewUtils.visible(fabProgressBar, 350).start();
                     }
 
                     @Override
                     public void onNext(RealmResults<Entry> entries) {
                         if (entries.isLoaded()) {
-                            ViewUtils.invisible(fabProgressBar, 350).start();
                             if (entries.isEmpty()) {
                                 emptyView = ((ViewStub) findViewById(R.id.activity_home_no_entries)).inflate();
                                 emptyView.setOnTouchListener(new View.OnTouchListener() {
@@ -134,5 +120,22 @@ public class HomeActivity extends BaseActivity {
                 }
                 break;
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_home, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_new_entry:
+                Intent intent = new Intent(this, EntryActivity.class);
+                startActivityForResult(intent, RESULT_CODE_ENTRY);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

@@ -44,7 +44,7 @@ public class TakePictureButton extends View {
 
     private void init() {
         paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_text_format_24dp);
+        drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_done_24dp);
     }
 
     @Override

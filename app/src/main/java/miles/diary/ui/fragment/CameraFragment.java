@@ -4,6 +4,7 @@ import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -31,7 +32,6 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -81,7 +81,6 @@ public class CameraFragment extends Fragment
     @Bind(R.id.fragment_camera_take_picture) TakePictureButton takePictureButton;
     @Bind(R.id.fragment_camera_navigation) ImageView navigation;
     @Bind(R.id.fragment_camera_rotation) ImageView orientation;
-    @Bind(R.id.fragment_camera_proceeed) ImageView proceed;
     @Bind(R.id.fragment_camera_text_layout) LinearLayout textLayout;
     @Bind(R.id.fragment_camera_title_input) TypefaceEditText title;
     @Bind(R.id.fragment_camera_body_input) TypefaceEditText body;
@@ -223,7 +222,7 @@ public class CameraFragment extends Fragment
                                            @NonNull int[] grantResults) {
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
             if (grantResults.length != 1 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                ErrorDialog.newInstance(getString(R.string.fragment_camera_permission))
+                ErrorDialog.newInstance("permissions")
                         .show(getChildFragmentManager(), FRAGMENT_DIALOG);
             }
         } else {
@@ -233,12 +232,31 @@ public class CameraFragment extends Fragment
 
     @Override
     @OnClick({R.id.fragment_camera_navigation, R.id.fragment_camera_take_picture,
-        R.id.fragment_camera_rotation, R.id.fragment_camera_proceeed})
+        R.id.fragment_camera_rotation})
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fragment_camera_take_picture:
                 if (mState == STATE_PREVIEW) {
                     takePicture();
+                } else {
+                    Activity activity = getActivity();
+                    String titleString = title.getTextAsString();
+                    String bodyString = body.getTextAsString();
+                    if (titleString.isEmpty()) {
+                        Toast.makeText(activity, getString(R.string.activity_entry_no_title_error),
+                                Toast.LENGTH_SHORT).show();
+                    } else if (bodyString.isEmpty()) {
+                        Toast.makeText(activity, getString(R.string.activity_entry_no_body_error),
+                                Toast.LENGTH_SHORT).show();
+                    } else {
+                        Intent result = new Intent();
+                        result.putExtra(EntryActivity.RESULT_TITLE, titleString);
+                        result.putExtra(EntryActivity.RESULT_BODY, bodyString);
+                        result.putExtra(EntryActivity.RESULT_URI,
+                                PhotoFileUtils.addFileToGallery(getActivity(), mFile.getAbsolutePath()));
+                        activity.setResult(Activity.RESULT_OK, result);
+                        activity.finish();
+                    }
                 }
                 break;
             case R.id.fragment_camera_navigation:
@@ -252,26 +270,6 @@ public class CameraFragment extends Fragment
                 }
                 break;
             case R.id.fragment_camera_rotation:
-                break;
-            case R.id.fragment_camera_proceeed:
-                Activity activity = getActivity();
-                String titleString = title.getTextAsString();
-                String bodyString = body.getTextAsString();
-                if (titleString.isEmpty()) {
-                    Toast.makeText(activity, getString(R.string.fragment_camera_no_title_error),
-                            Toast.LENGTH_SHORT).show();
-                } else if (bodyString.isEmpty()) {
-                    Toast.makeText(activity, getString(R.string.fragment_camera_no_body_error),
-                            Toast.LENGTH_SHORT).show();
-                } else {
-                    Intent result = new Intent();
-                    result.putExtra(EntryActivity.RESULT_TITLE, titleString);
-                    result.putExtra(EntryActivity.RESULT_BODY, bodyString);
-                    result.putExtra(EntryActivity.RESULT_URI,
-                            PhotoFileUtils.addFileToGallery(getActivity(), mFile.getAbsolutePath()));
-                    activity.setResult(Activity.RESULT_OK, result);
-                    activity.finish();
-                }
                 break;
         }
     }
@@ -642,10 +640,13 @@ public class CameraFragment extends Fragment
         navigation.setImageDrawable(arrowToCancel);
         arrowToCancel.start();
 
+        ObjectAnimator pos = ObjectAnimator.ofFloat(takePictureButton, View.TRANSLATION_X,
+                textureView.getWidth() - takePictureButton.getX() - takePictureButton.getWidth());
+        pos.setDuration(350);
+
         AnimatorSet animatorSet = new AnimatorSet();
-        animatorSet.playTogether(takePictureButton.showTextDrawable(),
-                ViewUtils.gone(orientation, 350), ViewUtils.visible(textLayout, 350),
-                ViewUtils.visible(proceed, 350));
+        animatorSet.playTogether(takePictureButton.showTextDrawable(), pos,
+                ViewUtils.gone(orientation, 350), ViewUtils.visible(textLayout, 350));
         animatorSet.start();
     }
 
@@ -655,8 +656,11 @@ public class CameraFragment extends Fragment
         navigation.setImageDrawable(arrowToCancel);
         arrowToCancel.start();
 
+        ObjectAnimator pos = ObjectAnimator.ofFloat(takePictureButton, View.TRANSLATION_X, 0);
+        pos.setDuration(350);
+
         AnimatorSet animatorSet = new AnimatorSet();
-        animatorSet.playTogether(ViewUtils.visible(orientation, 350), ViewUtils.gone(proceed, 350),
+        animatorSet.playTogether(ViewUtils.visible(orientation, 350), pos,
                 takePictureButton.hideTextDrawable(), ViewUtils.gone(textLayout, 350));
         animatorSet.addListener(new AnimatorListenerAdapter() {
             @Override
@@ -742,7 +746,7 @@ public class CameraFragment extends Fragment
             mCameraOpenCloseLock.release();
             cameraDevice.close();
             mCameraDevice = null;
-            ErrorDialog.newInstance(getString(R.string.fragment_camera_glitch))
+            ErrorDialog.newInstance("camera error")
                     .show(getChildFragmentManager(), FRAGMENT_DIALOG);
         }
     };

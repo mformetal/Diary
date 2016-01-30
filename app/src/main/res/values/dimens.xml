@@ -7,7 +7,11 @@
 
     <dimen name="full_width_text_field_horizontal_margin">20dp</dimen>
 
+    <dimen name="adapter_entry_elevation">4dp</dimen>
     <dimen name="adapter_entry_margin">7dp</dimen>
+    <dimen name="adapter_entry_spacing">10dp</dimen>
+    <dimen name="adapter_title_text_size">15sp</dimen>
+    <dimen name="adapter_time_text_size">12sp</dimen>
 
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="text_margin">16dp</dimen>
@@ -20,11 +24,11 @@
 
     <dimen name="recycler_margin">10dp</dimen>
 
-    <dimen name="drawn_icon_text_size">15sp</dimen>
+    <dimen name="medium_text_size">15sp</dimen>
     <dimen name="large_text_size">20sp</dimen>
     <dimen name="subtitle_text_size">17sp</dimen>
     <dimen name="logo_text_size">40sp</dimen>
 
-    <item name="four_by_three_aspect_ratio" type="dimen" format="float">1.7777788888</item>
+    <item name="four_by_three" type="dimen" format="float">1.7777788888</item>
 
 </resources>

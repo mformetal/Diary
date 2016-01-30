@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-feature android:name="android.hardware.camera" android:required="true" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
@@ -18,7 +20,8 @@
 
         <activity
             android:name="miles.diary.ui.activity.HomeActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.Home" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -32,16 +35,24 @@
             android:windowSoftInputMode="stateHidden|adjustPan" >
         </activity>
 
-        <meta-data
-            android:name="com.parse.APPLICATION_ID"
-            android:value="@string/parse_application_id" />
-        <meta-data
-            android:name="com.parse.CLIENT_KEY"
-            android:value="@string/parse_client_key" />
+        <activity
+            android:name=".ui.activity.ImageChooserActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/activity_entry_name"
+            android:windowSoftInputMode="stateHidden|adjustPan"
+            android:theme="@style/AppTheme.DialogActivity" >
+        </activity>
 
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="0868d9b0c625e6e7444fd594124826702c89255d" />
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_api_key" />
     </application>
 
 

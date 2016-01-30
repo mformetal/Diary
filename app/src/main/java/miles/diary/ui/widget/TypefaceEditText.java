@@ -6,6 +6,7 @@ import android.support.v7.widget.AppCompatEditText;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 
 import miles.diary.R;
 import miles.diary.util.TextUtils;
@@ -13,7 +14,7 @@ import miles.diary.util.TextUtils;
 /**
  * Created by mbpeele on 1/14/16.
  */
-public class TypefaceEditText extends AppCompatEditText {
+public class TypefaceEditText extends EditText {
 
     public TypefaceEditText(Context context) {
         super(context);

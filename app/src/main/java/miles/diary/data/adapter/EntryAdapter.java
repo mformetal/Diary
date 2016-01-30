@@ -23,6 +23,7 @@ import miles.diary.data.model.Entry;
 import miles.diary.ui.activity.HomeActivity;
 import miles.diary.ui.widget.TypefaceTextView;
 import miles.diary.util.ColorUtils;
+import miles.diary.util.Logg;
 
 /**
  * Created by mbpeele on 1/14/16.
@@ -49,37 +50,12 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.EntryViewHol
     public void onBindViewHolder(final EntryViewHolder holder, int position) {
         final Entry entry = getItem(position);
 
-        holder.time.setText(RealmUtils.formatDateString(entry));
         holder.title.setText(entry.getTitle());
+        holder.time.setText(RealmUtils.formatDateString(entry));
 
         Glide.with(activity)
-                .fromBytes()
-                .asBitmap()
                 .load(entry.getBytes())
                 .animate(android.R.anim.fade_in)
-                .listener(new RequestListener<byte[], Bitmap>() {
-                    @Override
-                    public boolean onException(Exception e, byte[] model, Target<Bitmap> target, boolean isFirstResource) {
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onResourceReady(Bitmap resource, byte[] model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                        Palette.from(resource)
-                                .clearFilters()
-                                .generate(new Palette.PaletteAsyncListener() {
-                            @Override
-                            public void onGenerated(Palette palette) {
-                                Palette.Swatch swatch = ColorUtils.mostPopulous(palette);
-                                if (swatch != null) {
-                                    holder.time.setTextColor(swatch.getTitleTextColor());
-                                    holder.title.setTextColor(swatch.getTitleTextColor());
-                                }
-                            }
-                        });
-                        return false;
-                    }
-                })
                 .into(holder.imageView);
     }
 
@@ -113,8 +89,8 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.EntryViewHol
     final class EntryViewHolder extends RecyclerView.ViewHolder {
 
         @Bind(R.id.adapter_entry_image) ImageView imageView;
-        @Bind(R.id.adapter_entry_time) TypefaceTextView time;
         @Bind(R.id.adapter_entry_title) TypefaceTextView title;
+        @Bind(R.id.adapter_entry_time) TypefaceTextView time;
 
         public EntryViewHolder(View itemView) {
             super(itemView);

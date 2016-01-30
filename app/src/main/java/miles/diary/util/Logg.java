@@ -107,6 +107,14 @@ public class Logg {
         mainLog(string);
     }
 
+    public static void log(CharSequence... charSequences) {
+        for (CharSequence charSequence: charSequences) {
+            builder.append(charSequence.toString());
+            builder.append(", ");
+        }
+        mainLog(builder.toString());
+    }
+
     public static void log(String string, Throwable throwable) {
         mainLog(string + throwable.getLocalizedMessage());
     }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -51,6 +51,8 @@
         layout="@layout/activity_entry_fab_menu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end" />
+        app:layout_anchor="@id/activity_entry_root"
+        app:layout_anchorGravity="bottom|end"
+        app:layout_behavior="miles.diary.ui.SnackbarBehavior" />
 
-</FrameLayout>
+</android.support.design.widget.CoordinatorLayout>

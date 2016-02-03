@@ -1,18 +1,15 @@
 package miles.diary.ui.activity;
 
 import android.Manifest;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
@@ -27,14 +24,11 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
 
-import java.io.File;
-
 import butterknife.Bind;
 import butterknife.OnClick;
 import miles.diary.R;
 import miles.diary.ui.widget.EntryFabMenu;
 import miles.diary.util.Logg;
-import miles.diary.util.PhotoFileUtils;
 
 /**
  * Created by mbpeele on 1/16/16.
@@ -42,6 +36,7 @@ import miles.diary.util.PhotoFileUtils;
 public class EntryActivity extends BaseActivity implements View.OnClickListener,
         GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
 
+    @Bind(R.id.activity_entry_root) CoordinatorLayout root;
     @Bind(R.id.activity_entry_toolbar) Toolbar toolbar;
     @Bind(R.id.activity_entry_fab_menu) EntryFabMenu menu;
 
@@ -52,6 +47,7 @@ public class EntryActivity extends BaseActivity implements View.OnClickListener,
     private final static int REQUEST_LOCATION_PERMISSION = 2;
     private final static int REQUEST_PLACE_PICKER = 3;
     private final static int REQUEST_IMAGE = 4;
+    private final static int REQUEST_RESOLVE_ERROR = 5;
 
     private GoogleApiClient mGoogleApiClient;
     private Location mLocation;
@@ -77,11 +73,13 @@ public class EntryActivity extends BaseActivity implements View.OnClickListener,
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case REQUEST_CAMERA_PERMISSION:
-                if (grantResults.length == 1 || grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (permissionsGranted(grantResults, 2)) {
+                    startImageChooserActivity();
                 }
                 break;
             case REQUEST_LOCATION_PERMISSION:
-                if (grantResults.length == 1 || grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (permissionsGranted(grantResults, 1)) {
+                    startPlaceChooserActivity();
                 }
                 break;
             default:
@@ -108,7 +106,15 @@ public class EntryActivity extends BaseActivity implements View.OnClickListener,
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
+        if (connectionResult.hasResolution()) {
+            try {
+                connectionResult.startResolutionForResult(this, REQUEST_RESOLVE_ERROR);
+            } catch (IntentSender.SendIntentException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Logg.log("CONNECTION FAILED WITH CODE: " + connectionResult.getErrorCode());
+        }
     }
 
     @Override
@@ -130,22 +136,27 @@ public class EntryActivity extends BaseActivity implements View.OnClickListener,
     @OnClick({R.id.activity_entry_photo, R.id.activity_entry_location, R.id.activity_entry_weather,
         R.id.activity_entry_hashtag})
     public void onClick(View v) {
-        String perm;
         switch (v.getId()) {
             case R.id.activity_entry_photo:
-                perm = Manifest.permission.CAMERA;
-                if (ContextCompat.checkSelfPermission(this, perm) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(this, new String[]{perm}, REQUEST_CAMERA_PERMISSION);
+                if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
+                    String[] camera = new String[] {Manifest.permission.CAMERA,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE};
+                    if (!hasPermissions(camera)) {
+                        ActivityCompat.requestPermissions(this, camera, REQUEST_CAMERA_PERMISSION);
+                    } else {
+                        startImageChooserActivity();
+                    }
                 } else {
-                    startImageChooserActivity();
+                    Snackbar.make(root, R.string.activity_entry_no_camera_error,
+                            Snackbar.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.activity_entry_location:
-                perm = Manifest.permission.ACCESS_COARSE_LOCATION;
-                if (ContextCompat.checkSelfPermission(this, perm) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(this, new String[]{perm}, REQUEST_LOCATION_PERMISSION);
+                String[] location = new String[] {Manifest.permission.ACCESS_COARSE_LOCATION};
+                if (!hasPermissions(location)) {
+                    ActivityCompat.requestPermissions(this, location, REQUEST_LOCATION_PERMISSION);
                 } else {
-                    startMapActivity();
+                    startPlaceChooserActivity();
                 }
                 break;
             case R.id.activity_entry_weather:
@@ -155,7 +166,7 @@ public class EntryActivity extends BaseActivity implements View.OnClickListener,
         }
     }
 
-    private void startMapActivity() {
+    private void startPlaceChooserActivity() {
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
 
         try {
@@ -166,6 +177,10 @@ public class EntryActivity extends BaseActivity implements View.OnClickListener,
     }
 
     private void startImageChooserActivity() {
-        startActivityForResult(new Intent(this, ImageChooserActivity.class), REQUEST_IMAGE);
+        Intent intent = new Intent(this, UriActivity.class);
+        intent.setData(mImageUri);
+        startActivityForResult(intent, REQUEST_IMAGE);
+
+        overridePendingTransition(0, 0);
     }
 }

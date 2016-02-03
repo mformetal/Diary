@@ -1,9 +1,11 @@
 package miles.diary.util;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
+import android.webkit.MimeTypeMap;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -17,14 +19,23 @@ import java.util.Locale;
 /**
  * Created by mbpeele on 1/20/16.
  */
-public class PhotoFileUtils {
+public class FileUtils {
 
-    private PhotoFileUtils() {}
+    public final static String MIME_IMAGE = "image/jpeg";
+    public final static String MIME_VIDEO = "video/mp4";
 
-    public static File createPhotoFile(Context context) {
+    private FileUtils() {}
+
+    public static File createPhotoFile() throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
-        return new File(context.getFilesDir(), imageFileName);
+        File storageDir = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES);
+        return File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
     }
 
     public static Uri addFileToGallery(Context context, String filePath) {
@@ -48,5 +59,21 @@ public class PhotoFileUtils {
         }
 
         return byteBuffer.toByteArray();
+    }
+
+    public static boolean isImageUri(Context context, Uri uri) {
+        ContentResolver contentResolver = context.getContentResolver();
+        String contentResolverType = contentResolver.getType(uri);
+        if (contentResolverType != null) {
+            return contentResolverType.equals(MIME_IMAGE);
+        } else {
+            String extension = MimeTypeMap.getFileExtensionFromUrl(uri.toString());
+            if (extension != null) {
+                String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+                return type.equals(MIME_IMAGE);
+            }
+        }
+
+        return false;
     }
 }

@@ -4,7 +4,6 @@ package miles.diary.data;
 import android.content.Context;
 import android.net.Uri;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -16,7 +15,7 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import miles.diary.data.model.Entry;
 import miles.diary.util.Logg;
-import miles.diary.util.PhotoFileUtils;
+import miles.diary.util.FileUtils;
 import rx.Observable;
 
 public class RealmUtils {
@@ -41,7 +40,7 @@ public class RealmUtils {
         if (uri != null) {
             try {
                 InputStream inputStream = context.getContentResolver().openInputStream(uri);
-                byte[] bytes = PhotoFileUtils.readBytes(inputStream);
+                byte[] bytes = FileUtils.readBytes(inputStream);
                 entry.setBytes(bytes);
             } catch (IOException e) {
                 Logg.log(e);

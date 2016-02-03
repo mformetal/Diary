@@ -70,4 +70,18 @@ public class BaseActivity extends AppCompatActivity {
 
         return true;
     }
+
+    public boolean permissionsGranted(int[] results, int expectedLength) {
+        if (results == null || results.length != expectedLength) {
+            return false;
+        }
+
+        for (int result: results) {
+            if (result != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

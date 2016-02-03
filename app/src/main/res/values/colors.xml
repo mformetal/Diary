@@ -11,6 +11,4 @@
     <color name="divider">#B6B6B6</color>
     <color name="half_opacity_gray">#80888888</color>
     <color name="scrim">#99323232</color>
-    <color name="dark">#ff333333</color>
-    <color name="bars">#99000000</color>
 </resources>

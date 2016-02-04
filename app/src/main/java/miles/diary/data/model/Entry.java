@@ -12,10 +12,17 @@ import io.realm.annotations.Required;
 public class Entry extends RealmObject {
 
     @PrimaryKey private String id;
-    @Required private String title;
     @Required private String body;
     @Required private Date date;
-    @Required private byte[] bytes;
+    private String uriString;
+
+    public String getUriString() {
+        return uriString;
+    }
+
+    public void setUriString(String uriString) {
+        this.uriString = uriString;
+    }
 
     public String getId() {
         return id;
@@ -23,14 +30,6 @@ public class Entry extends RealmObject {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public String getBody() {
@@ -47,13 +46,5 @@ public class Entry extends RealmObject {
 
     public void setDate(Date date) {
         this.date = date;
-    }
-
-    public byte[] getBytes() {
-        return bytes;
-    }
-
-    public void setBytes(byte[] bytes) {
-        this.bytes = bytes;
     }
 }

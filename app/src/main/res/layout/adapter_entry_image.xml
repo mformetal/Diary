@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_gravity="bottom"
+    android:padding="@dimen/activity_horizontal_margin"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/adapter_entry_image_view"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="@dimen/adapter_entry_margin"
+        android:layout_marginBottom="@dimen/adapter_entry_margin"
+        android:layout_gravity="center_horizontal"
+        tools:text="MOUNTAIN BIKING" />
+
+    <miles.diary.ui.widget.TypefaceTextView
+        android:id="@+id/adapter_entry_image_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/adapter_time_text_size"
+        android:textColor="@color/time"
+        android:maxLines="1"
+        app:textViewAutoFit="true"
+        tools:text="MOUNTAIN BIKING" />
+
+    <miles.diary.ui.widget.TypefaceTextView
+        android:id="@+id/adapter_entry_image_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/adapter_entry_margin"
+        android:layout_marginBottom="@dimen/adapter_entry_margin"
+        android:textSize="@dimen/adapter_title_text_size"
+        android:textColor="@android:color/black"
+        android:maxLines="1"
+        tools:text="MOUNTAIN BIKING" />
+
+    <miles.diary.ui.widget.TypefaceTextView
+        android:id="@+id/adapter_entry_image_location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/adapter_entry_margin"
+        android:layout_marginBottom="@dimen/adapter_entry_margin"
+        android:textSize="@dimen/adapter_time_text_size"
+        android:textColor="@color/half_opacity_gray"
+        android:maxLines="1"
+        tools:text="MOUNTAIN BIKING" />
+
+</LinearLayout>

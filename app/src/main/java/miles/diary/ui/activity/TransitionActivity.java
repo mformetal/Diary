@@ -1,6 +1,12 @@
 package miles.diary.ui.activity;
 
+import android.animation.Animator;
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -15,11 +21,23 @@ public abstract class TransitionActivity extends BaseActivity {
 
     private View root;
     private boolean hasSavedInstanceState;
+    private Intent intent;
+    public ValueAnimator enterColor, exitColor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        hasSavedInstanceState = savedInstanceState == null;
+        hasSavedInstanceState = savedInstanceState != null;
+        intent = getIntent();
+
+        ValueAnimator.AnimatorUpdateListener updateListener = animation ->
+                getWindow().getDecorView().setBackgroundColor((int) animation.getAnimatedValue());
+        exitColor = ValueAnimator.ofObject(new ArgbEvaluator(),
+                ContextCompat.getColor(this, R.color.scrim), Color.TRANSPARENT);
+        exitColor.addUpdateListener(updateListener);
+        enterColor = ValueAnimator.ofObject(new ArgbEvaluator(),
+                Color.TRANSPARENT, ContextCompat.getColor(this, R.color.scrim));
+        enterColor.addUpdateListener(updateListener);
     }
 
     @Override
@@ -29,7 +47,7 @@ public abstract class TransitionActivity extends BaseActivity {
         new PreDrawer(root) {
             @Override
             public void notifyPreDraw() {
-                onEnter(root, hasSavedInstanceState);
+                onEnter(root, intent, hasSavedInstanceState);
             }
         };
     }
@@ -40,7 +58,7 @@ public abstract class TransitionActivity extends BaseActivity {
         new PreDrawer(view) {
             @Override
             public void notifyPreDraw() {
-                onEnter(root, hasSavedInstanceState);
+                onEnter(root, intent, hasSavedInstanceState);
             }
         };
     }
@@ -51,23 +69,27 @@ public abstract class TransitionActivity extends BaseActivity {
         new PreDrawer(view) {
             @Override
             public void notifyPreDraw() {
-                onEnter(root, hasSavedInstanceState);
+                onEnter(root, intent, hasSavedInstanceState);
             }
         };
     }
 
     @Override
     public void onBackPressed() {
-        onExit(root, hasSavedInstanceState);
+        onExit(root, intent, hasSavedInstanceState);
     }
 
-    @Override
-    public void finish() {
-        super.finish();
+    public void finishWithDefaultTransition() {
+        finishWithoutDefaultTransition();
+    }
+
+    public void finishWithoutDefaultTransition() {
+        finish();
         overridePendingTransition(0, 0);
     }
 
-    public abstract void onEnter(View root, boolean hasSavedInstanceState);
 
-    public abstract void onExit(View root, boolean hasSavedInstanceState);
+    public abstract void onEnter(View root, Intent calledIntent, boolean hasSavedInstanceState);
+
+    public abstract void onExit(View root, Intent calledIntent, boolean hasSavedInstanceState);
 }

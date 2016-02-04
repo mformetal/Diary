@@ -2,6 +2,7 @@ package miles.diary.data;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 
 import java.io.IOException;
@@ -20,72 +21,12 @@ import rx.Observable;
 
 public class RealmUtils {
 
-    private Realm realm;
-    private Observable<RealmResults<Entry>> entries;
-    private Context context;
+    private final static SimpleDateFormat dateFormatter
+            = new SimpleDateFormat("EEE, MMM d, ''yy", Locale.getDefault());
 
-    public RealmUtils(Context cxt) {
-        context = cxt;
-        realm = Realm.getDefaultInstance();
-        getEntries();
-    }
-
-    public Entry addEntry(String title, String body, Uri uri) {
-        realm.beginTransaction();
-        Entry entry = realm.createObject(Entry.class);
-        entry.setId(UUID.randomUUID().toString());
-        entry.setTitle(title);
-        entry.setBody(body);
-        entry.setDate(new Date());
-        if (uri != null) {
-            try {
-                InputStream inputStream = context.getContentResolver().openInputStream(uri);
-                byte[] bytes = FileUtils.readBytes(inputStream);
-                entry.setBytes(bytes);
-            } catch (IOException e) {
-                Logg.log(e);
-            }
-        }
-        realm.commitTransaction();
-        return entry;
-    }
-
-    public void deleteEntry(Entry entry) {
-        realm.beginTransaction();
-        entry.removeFromRealm();
-        realm.commitTransaction();
-    }
+    private RealmUtils() {}
 
     public static String formatDateString(Entry entry) {
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("EEE, MMM d, ''yy", Locale.getDefault());
         return dateFormatter.format(entry.getDate());
-    }
-
-    public Observable<RealmResults<Entry>> getEntries() {
-        if (entries == null) {
-            entries = realm.where(Entry.class)
-                    .findAllAsync()
-                    .asObservable()
-                    .cache();
-        }
-
-        return entries;
-    }
-
-    public Observable<RealmResults<Entry>> searchEntries(String text) {
-        return realm.where(Entry.class)
-                .beginGroup()
-                    .contains("title", text)
-                    .or()
-                    .contains("body", text)
-                    .or()
-                    .contains("date", text)
-                .endGroup()
-                .findAllAsync()
-                .asObservable();
-    }
-
-    public void closeRealm() {
-        realm.close();
     }
 }

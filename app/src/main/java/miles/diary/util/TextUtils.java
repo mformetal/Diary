@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Random;
 
 import miles.diary.R;
 
@@ -59,10 +60,12 @@ public final class TextUtils {
         return typeface;
     }
 
-    public static void editableTextView(TextView textView) {
-        textView.setCursorVisible(true);
-        textView.setFocusableInTouchMode(true);
-        textView.setInputType(InputType.TYPE_CLASS_TEXT);
-        textView.requestFocus(); //to trigger the soft input
+    public static String randomString(int len) {
+        final String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        Random rnd = new Random();
+        StringBuilder sb = new StringBuilder( len );
+        for( int i = 0; i < len; i++ )
+            sb.append( AB.charAt( rnd.nextInt(AB.length()) ) );
+        return sb.toString();
     }
 }

@@ -20,16 +20,17 @@ import rx.subscriptions.CompositeSubscription;
 /**
  * Created by mbpeele on 1/14/16.
  */
-public class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity {
 
     private CompositeSubscription compositeSubscription;
+    protected Realm realm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        compositeSubscription = new CompositeSubscription();
-
         ((DiaryApplication) getApplication()).getComponent().inject(this);
+        compositeSubscription = new CompositeSubscription();
+        realm = Realm.getDefaultInstance();
     }
 
     @Override
@@ -41,6 +42,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        realm.close();
         ButterKnife.unbind(this);
         compositeSubscription.unsubscribe();
     }

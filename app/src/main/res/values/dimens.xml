@@ -2,6 +2,8 @@
     <dimen name="activity_vertical_margin">20dp</dimen>
     <dimen name="activity_horizontal_margin">20dp</dimen>
 
+    <dimen name="action_bar_margin">68dp</dimen>
+
     <dimen name="camera_button_dimens">36dp</dimen>
     <dimen name="camera_picture_dimens">125dp</dimen>
 
@@ -23,12 +25,12 @@
     <dimen name="dialog_min_width">300dp</dimen>
 
     <dimen name="recycler_margin">10dp</dimen>
+    <dimen name="recycler_divider_height">1dp</dimen>
 
     <dimen name="medium_text_size">15sp</dimen>
     <dimen name="large_text_size">20sp</dimen>
     <dimen name="subtitle_text_size">17sp</dimen>
     <dimen name="logo_text_size">40sp</dimen>
-
-    <item name="four_by_three" type="dimen" format="float">1.7777788888</item>
+    
 
 </resources>

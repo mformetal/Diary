@@ -19,22 +19,23 @@ public class ActivitySubscriber<T> extends Subscriber<T> {
 
     @Override
     public void onCompleted() {
-        BaseActivity activity = softReference.get();
-        if (activity != null) {
-            activity.removeSubscription(this);
-        }
+        removeSelf();
     }
 
     @Override
     public void onError(Throwable e) {
-        BaseActivity activity = softReference.get();
-        if (activity != null) {
-            activity.removeSubscription(this);
-        }
+        removeSelf();
     }
 
     @Override
     public void onNext(T t) {
 
+    }
+
+    private void removeSelf() {
+        BaseActivity activity = softReference.get();
+        if (activity != null) {
+            activity.removeSubscription(this);
+        }
     }
 }

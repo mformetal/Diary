@@ -11,7 +11,8 @@
         android:id="@+id/activity_uri_image_view"
         android:layout_gravity="center"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
 
     <VideoView
         android:id="@+id/activity_uri_video_view"

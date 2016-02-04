@@ -3,30 +3,23 @@ package miles.diary.ui.activity;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
-import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
-import android.animation.ValueAnimator;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.animation.AccelerateInterpolator;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.ViewPropertyAnimation;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +27,6 @@ import java.io.IOException;
 import butterknife.Bind;
 import butterknife.OnClick;
 import miles.diary.R;
-import miles.diary.ui.PreDrawer;
 import miles.diary.ui.widget.TypefaceButton;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.IntentUtils;
@@ -49,6 +41,7 @@ public class UriActivity extends TransitionActivity implements View.OnClickListe
     private final static int REQUEST_GALLERY = 4;
     private final static int REQUEST_CAMERA = 5;
     private final static int REQUEST_VIDEO = 6;
+    private final static int START_DELAY = 100;
 
     @Bind(R.id.activity_uri_image_view) ImageView imageView;
     @Bind(R.id.activity_uri_video_view) VideoView videoView;
@@ -59,6 +52,8 @@ public class UriActivity extends TransitionActivity implements View.OnClickListe
 
     private File mFile;
     private Uri uri;
+
+    private float originX, originY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,73 +73,82 @@ public class UriActivity extends TransitionActivity implements View.OnClickListe
     }
 
     @Override
-    public void onEnter(View root, boolean hasSavedInstanceState) {
-        ValueAnimator color = ValueAnimator.ofObject(new ArgbEvaluator(),
-                Color.TRANSPARENT, ContextCompat.getColor(this, R.color.scrim));
-        color.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                getWindow().getDecorView().setBackgroundColor((int) animation.getAnimatedValue());
-            }
-        });
-        color.setDuration(AnimUtils.mediumAnim(this));
+    public void onEnter(View root, Intent intent, boolean hasSavedInstanceState) {
+        enterColor.setDuration(AnimUtils.mediumAnim(this)).start();
 
-        ObjectAnimator slide;
-        if (uri != null && !FileUtils.isImageUri(this, uri)) {
-            slide = ObjectAnimator.ofPropertyValuesHolder(root,
-                    PropertyValuesHolder.ofFloat(View.TRANSLATION_X, -root.getWidth(), 0f),
+        if (uri != null) {
+            Bundle extra = intent.getExtras();
+            originX = extra.getFloat(IntentUtils.TOUCH_X);
+            originY = extra.getFloat(IntentUtils.TOUCH_Y);
+
+            ObjectAnimator slide = ObjectAnimator.ofPropertyValuesHolder(root,
+                    PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, root.getHeight() / 5, 0),
                     PropertyValuesHolder.ofFloat(View.ALPHA, 0f, 1f));
-            slide.setDuration(AnimUtils.mediumAnim(this));
-            slide.setInterpolator(new AccelerateInterpolator());
+            slide.setDuration(AnimUtils.longAnim(this));
+            slide.setInterpolator(new FastOutSlowInInterpolator());
+
+            Animator reveal = ViewAnimationUtils.createCircularReveal(root,
+                    (int) originX, (int) originY,
+                    0, (float) Math.hypot(root.getWidth(), root.getHeight()));
+            reveal.setDuration(AnimUtils.longAnim(this));
+            reveal.setInterpolator(new FastOutSlowInInterpolator());
+
+            AnimatorSet animatorSet = new AnimatorSet();
+            animatorSet.playTogether(slide, reveal);
+            animatorSet.start();
         } else {
-            slide = ObjectAnimator.ofPropertyValuesHolder(root,
-                    PropertyValuesHolder.ofFloat(View.TRANSLATION_X, -root.getWidth() / 2f, 0f),
-                    PropertyValuesHolder.ofFloat(View.ALPHA, 0f, 1f));
-            slide.setDuration(AnimUtils.mediumAnim(this));
-            slide.setInterpolator(new AccelerateInterpolator());
-        }
+            buttonRow.setAlpha(0f);
+            buttonRow.setTranslationY(root.getHeight());
 
-        AnimatorSet animatorSet = new AnimatorSet();
-        animatorSet.playTogether(color, slide);
-        animatorSet.start();
+            buttonRow.animate()
+                    .translationY(0)
+                    .alpha(1)
+                    .setStartDelay(START_DELAY)
+                    .setDuration(AnimUtils.mediumAnim(this))
+                    .setInterpolator(new DecelerateInterpolator()).start();
+        }
     }
 
     @Override
-    public void onExit(View root, boolean hasSavedInstanceState) {
-        ValueAnimator color = ValueAnimator.ofObject(new ArgbEvaluator(),
-                ContextCompat.getColor(this, R.color.scrim), Color.TRANSPARENT);
-        color.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                getWindow().getDecorView().setBackgroundColor((int) animation.getAnimatedValue());
-            }
-        });
-        color.setDuration(AnimUtils.mediumAnim(this));
+    public void onExit(View root, Intent intent, boolean hasSavedInstanceState) {
+        exitColor.setDuration(AnimUtils.mediumAnim(this)).start();
 
-        ObjectAnimator slide;
-        if (uri != null && !FileUtils.isImageUri(this, uri)) {
-            slide = ObjectAnimator.ofPropertyValuesHolder(root,
-                    PropertyValuesHolder.ofFloat(View.TRANSLATION_X, root.getWidth()),
+        if (uri != null) {
+            if (originX == 0) {
+                originX = root.getWidth() / 8f;
+                originY = root.getHeight() * .9f;
+            }
+
+            ObjectAnimator slide = ObjectAnimator.ofPropertyValuesHolder(root,
+                    PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, root.getHeight() / 5),
                     PropertyValuesHolder.ofFloat(View.ALPHA, 0f));
-            slide.setDuration(AnimUtils.mediumAnim(this));
-            slide.setInterpolator(new AccelerateInterpolator());
+            slide.setDuration(AnimUtils.longAnim(this));
+            slide.setInterpolator(new FastOutSlowInInterpolator());
+
+            Animator reveal = ViewAnimationUtils.createCircularReveal(root,
+                    (int) originX, (int) originY,
+                    (float) Math.hypot(root.getWidth(), root.getHeight()), 0);
+            reveal.setDuration(AnimUtils.longAnim(this));
+            reveal.setInterpolator(new FastOutSlowInInterpolator());
+
+            AnimatorSet animatorSet = new AnimatorSet();
+            animatorSet.playTogether(slide, reveal);
+            animatorSet.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    finishWithoutDefaultTransition();
+                }
+            });
+            animatorSet.start();
         } else {
-            slide = ObjectAnimator.ofPropertyValuesHolder(root,
-                    PropertyValuesHolder.ofFloat(View.TRANSLATION_X, root.getWidth() / 2f),
-                    PropertyValuesHolder.ofFloat(View.ALPHA, 0f));
-            slide.setDuration(AnimUtils.mediumAnim(this));
-            slide.setInterpolator(new AccelerateInterpolator());
+            buttonRow.animate()
+                    .translationY(root.getHeight())
+                    .alpha(0f)
+                    .setStartDelay(START_DELAY)
+                    .setDuration(AnimUtils.mediumAnim(this))
+                    .withEndAction(this::finishWithDefaultTransition)
+                    .setInterpolator(new AccelerateInterpolator()).start();
         }
-
-        AnimatorSet animatorSet = new AnimatorSet();
-        animatorSet.playTogether(color, slide);
-        animatorSet.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                finish();
-            }
-        });
-        animatorSet.start();
     }
 
     @Override
@@ -183,9 +187,8 @@ public class UriActivity extends TransitionActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.activity_uri_gallery:
-                Intent intent = new Intent();
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
                 intent.setType(IntentUtils.IMAGE);
-                intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(intent, REQUEST_GALLERY);
                 break;
             case R.id.activity_uri_camera:
@@ -217,26 +220,9 @@ public class UriActivity extends TransitionActivity implements View.OnClickListe
             imageView.setVisibility(View.VISIBLE);
             videoView.setVisibility(View.GONE);
 
-            ViewPropertyAnimation.Animator animator = new ViewPropertyAnimation.Animator() {
-                @Override
-                public void animate(View view) {
-                    PreDrawer preDrawer = new PreDrawer(view) {
-                        @Override
-                        public void notifyPreDraw() {
-                            Animator reveal = ViewAnimationUtils.createCircularReveal(view,
-                                    view.getWidth() / 2, view.getHeight() / 2, 0,
-                                    Math.max(view.getWidth(), view.getHeight()));
-                            reveal.setDuration(500);
-                            reveal.setInterpolator(new FastOutSlowInInterpolator());
-                            reveal.start();
-                        }
-                    };
-                }
-            };
-
             Glide.with(this)
                     .fromUri()
-                    .animate(animator)
+                    .animate(android.R.anim.fade_in)
                     .load(uri)
                     .into(imageView);
         }

@@ -1,6 +1,7 @@
 package miles.diary;
 
 import android.app.Application;
+import android.os.Build;
 
 import com.crashlytics.android.Crashlytics;
 
@@ -36,4 +37,8 @@ public class DiaryApplication extends Application {
     }
 
     public ApplicationComponent getComponent() { return component; }
+
+    public static boolean isMarshmallow() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
+    }
 }

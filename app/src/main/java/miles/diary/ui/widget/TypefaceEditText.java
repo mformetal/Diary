@@ -45,9 +45,9 @@ public class TypefaceEditText extends EditText {
                 setTypeface(TextUtils.getDefaultFont(getContext()));
             }
             array.recycle();
-        } else {
-            setTypeface(TextUtils.getDefaultFont(getContext()));
         }
+
+        setTypeface(TextUtils.getDefaultFont(getContext()));
     }
 
     public String getTextAsString() {

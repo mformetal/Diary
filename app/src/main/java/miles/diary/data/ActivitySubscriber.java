@@ -1,8 +1,11 @@
 package miles.diary.data;
 
+import android.app.Activity;
+
 import java.lang.ref.SoftReference;
 
 import miles.diary.ui.activity.BaseActivity;
+import miles.diary.util.Logg;
 import rx.Subscriber;
 
 /**
@@ -13,17 +16,23 @@ public class ActivitySubscriber<T> extends Subscriber<T> {
     private final SoftReference<BaseActivity> softReference;
 
     public ActivitySubscriber(BaseActivity activity) {
-        softReference = new SoftReference<>(activity);
-        activity.addSubscription(this);
+        if (activity == null) {
+            onError(new NullPointerException("Activity subscriber is null"));
+        }
+
+        softReference = new SoftReference<BaseActivity>(activity);
     }
 
     @Override
     public void onCompleted() {
-        removeSelf();
     }
 
     @Override
     public void onError(Throwable e) {
+        BaseActivity activity = softReference.get();
+        if (activity != null) {
+            Logg.log(activity.getClass().getName(), e);
+        }
         removeSelf();
     }
 

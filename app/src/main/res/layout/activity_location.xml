@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:layout_gravity="center"
+    android:background="@android:color/white"
+    android:id="@+id/activity_location_root"
+    android:layout_width="@dimen/dialog_min_width"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/activity_location_image"
+        android:layout_width="@dimen/activity_location_image_size"
+        android:layout_height="@dimen/activity_location_image_size"
+        android:layout_gravity="center_horizontal"
+        android:transitionName="@string/transition_entry_to_location_activity"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:src="@drawable/ic_place_24dp" />
+
+    <miles.diary.ui.widget.TypefaceTextView
+        android:id="@+id/activity_location_weather"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:textSize="30sp"
+        tools:text="44*f" />
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <miles.diary.ui.widget.TypefaceAutoCompleteTextView
+            android:id="@+id/activity_location_autocomplete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableEnd="@drawable/ic_close_24dp_black"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:lines="1"
+            android:singleLine="true"
+            android:hint="@string/activity_location_text_hint" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <miles.diary.ui.widget.TypefaceButton
+            android:id="@+id/activity_location_neg_button"
+            android:drawableStart="@drawable/ic_close_24dp"
+            android:text="@android:string/cancel"
+            android:gravity="center"
+            android:layout_margin="@dimen/activity_vertical_margin"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:theme="@style/AppTheme.ColoredButton"
+            app:tintDrawable="@android:color/white" />
+
+        <miles.diary.ui.widget.TypefaceButton
+            android:id="@+id/activity_location_pos_button"
+            android:layout_margin="@dimen/activity_vertical_margin"
+            android:drawableEnd="@drawable/ic_check_24dp"
+            android:text="@android:string/yes"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:theme="@style/AppTheme.ColoredButton"
+            app:tintDrawable="@android:color/white" />
+
+    </LinearLayout>
+
+</LinearLayout>

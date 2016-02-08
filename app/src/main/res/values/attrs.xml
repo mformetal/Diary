@@ -8,6 +8,7 @@
 
     <declare-styleable name="TypefaceButton">
         <attr name="buttonAutofit" format="boolean" />
+        <attr name="tintDrawable" format="reference" />
     </declare-styleable>
 
     <declare-styleable name="TypefaceEditText">

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activity_entry_root"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <Toolbar
+        android:id="@+id/activity_entry_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        style="@style/AppTheme.Widget.Toolbar" />
+
+    <miles.diary.ui.widget.NotebookEditText
+        android:id="@+id/activity_entry_body"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textSize="@dimen/large_text_size"
+        android:layout_marginTop="@dimen/action_bar_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="@dimen/action_bar_margin"
+        android:gravity="start|top"
+        android:background="@null"
+        android:hint="@string/activity_entry_body_hint" />
+
+    <RelativeLayout
+        android:id="@+id/activity_entry_fab_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_anchor="@id/activity_entry_root"
+        app:layout_anchorGravity="bottom|end"
+        app:layout_behavior="miles.diary.ui.SnackbarBehavior" >
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/activity_entry_photo"
+            android:src="@drawable/ic_photo_24dp_accent"
+            android:transitionName="@string/transition_entry_to_uri_activity"
+            android:layout_width="@dimen/fab_normal_dimens"
+            android:layout_height="@dimen/fab_normal_dimens"
+            android:layout_margin="@dimen/activity_entry_fab_margin"
+            android:layout_alignParentStart="true" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/activity_entry_location"
+            android:src="@drawable/ic_place_24dp"
+            android:transitionName="@string/transition_entry_to_location_activity"
+            android:layout_width="@dimen/fab_normal_dimens"
+            android:layout_height="@dimen/fab_normal_dimens"
+            android:layout_margin="@dimen/activity_entry_fab_margin"
+            android:layout_alignParentEnd="true" />
+
+    </RelativeLayout>
+
+</android.support.design.widget.CoordinatorLayout>

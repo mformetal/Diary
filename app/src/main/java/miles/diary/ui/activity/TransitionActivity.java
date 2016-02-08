@@ -80,14 +80,13 @@ public abstract class TransitionActivity extends BaseActivity {
     }
 
     public void finishWithDefaultTransition() {
-        finishWithoutDefaultTransition();
+        finish();
     }
 
     public void finishWithoutDefaultTransition() {
         finish();
         overridePendingTransition(0, 0);
     }
-
 
     public abstract void onEnter(View root, Intent calledIntent, boolean hasSavedInstanceState);
 

@@ -8,12 +8,15 @@ import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.View;
 
+import miles.diary.R;
+
 /**
  * Created by mbpeele on 2/3/16.
  */
 public class ScrollingFabBehavior extends CoordinatorLayout.Behavior<FloatingActionButton> {
 
-    public ScrollingFabBehavior(Context context, AttributeSet attrs) {}
+    public ScrollingFabBehavior(Context context, AttributeSet attrs) {
+    }
 
     @Override
     public boolean layoutDependsOn(CoordinatorLayout parent, FloatingActionButton child, View dependency) {

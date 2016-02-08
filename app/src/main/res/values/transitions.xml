@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="transition_entry_to_uri_activity">uri</string>
+    <string name="transition_entry_to_location_activity">placeName</string>
+</resources>

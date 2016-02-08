@@ -4,7 +4,6 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -12,34 +11,24 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewStub;
 import android.view.animation.AnticipateOvershootInterpolator;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
 import butterknife.Bind;
-import io.realm.RealmResults;
 import jp.wasabeef.recyclerview.animators.FadeInAnimator;
 import miles.diary.R;
-import miles.diary.data.ActivitySubscriber;
-import miles.diary.data.RealmUtils;
 import miles.diary.data.adapter.BackendAdapter;
-import miles.diary.data.adapter.EntryAdapter;
-import miles.diary.data.model.Entry;
+import miles.diary.data.adapter.BackendAdapterListener;
+import miles.diary.data.adapter.EntryRecycler;
 import miles.diary.ui.SpacingDecoration;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.Logg;
 
-public class HomeActivity extends TransitionActivity
-        implements BackendAdapter.BackendAdapterListener {
+public class HomeActivity extends TransitionActivity implements BackendAdapterListener {
 
     @Bind(R.id.activity_home_recycler) RecyclerView recyclerView;
     @Bind(R.id.activity_home_root) CoordinatorLayout coordinatorLayout;
@@ -49,7 +38,7 @@ public class HomeActivity extends TransitionActivity
 
     private final static int RESULT_CODE_ENTRY = 1001;
 
-    private EntryAdapter entryAdapter;
+    private EntryRecycler entryRecycler;
     private View emptyView;
 
     @Override
@@ -59,16 +48,16 @@ public class HomeActivity extends TransitionActivity
 
         setActionBar(toolbar);
 
-        entryAdapter = new EntryAdapter(this, realm);
+        entryRecycler = new EntryRecycler(this, realm);
         recyclerView.setItemAnimator(new FadeInAnimator());
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(entryAdapter);
+        recyclerView.setAdapter(entryRecycler);
         recyclerView.addItemDecoration(new SpacingDecoration(
                 ContextCompat.getDrawable(this, R.drawable.recycler_divider)));
 
         fab.setOnClickListener(v -> {
-            Intent intent = new Intent(v.getContext(), EntryActivity.class);
+            Intent intent = new Intent(v.getContext(), NewEntryActivity.class);
             startActivityForResult(intent, RESULT_CODE_ENTRY);
         });
     }
@@ -85,16 +74,12 @@ public class HomeActivity extends TransitionActivity
         scale.setInterpolator(new AnticipateOvershootInterpolator());
         scale.start();
 
-        View t = toolbar.getChildAt(0);
-        if (t != null && t instanceof TextView) {
-            TextView title = (TextView) t;
+        View view = toolbar.getChildAt(0);
+        if (view != null && view instanceof TextView) {
+            view.setAlpha(0f);
+            view.setScaleX(0.8f);
 
-            // fade in and space out the title.  Animating the letterSpacing performs horribly so
-            // fake it by setting the desired letterSpacing then animating the scaleX ¯\_(ツ)_/¯
-            title.setAlpha(0f);
-            title.setScaleX(0.8f);
-
-            title.animate()
+            view.animate()
                     .alpha(1f)
                     .scaleX(1f)
                     .setDuration(AnimUtils.longAnim(this))
@@ -112,12 +97,10 @@ public class HomeActivity extends TransitionActivity
         switch (requestCode) {
             case RESULT_CODE_ENTRY:
                 if (resultCode == RESULT_OK) {
-                    Bundle extra = data.getExtras();
-                    if (extra != null) {
-                        String body = extra.getString(EntryActivity.RESULT_BODY);
-                        Uri uri = extra.getParcelable(EntryActivity.RESULT_URI);
+                    Bundle extras = data.getExtras();
+                    if (extras != null) {
+                        entryRecycler.addEntry(extras);
 
-                        entryAdapter.addEntry(body, uri);
                         if (emptyView != null) {
                             coordinatorLayout.removeView(emptyView);
                         }
@@ -145,7 +128,7 @@ public class HomeActivity extends TransitionActivity
             ViewStub viewStub = (ViewStub) findViewById(R.id.activity_home_no_entries);
             emptyView = viewStub.inflate();
             emptyView.setOnClickListener(v -> {
-                Intent intent = new Intent(v.getContext(), EntryActivity.class);
+                Intent intent = new Intent(v.getContext(), NewEntryActivity.class);
                 startActivityForResult(intent, RESULT_CODE_ENTRY);
             });
         }

@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<objectAnimator
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:duration="350"
-    android:propertyName="pathData"
-    android:valueFrom="@string/vector_arrow_back"
-    android:valueTo="@string/vector_cancel"
-    android:valueType="pathType" />

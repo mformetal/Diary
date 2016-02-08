@@ -1,19 +1,21 @@
 package miles.diary.ui.activity;
 
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
-import android.support.annotation.StringRes;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
+import android.view.ViewGroup;
+
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import io.realm.Realm;
 import miles.diary.DiaryApplication;
-import miles.diary.data.RealmUtils;
+import miles.diary.data.Datastore;
+import miles.diary.data.WeatherService;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
 
@@ -22,8 +24,13 @@ import rx.subscriptions.CompositeSubscription;
  */
 public abstract class BaseActivity extends AppCompatActivity {
 
+    @Inject WeatherService weatherService;
+    @Inject Datastore datastore;
+    @Inject GoogleApiClient.Builder googleApiClientBuilder;
+
     private CompositeSubscription compositeSubscription;
     protected Realm realm;
+    public ViewGroup root;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +44,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
         ButterKnife.bind(this);
+        root = (ViewGroup) ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
     }
 
     @Override
@@ -47,14 +55,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         compositeSubscription.unsubscribe();
     }
 
-    public void showSnackbar(@StringRes int res, View root, View.OnClickListener onClickListener, int dur) {
-        Snackbar snackbar = Snackbar.make(root, res, dur);
-        if (onClickListener != null) {
-            snackbar.setAction("Aight", onClickListener);
-        }
-        snackbar.show();
-    }
-
     public void addSubscription(Subscription subscription) {
         compositeSubscription.add(subscription);
     }
@@ -63,9 +63,15 @@ public abstract class BaseActivity extends AppCompatActivity {
         compositeSubscription.remove(subscription);
     }
 
+    public boolean hasConnection() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        return connectivityManager.getActiveNetworkInfo() != null &&
+                connectivityManager.getActiveNetworkInfo().isConnectedOrConnecting();
+    }
+
     public boolean hasPermissions(String[] permissions) {
         for (String permission: permissions) {
-            if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_DENIED) {
+            if (ActivityCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_DENIED) {
                 return false;
             }
         }

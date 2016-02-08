@@ -2,13 +2,15 @@
     <dimen name="activity_vertical_margin">20dp</dimen>
     <dimen name="activity_horizontal_margin">20dp</dimen>
 
+    <dimen name="activity_entry_fab_margin">8dp</dimen>
+
+    <dimen name="activity_location_image_size">150dp</dimen>
+
+    <dimen name="fragment_entry_app_bar">300dp</dimen>
+
     <dimen name="action_bar_margin">68dp</dimen>
 
-    <dimen name="camera_button_dimens">36dp</dimen>
-    <dimen name="camera_picture_dimens">125dp</dimen>
-
-    <dimen name="full_width_text_field_horizontal_margin">20dp</dimen>
-
+    <dimen name="adapter_image_dimens">100dp</dimen>
     <dimen name="adapter_entry_elevation">4dp</dimen>
     <dimen name="adapter_entry_margin">7dp</dimen>
     <dimen name="adapter_entry_spacing">10dp</dimen>
@@ -16,6 +18,10 @@
     <dimen name="adapter_time_text_size">12sp</dimen>
 
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="fab_elevation">6dp</dimen>
+    <dimen name="fab_normal_dimens">56dp</dimen>
+    <dimen name="fab_mini_dimens">40dp</dimen>
+
     <dimen name="text_margin">16dp</dimen>
 
     <dimen name="toolbar_margin">16dp</dimen>

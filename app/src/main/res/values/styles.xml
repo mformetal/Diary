@@ -11,9 +11,17 @@
         <item name="android:textColorSecondary">@color/secondary_text</item>
         <item name="android:textColorHint">@color/half_opacity_gray</item>
         <item name="icon">@color/icons</item>
+        <item name="android:windowActivityTransitions">true</item>
     </style>
 
     <style name="AppTheme.Home" >
+    </style>
+
+    <style name="AppTheme.DialogActivity" parent="AppTheme">
+        <item name="android:windowActivityTransitions">true</item>
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowBackground">@color/scrim</item>
+        <item name="android:windowIsTranslucent">true</item>
     </style>
 
     <style name="AppTheme.Widget" parent="android:Widget" />
@@ -25,16 +33,15 @@
 
     <style name="AppTheme.Dialog" parent="@style/Theme.AppCompat.Light.Dialog" />
 
-    <style name="AppTheme.Widget.HomeToolbar" >
+    <style name="AppTheme.Widget.Toolbar" >
         <item name="android:background">@color/toolbar</item>
         <item name="android:theme">@android:style/ThemeOverlay.Material.Dark</item>
         <item name="android:elevation">6dp</item>
     </style>
 
-    <style name="AppTheme.DialogActivity" >
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowAnimationStyle">@null</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
+    <style name="AppTheme.ColoredButton" parent="AppTheme.Widget">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:backgroundTint">@color/accent</item>
     </style>
 
 </resources>

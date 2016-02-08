@@ -19,14 +19,13 @@
         tools:text="MOUNTAIN BIKING" />
 
     <miles.diary.ui.widget.TypefaceTextView
-        android:id="@+id/adapter_entry_text_title"
+        android:id="@+id/adapter_entry_text_body"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/adapter_entry_margin"
         android:layout_marginBottom="@dimen/adapter_entry_margin"
         android:textSize="@dimen/adapter_title_text_size"
         android:textColor="@android:color/black"
-        android:maxLines="1"
         tools:text="MOUNTAIN BIKING" />
 
     <miles.diary.ui.widget.TypefaceTextView
@@ -36,7 +35,7 @@
         android:layout_marginTop="@dimen/adapter_entry_margin"
         android:layout_marginBottom="@dimen/adapter_entry_margin"
         android:textSize="@dimen/adapter_time_text_size"
-        android:textColor="@color/half_opacity_gray"
+        android:textColor="@color/muted_gray"
         android:maxLines="1"
         tools:text="MOUNTAIN BIKING" />
 

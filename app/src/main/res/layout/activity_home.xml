@@ -8,17 +8,24 @@
     android:layout_height="match_parent"
     tools:context="miles.diary.ui.activity.HomeActivity" >
 
-    <Toolbar
-        android:id="@+id/activity_home_toolbar"
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="?android:attr/actionBarSize"
-        style="@style/AppTheme.Widget.HomeToolbar" />
+        android:layout_height="wrap_content" >
+
+        <Toolbar
+            android:id="@+id/activity_home_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/actionBarSize"
+            app:layout_scrollFlags="scroll|enterAlways"
+            style="@style/AppTheme.Widget.Toolbar" />
+
+    </android.support.design.widget.AppBarLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/activity_home_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="?android:attr/actionBarSize" />
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <ProgressBar
         android:id="@+id/activity_home_loading"

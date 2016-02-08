@@ -64,7 +64,7 @@ public class NotebookEditText extends TypefaceEditText {
             count = getLineCount();
         }
 
-        int baseline = getLineBounds(0, mRect);
+        int baseline = getLineBounds(0, mRect) + Math.round(height * .01f);
 
         for (int i = 0; i < count; i++) {
             canvas.drawLine(mRect.left, baseline + 1, mRect.right, baseline + 1, mPaint);

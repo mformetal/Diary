@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.Property;
@@ -55,31 +56,11 @@ public class ViewUtils {
         return RECT;
     }
 
-    public static abstract class FloatProperty<T> extends Property<T, Float> {
-        public FloatProperty(String name) {
-            super(Float.class, name);
-        }
-
-        public abstract void setValue(T object, float value);
-
-        @Override
-        final public void set(T object, Float value) {
-            setValue(object, value);
-        }
+    public static float pxToDp(final float px) {
+        return px / Resources.getSystem().getDisplayMetrics().density;
     }
 
-    public static abstract class IntProperty<T> extends Property<T, Integer> {
-
-        public IntProperty(String name) {
-            super(Integer.class, name);
-        }
-
-        public abstract void setValue(T object, int value);
-
-        @Override
-        final public void set(T object, Integer value) {
-            setValue(object, value);
-        }
+    public static float dpToPx(final float dp) {
+        return dp * Resources.getSystem().getDisplayMetrics().density;
     }
-
 }

@@ -1,22 +1,26 @@
 package miles.diary.ui.widget;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.graphics.Paint;
-import android.support.v7.widget.AppCompatButton;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.widget.Button;
 
 import me.grantland.widget.AutofitHelper;
+import miles.diary.DiaryApplication;
 import miles.diary.R;
+import miles.diary.ui.PreDrawer;
+import miles.diary.util.Logg;
 import miles.diary.util.TextUtils;
 
 /**
  * Created by mbpeele on 1/14/16.
  */
 public class TypefaceButton extends Button {
-
-    private Paint mBorderPaint;
 
     public TypefaceButton(Context context) {
         super(context);
@@ -41,18 +45,33 @@ public class TypefaceButton extends Button {
         if (attrs != null) {
             TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.TypefaceButton);
 
-            boolean autofit = array.getBoolean(R.styleable.TypefaceButton_buttonAutofit, false);
-            if (autofit) {
+            if (array.getBoolean(R.styleable.TypefaceButton_buttonAutofit, false)) {
                 AutofitHelper helper = AutofitHelper.create(this, attrs);
                 helper.setTextSize(getTextSize());
             }
+
+            int color = array.getColor(R.styleable.TypefaceButton_tintDrawable, Color.TRANSPARENT);
+            if (color != Color.TRANSPARENT) {
+                tintDrawables(color);
+            }
+
             array.recycle();
         }
 
         setTypeface(TextUtils.getDefaultFont(getContext()));
     }
 
-    public String getTextAsString() {
-        return getText().toString();
+    private void tintDrawables(int color) {
+        new PreDrawer(this) {
+            @Override
+            public void notifyPreDraw() {
+                Drawable[] drawables = getCompoundDrawables();
+                for (Drawable drawable: drawables) {
+                    if (drawable != null) {
+                        drawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+                    }
+                }
+            }
+        };
     }
 }

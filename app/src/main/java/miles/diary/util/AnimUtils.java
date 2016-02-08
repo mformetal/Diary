@@ -3,10 +3,14 @@ package miles.diary.util;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
+import android.util.Property;
 import android.view.View;
 import android.view.ViewAnimationUtils;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.ImageView;
 
 import com.bumptech.glide.request.animation.ViewPropertyAnimation;
 
@@ -88,7 +92,7 @@ public class AnimUtils {
                             view.getWidth() / 2, view.getHeight() / 2, 0,
                             Math.max(view.getWidth(), view.getHeight()));
                     reveal.setDuration(longAnim(view.getContext()));
-                    reveal.setInterpolator(new FastOutSlowInInterpolator());
+                    reveal.setInterpolator(new DecelerateInterpolator());
                     reveal.start();
                 }
             };
@@ -97,8 +101,35 @@ public class AnimUtils {
                     view.getWidth() / 2, view.getHeight() / 2, 0,
                     Math.max(view.getWidth(), view.getHeight()));
             reveal.setDuration(longAnim(view.getContext()));
-            reveal.setInterpolator(new FastOutSlowInInterpolator());
+            reveal.setInterpolator(new DecelerateInterpolator());
             reveal.start();
         }
     };
+
+    public static abstract class FloatProperty<T> extends Property<T, Float> {
+        public FloatProperty(String name) {
+            super(Float.class, name);
+        }
+
+        public abstract void setValue(T object, float value);
+
+        @Override
+        final public void set(T object, Float value) {
+            setValue(object, value);
+        }
+    }
+
+    public static abstract class IntProperty<T> extends Property<T, Integer> {
+
+        public IntProperty(String name) {
+            super(Integer.class, name);
+        }
+
+        public abstract void setValue(T object, int value);
+
+        @Override
+        final public void set(T object, Integer value) {
+            setValue(object, value);
+        }
+    }
 }

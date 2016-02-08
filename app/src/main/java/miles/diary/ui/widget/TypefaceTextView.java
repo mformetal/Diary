@@ -54,4 +54,8 @@ public class TypefaceTextView extends TextView {
             setTypeface(TextUtils.getDefaultFont(getContext()));
         }
     }
+
+    public String getStringText() {
+        return getText().toString();
+    }
 }

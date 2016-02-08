@@ -3,4 +3,5 @@
     <string name="twitter_key">BPDFCX6EhkhnpvNoypu1H9oRz</string>
     <string name="twitter_secret">n4NeidmOFJG6gOQG0rA9LLgKMcEyNxXxOkyk5IZAHY8Mw2vlfz</string>
     <string name="google_api_key">AIzaSyAzjwPsLDflM1T11lTbcywrcRe8jPPV-GI</string>
+    <string name="weather_api_key">f63f27c3e67b516159a85e98d50d53cb</string>
 </resources>

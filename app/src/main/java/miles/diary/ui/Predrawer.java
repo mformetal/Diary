@@ -19,11 +19,11 @@ public abstract class PreDrawer {
                     view.getViewTreeObserver().removeOnPreDrawListener(this);
                 }
 
-                notifyPreDraw();
+                notifyPreDraw(view);
                 return true;
             }
         });
     }
 
-    public abstract void notifyPreDraw();
+    public abstract void notifyPreDraw(View view);
 }

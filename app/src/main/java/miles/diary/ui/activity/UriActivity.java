@@ -158,10 +158,10 @@ public class UriActivity extends BaseActivity implements View.OnClickListener {
                 }
                 break;
             case R.id.activity_uri_video:
-                Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-                if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
-                    startActivityForResult(takeVideoIntent, REQUEST_VIDEO);
-                }
+//                Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+//                if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
+//                    startActivityForResult(takeVideoIntent, REQUEST_VIDEO);
+//                }
                 break;
         }
     }

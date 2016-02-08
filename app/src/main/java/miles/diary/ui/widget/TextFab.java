@@ -48,7 +48,7 @@ public class TextFab extends FloatingActionButton {
 
     private void init() {
         paint = new Paint();
-        paint.setColor(ContextCompat.getColor(getContext(), R.color.accent));
+        paint.setColor(Color.WHITE);
         paint.setStrokeCap(Paint.Cap.ROUND);
         paint.setStrokeJoin(Paint.Join.ROUND);
         paint.setTextAlign(Paint.Align.CENTER);

@@ -8,23 +8,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <miles.diary.ui.widget.SquareCornerImageView
+    <miles.diary.ui.widget.MaxCornerImageView
         android:id="@+id/activity_uri_image_view"
         android:layout_gravity="center"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:transitionName="@string/transition_entry_to_uri_activity"
+        android:transitionName="@string/transition_image"
         android:visibility="gone" />
 
     <VideoView
         android:id="@+id/activity_uri_video_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingBottom="?android:attr/actionBarSize"
         android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/activity_uri_button_row"
         android:orientation="horizontal"
+        android:layout_gravity="bottom"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize" >
 

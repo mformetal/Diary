@@ -14,7 +14,7 @@ import javax.inject.Inject;
 import butterknife.ButterKnife;
 import io.realm.Realm;
 import miles.diary.DiaryApplication;
-import miles.diary.data.Datastore;
+import miles.diary.data.DataStore;
 import miles.diary.data.WeatherService;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
@@ -25,7 +25,7 @@ import rx.subscriptions.CompositeSubscription;
 public abstract class BaseActivity extends AppCompatActivity {
 
     @Inject WeatherService weatherService;
-    @Inject Datastore datastore;
+    @Inject DataStore datastore;
     @Inject GoogleApiClient.Builder googleApiClientBuilder;
 
     private CompositeSubscription compositeSubscription;

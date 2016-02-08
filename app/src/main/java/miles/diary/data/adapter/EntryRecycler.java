@@ -1,6 +1,7 @@
 package miles.diary.data.adapter;
 
-import android.app.Activity;
+import android.app.ActivityOptions;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -11,27 +12,25 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 
-import java.util.Date;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.realm.Realm;
-import io.realm.RealmObject;
 import io.realm.RealmResults;
 import miles.diary.R;
 import miles.diary.data.ActivitySubscriber;
 import miles.diary.data.model.Entry;
 import miles.diary.data.model.WeatherResponse;
 import miles.diary.ui.activity.BaseActivity;
+import miles.diary.ui.activity.EntryActivity;
 import miles.diary.ui.activity.NewEntryActivity;
+import miles.diary.ui.activity.UriActivity;
 import miles.diary.ui.widget.TypefaceTextView;
 import miles.diary.util.AnimUtils;
-import rx.functions.Func1;
 
 /**
  * Created by mbpeele on 1/14/16.
  */
-public class EntryRecycler extends BackendAdapter<Entry> {
+public class EntryRecycler extends BackendAdapter<Entry, RecyclerView.ViewHolder> {
 
     private static final int TYPE_IMAGE = 0;
     private static final int TYPE_TEXT = 1;
@@ -42,7 +41,7 @@ public class EntryRecycler extends BackendAdapter<Entry> {
 
     public EntryRecycler(BaseActivity activity, Realm realm) {
         super(realm);
-        setListener((BackendAdapterListener) activity);
+        setListener((BackendAdapterListener<Entry>) activity);
         host = activity;
         layoutInflater = LayoutInflater.from(activity);
 
@@ -81,6 +80,32 @@ public class EntryRecycler extends BackendAdapter<Entry> {
         }
     }
 
+    @Override
+    public void loadData(Realm realm) {
+        realm.where(Entry.class)
+                .findAllAsync()
+                .asObservable()
+                .filter(RealmResults::isLoaded)
+                .subscribe(new ActivitySubscriber<RealmResults<Entry>>(host) {
+                    @Override
+                    public void onNext(RealmResults<Entry> entries) {
+                        super.onNext(entries);
+                        setData(entries);
+                        if (getData().isEmpty()) {
+                            propogateEmpty();
+                        } else {
+                            propogateCompletion();
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+                        propogateError(e);
+                    }
+                });
+    }
+
     public Entry addEntry(Bundle bundle) {
         String body = bundle.getString(NewEntryActivity.RESULT_BODY);
         Uri uri = bundle.getParcelable(NewEntryActivity.RESULT_URI);
@@ -92,6 +117,17 @@ public class EntryRecycler extends BackendAdapter<Entry> {
     }
 
     private void bindImageViewHolder(ImageViewHolder holder, Entry entry) {
+        holder.image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(host, EntryActivity.class);
+                intent.putExtra(EntryActivity.DATA, entry.getBody());
+                ActivityOptions transitionActivityOptions =
+                        ActivityOptions.makeSceneTransitionAnimation(host, holder.image,
+                                host.getString(R.string.transition_image));
+                host.startActivity(intent, transitionActivityOptions.toBundle());
+            }
+        });
         holder.time.setText(Entry.formatDateString(entry));
         holder.body.setText(entry.getBody());
         String placeName = entry.getPlaceName();
@@ -117,32 +153,6 @@ public class EntryRecycler extends BackendAdapter<Entry> {
         } else {
             holder.location.setVisibility(View.GONE);
         }
-    }
-
-    @Override
-    public void loadData(Realm realm) {
-        realm.where(Entry.class)
-                .findAllAsync()
-                .asObservable()
-                .filter(RealmResults::isLoaded)
-                .subscribe(new ActivitySubscriber<RealmResults<Entry>>(host) {
-                    @Override
-                    public void onNext(RealmResults<Entry> entries) {
-                        super.onNext(entries);
-                        setData(entries);
-                        if (getData().isEmpty()) {
-                            propogateEmpty();
-                        } else {
-                            propogateCompletion();
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        super.onError(e);
-                        propogateError(e);
-                    }
-                });
     }
 
     final class TextViewHolder extends RecyclerView.ViewHolder {

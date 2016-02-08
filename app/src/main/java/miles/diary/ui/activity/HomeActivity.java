@@ -3,8 +3,10 @@ package miles.diary.ui.activity;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
@@ -24,19 +26,19 @@ import miles.diary.R;
 import miles.diary.data.adapter.BackendAdapter;
 import miles.diary.data.adapter.BackendAdapterListener;
 import miles.diary.data.adapter.EntryRecycler;
+import miles.diary.data.model.Entry;
 import miles.diary.ui.SpacingDecoration;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.Logg;
 
-public class HomeActivity extends TransitionActivity implements BackendAdapterListener {
+public class HomeActivity extends TransitionActivity implements BackendAdapterListener<Entry> {
 
     @Bind(R.id.activity_home_recycler) RecyclerView recyclerView;
-    @Bind(R.id.activity_home_root) CoordinatorLayout coordinatorLayout;
     @Bind(R.id.activity_home_toolbar) Toolbar toolbar;
     @Bind(R.id.activity_home_loading) ProgressBar progressBar;
     @Bind(R.id.activity_home_fab) FloatingActionButton fab;
 
-    private final static int RESULT_CODE_ENTRY = 1001;
+    private final static int RESULT_CODE_ENTRY = 1;
 
     private EntryRecycler entryRecycler;
     private View emptyView;
@@ -102,7 +104,7 @@ public class HomeActivity extends TransitionActivity implements BackendAdapterLi
                         entryRecycler.addEntry(extras);
 
                         if (emptyView != null) {
-                            coordinatorLayout.removeView(emptyView);
+                            root.removeView(emptyView);
                         }
                     }
                 }

@@ -18,12 +18,6 @@
 
 <menu
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <item
-        android:id="@+id/menu_home_new_entry"
-        android:title="@string/menu_home_new_entry"
-        android:icon="@drawable/ic_add_24dp"
-        android:showAsAction="always" />
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
 
 </menu>

@@ -10,7 +10,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import miles.diary.data.Datastore;
+import miles.diary.data.DataStore;
 import miles.diary.data.WeatherService;
 
 /**
@@ -34,8 +34,8 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    public Datastore getDatastore() {
-        return new Datastore(mApplication);
+    public DataStore getDataStore() {
+        return new DataStore(mApplication);
     }
 
     @Provides

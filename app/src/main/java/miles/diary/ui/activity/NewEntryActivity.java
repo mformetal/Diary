@@ -3,7 +3,6 @@ package miles.diary.ui.activity;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Intent;
-import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -12,16 +11,15 @@ import android.support.v4.content.ContextCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 
 import butterknife.Bind;
 import butterknife.OnClick;
+import de.hdodenhof.circleimageview.CircleImageView;
 import miles.diary.R;
 import miles.diary.data.model.WeatherResponse;
-import miles.diary.ui.PreDrawer;
 import miles.diary.ui.widget.TypefaceEditText;
 
 /**
@@ -29,11 +27,11 @@ import miles.diary.ui.widget.TypefaceEditText;
  */
 public class NewEntryActivity extends BaseActivity implements View.OnClickListener {
 
-    @Bind(R.id.activity_entry_root) CoordinatorLayout root;
-    @Bind(R.id.activity_entry_toolbar) Toolbar toolbar;
-    @Bind(R.id.activity_entry_body) TypefaceEditText bodyInput;
-    @Bind(R.id.activity_entry_photo) ImageView photoFab;
-    @Bind(R.id.activity_entry_location) ImageView locationFab;
+    @Bind(R.id.activity_new_entry_root) CoordinatorLayout root;
+    @Bind(R.id.fragment_entry_toolbar) Toolbar toolbar;
+    @Bind(R.id.activity_new_entry_body) TypefaceEditText bodyInput;
+    @Bind(R.id.activity_new_entry_photo) CircleImageView photo;
+    @Bind(R.id.activity_new_entry_location) CircleImageView location;
 
     public static final String RESULT_BODY = "body";
     public static final String RESULT_URI = "uri";
@@ -55,12 +53,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
 
         setActionBar(toolbar);
 
-        new PreDrawer(root) {
-            @Override
-            public void notifyPreDraw() {
-                tintImages();
-            }
-        };
+        tintImages();
     }
 
     @Override
@@ -85,6 +78,8 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
 
                     loadThumbnailFromUri();
                 }
+
+                tintImages();
                 break;
             default:
                 super.onActivityResult(requestCode, resultCode, data);
@@ -121,10 +116,10 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     }
 
     @Override
-    @OnClick({R.id.activity_entry_photo, R.id.activity_entry_location})
+    @OnClick({R.id.activity_new_entry_photo, R.id.activity_new_entry_location})
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.activity_entry_photo:
+            case R.id.activity_new_entry_photo:
                 Intent intent = new Intent(this, UriActivity.class);
                 intent.setData(imageUri);
 
@@ -132,48 +127,45 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                     startActivityForResult(intent, REQUEST_IMAGE);
                 } else {
                     ActivityOptions transitionActivityOptions =
-                            ActivityOptions.makeSceneTransitionAnimation(this, photoFab,
-                                    getString(R.string.transition_entry_to_uri_activity));
+                            ActivityOptions.makeSceneTransitionAnimation(this, photo,
+                                    getString(R.string.transition_image));
                     startActivityForResult(intent, REQUEST_IMAGE, transitionActivityOptions.toBundle());
                 }
                 break;
-            case R.id.activity_entry_location:
+            case R.id.activity_new_entry_location:
                 Intent intent1 = new Intent(this, LocationActivity.class);
                 ActivityOptions transitionActivityOptions =
-                        ActivityOptions.makeSceneTransitionAnimation(this, locationFab,
-                                getString(R.string.transition_entry_to_location_activity));
+                        ActivityOptions.makeSceneTransitionAnimation(this, location,
+                                getString(R.string.transition_location));
                 startActivityForResult(intent1, REQUEST_LOCATION, transitionActivityOptions.toBundle());
                 break;
         }
     }
 
-    private void tintImages() {
-        int gray = ContextCompat.getColor(this, R.color.muted_gray);
-        int accent = ContextCompat.getColor(this, R.color.accent);
-
-        if (placeId == null) {
-            locationFab.setColorFilter(gray);
-        } else {
-           locationFab.setColorFilter(accent);
-        }
-
-        if (imageUri == null) {
-           photoFab.setColorFilter(gray, PorterDuff.Mode.SRC_IN);
-        } else {
-            photoFab.clearColorFilter();
-        }
-    }
-
     private void loadThumbnailFromUri() {
         if (imageUri != null) {
-            photoFab.clearColorFilter();
+            photo.clearColorFilter();
             Glide.with(this)
                     .fromUri()
-                    .asBitmap()
                     .animate(R.anim.glide_scale_in)
                     .load(imageUri)
                     .centerCrop()
-                    .into(photoFab);
+                    .into(photo);
+        }
+    }
+
+    private void tintImages() {
+        int unactivated = ContextCompat.getColor(this, R.color.muted_gray);
+        int activated = ContextCompat.getColor(this, R.color.accent);
+
+        if (imageUri == null) {
+            photo.setColorFilter(unactivated);
+        }
+
+        if (placeName == null) {
+            location.setColorFilter(unactivated);
+        } else {
+            location.setColorFilter(activated);
         }
     }
 }

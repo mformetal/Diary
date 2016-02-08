@@ -15,7 +15,7 @@
         android:layout_width="@dimen/activity_location_image_size"
         android:layout_height="@dimen/activity_location_image_size"
         android:layout_gravity="center_horizontal"
-        android:transitionName="@string/transition_entry_to_location_activity"
+        android:transitionName="@string/transition_location"
         android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:src="@drawable/ic_place_24dp" />
 

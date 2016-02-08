@@ -4,23 +4,23 @@ import android.content.Context;
 import android.util.AttributeSet;
 
 /**
- * Created by mbpeele on 2/6/16.
+ * Created by mbpeele on 2/8/16.
  */
-public class SquareCornerImageView extends CornerImageView {
+public class MaxCornerImageView extends CornerImageView {
 
-    public SquareCornerImageView(Context context) {
+    public MaxCornerImageView(Context context) {
         super(context);
     }
 
-    public SquareCornerImageView(Context context, AttributeSet attrs) {
+    public MaxCornerImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public SquareCornerImageView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public MaxCornerImageView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
-    public SquareCornerImageView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public MaxCornerImageView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 

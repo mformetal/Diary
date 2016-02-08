@@ -39,7 +39,7 @@ public class CanceListener {
 
         new PreDrawer(widget) {
             @Override
-            public void notifyPreDraw() {
+            public void notifyPreDraw(View view) {
                 Drawable[] drawables = widget.getCompoundDrawables();
                 for (int i = 0; i < drawables.length; i++) {
                     Drawable drawable = drawables[i];

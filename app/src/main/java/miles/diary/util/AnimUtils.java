@@ -87,11 +87,11 @@ public class AnimUtils {
         if (view.getWidth() == 0 || view.getHeight() == 0) {
             new PreDrawer(view) {
                 @Override
-                public void notifyPreDraw() {
-                    Animator reveal = ViewAnimationUtils.createCircularReveal(view,
-                            view.getWidth() / 2, view.getHeight() / 2, 0,
-                            Math.max(view.getWidth(), view.getHeight()));
-                    reveal.setDuration(longAnim(view.getContext()));
+                public void notifyPreDraw(View view1) {
+                    Animator reveal = ViewAnimationUtils.createCircularReveal(view1,
+                            view1.getWidth() / 2, view1.getHeight() / 2, 0,
+                            Math.max(view1.getWidth(), view1.getHeight()));
+                    reveal.setDuration(longAnim(view1.getContext()));
                     reveal.setInterpolator(new DecelerateInterpolator());
                     reveal.start();
                 }

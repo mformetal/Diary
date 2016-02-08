@@ -19,7 +19,7 @@ import miles.diary.util.Logg;
  */
 public abstract class TransitionActivity extends BaseActivity {
 
-    private View root;
+    protected ViewGroup root;
     private boolean hasSavedInstanceState;
     private Intent intent;
     public ValueAnimator enterColor, exitColor;
@@ -43,10 +43,10 @@ public abstract class TransitionActivity extends BaseActivity {
     @Override
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
-        root = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
+        root = (ViewGroup) ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
         new PreDrawer(root) {
             @Override
-            public void notifyPreDraw() {
+            public void notifyPreDraw(View view) {
                 onEnter(root, intent, hasSavedInstanceState);
             }
         };
@@ -57,7 +57,7 @@ public abstract class TransitionActivity extends BaseActivity {
         super.setContentView(view);
         new PreDrawer(view) {
             @Override
-            public void notifyPreDraw() {
+            public void notifyPreDraw(View view) {
                 onEnter(root, intent, hasSavedInstanceState);
             }
         };
@@ -68,7 +68,7 @@ public abstract class TransitionActivity extends BaseActivity {
         super.setContentView(view, params);
         new PreDrawer(view) {
             @Override
-            public void notifyPreDraw() {
+            public void notifyPreDraw(View view) {
                 onEnter(root, intent, hasSavedInstanceState);
             }
         };

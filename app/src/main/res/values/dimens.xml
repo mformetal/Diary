@@ -10,6 +10,7 @@
 
     <dimen name="action_bar_margin">68dp</dimen>
 
+    <dimen name="adapter_image_border_width">2dp</dimen>
     <dimen name="adapter_image_dimens">100dp</dimen>
     <dimen name="adapter_entry_elevation">4dp</dimen>
     <dimen name="adapter_entry_margin">7dp</dimen>

@@ -8,13 +8,13 @@ import android.graphics.Color;
 /**
  * Created by mbpeele on 1/18/16.
  */
-public class Datastore {
+public class DataStore {
 
     private SharedPreferences preferences;
 
     private final static String SHARED_PREFS_KEY = "prefs";
 
-    public Datastore(Application application) {
+    public DataStore(Application application) {
         preferences = application.getSharedPreferences(SHARED_PREFS_KEY, Context.MODE_PRIVATE);
     }
 

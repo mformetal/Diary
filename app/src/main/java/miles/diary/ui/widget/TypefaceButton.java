@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.Button;
 
 import me.grantland.widget.AutofitHelper;
@@ -61,10 +62,10 @@ public class TypefaceButton extends Button {
         setTypeface(TextUtils.getDefaultFont(getContext()));
     }
 
-    private void tintDrawables(int color) {
+    private void tintDrawables(final int color) {
         new PreDrawer(this) {
             @Override
-            public void notifyPreDraw() {
+            public void notifyPreDraw(View view) {
                 Drawable[] drawables = getCompoundDrawables();
                 for (Drawable drawable: drawables) {
                     if (drawable != null) {

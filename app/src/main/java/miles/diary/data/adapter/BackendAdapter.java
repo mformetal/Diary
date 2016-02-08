@@ -13,11 +13,12 @@ import rx.subscriptions.CompositeSubscription;
 /**
  * Created by mbpeele on 2/3/16.
  */
-public abstract class BackendAdapter<T extends RealmObject> extends RecyclerView.Adapter {
+public abstract class BackendAdapter<T extends RealmObject, VH extends RecyclerView.ViewHolder>
+        extends RecyclerView.Adapter<VH> {
 
     private RealmResults<T> data;
     protected Realm realm;
-    private BackendAdapterListener listener;
+    private BackendAdapterListener<T> listener;
 
     public BackendAdapter(Realm realm1) {
         realm = realm1;

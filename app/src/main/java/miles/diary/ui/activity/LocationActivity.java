@@ -4,13 +4,17 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
+import android.transition.ArcMotion;
 import android.view.View;
+import android.view.animation.AnimationUtils;
+import android.view.animation.Interpolator;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -18,6 +22,7 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
@@ -225,31 +230,31 @@ public class LocationActivity extends BaseActivity
         if (weatherText.getStringText().isEmpty()) {
             Location loc = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
             if (loc != null) {
-                weatherService.getWeather(loc.getLatitude(), loc.getLongitude())
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new ActivitySubscriber<WeatherResponse>(this) {
-                            @Override
-                            public void onNext(WeatherResponse weatherResponse) {
-                                weather = weatherResponse.getCurrentWeather();
-
-                                weatherText.setAlpha(0f);
-                                weatherText.setScaleX(.8f);
-
-                                weatherText.setText(weather.formatTemperature());
-
-                                weatherText.animate()
-                                        .alpha(1f)
-                                        .scaleX(1f)
-                                        .setDuration(AnimUtils.longAnim(LocationActivity.this))
-                                        .setInterpolator(new FastOutSlowInInterpolator());
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                Logg.log(e);
-                            }
-                        });
+//                weatherService.getWeather(loc.getLatitude(), loc.getLongitude())
+//                        .subscribeOn(Schedulers.io())
+//                        .observeOn(AndroidSchedulers.mainThread())
+//                        .subscribe(new ActivitySubscriber<WeatherResponse>(this) {
+//                            @Override
+//                            public void onNext(WeatherResponse weatherResponse) {
+//                                weather = weatherResponse.getCurrentWeather();
+//
+//                                weatherText.setAlpha(0f);
+//                                weatherText.setScaleX(.8f);
+//
+//                                weatherText.setText(weather.formatTemperature());
+//
+//                                weatherText.animate()
+//                                        .alpha(1f)
+//                                        .scaleX(1f)
+//                                        .setDuration(AnimUtils.longAnim(LocationActivity.this))
+//                                        .setInterpolator(new FastOutSlowInInterpolator());
+//                            }
+//
+//                            @Override
+//                            public void onError(Throwable e) {
+//                                Logg.log(e);
+//                            }
+//                        });
             }
         }
     }
@@ -257,7 +262,7 @@ public class LocationActivity extends BaseActivity
     private void setupTransitions() {
         new PreDrawer(root) {
             @Override
-            public void notifyPreDraw() {
+            public void notifyPreDraw(View view) {
                 float offset = root.getHeight() / 3;
                 for (int i = 0; i < root.getChildCount(); i++) {
                     View v = root.getChildAt(i);

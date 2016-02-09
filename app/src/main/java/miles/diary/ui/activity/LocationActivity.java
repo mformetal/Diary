@@ -4,17 +4,13 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
-import android.transition.ArcMotion;
 import android.view.View;
-import android.view.animation.AnimationUtils;
-import android.view.animation.Interpolator;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -22,7 +18,6 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
@@ -33,7 +28,9 @@ import butterknife.OnClick;
 import miles.diary.R;
 import miles.diary.data.ActivitySubscriber;
 import miles.diary.data.adapter.AutoCompleteAdapter;
-import miles.diary.data.model.WeatherResponse;
+import miles.diary.data.model.weather.Main;
+import miles.diary.data.model.weather.Weather;
+import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.ui.PreDrawer;
 import miles.diary.ui.widget.TypefaceAutoCompleteTextView;
 import miles.diary.ui.widget.TypefaceButton;
@@ -66,7 +63,7 @@ public class LocationActivity extends BaseActivity
     private AutoCompleteAdapter autoCompleteAdapter;
     private String locationName;
     private String locationId;
-    private WeatherResponse.Weather weather;
+    private WeatherResponse weatherResponse;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,7 +173,7 @@ public class LocationActivity extends BaseActivity
                     Intent intent = new Intent();
                     intent.putExtra(RESULT_LOCATION_NAME, locationName);
                     intent.putExtra(RESULT_LOCATION_ID, locationId);
-                    intent.putExtra(RESULT_WEATHER, weather);
+//                    intent.putExtra(RESULT_WEATHER, weather);
                     setResult(RESULT_OK, intent);
                     onBackPressed();
                 } else {
@@ -230,31 +227,32 @@ public class LocationActivity extends BaseActivity
         if (weatherText.getStringText().isEmpty()) {
             Location loc = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
             if (loc != null) {
-//                weatherService.getWeather(loc.getLatitude(), loc.getLongitude())
-//                        .subscribeOn(Schedulers.io())
-//                        .observeOn(AndroidSchedulers.mainThread())
-//                        .subscribe(new ActivitySubscriber<WeatherResponse>(this) {
-//                            @Override
-//                            public void onNext(WeatherResponse weatherResponse) {
-//                                weather = weatherResponse.getCurrentWeather();
-//
-//                                weatherText.setAlpha(0f);
-//                                weatherText.setScaleX(.8f);
-//
-//                                weatherText.setText(weather.formatTemperature());
-//
-//                                weatherText.animate()
-//                                        .alpha(1f)
-//                                        .scaleX(1f)
-//                                        .setDuration(AnimUtils.longAnim(LocationActivity.this))
-//                                        .setInterpolator(new FastOutSlowInInterpolator());
-//                            }
-//
-//                            @Override
-//                            public void onError(Throwable e) {
-//                                Logg.log(e);
-//                            }
-//                        });
+                weatherService.getWeather(loc.getLatitude(), loc.getLongitude())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new ActivitySubscriber<WeatherResponse>(this) {
+                            @Override
+                            public void onNext(WeatherResponse weatherResponse1) {
+                                weatherResponse = weatherResponse1;
+                                Main weather = weatherResponse.getMain();
+
+                                weatherText.setAlpha(0f);
+                                weatherText.setScaleX(.8f);
+
+                                weatherText.setText(weather.formatTemperature());
+
+                                weatherText.animate()
+                                        .alpha(1f)
+                                        .scaleX(1f)
+                                        .setDuration(AnimUtils.longAnim(LocationActivity.this))
+                                        .setInterpolator(new FastOutSlowInInterpolator());
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                Logg.log(e);
+                            }
+                        });
             }
         }
     }

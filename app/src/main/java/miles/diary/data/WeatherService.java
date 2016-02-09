@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.Reader;
 
 import miles.diary.R;
-import miles.diary.data.model.WeatherResponse;
+import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.util.Logg;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -40,7 +40,8 @@ public class WeatherService {
                 @Override
                 public void call(Subscriber<? super WeatherResponse> subscriber) {
                     try {
-                        String url = baseUrl + "/" + apiKey + "/" + latitude + "," + longitude;
+                        String url = baseUrl + "data/2.5/weather?" +
+                                "lat=" + latitude + "&lon=" + longitude + "&APPID=" + apiKey;
 
                         Response response = client.newCall(new Request.Builder()
                                 .url(url)

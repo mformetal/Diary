@@ -11,13 +11,13 @@ import android.widget.EditText;
 /**
  * Created by mbpeele on 2/6/16.
  */
-public class CanceListener {
+public class CancelListener {
 
     private EditText widget;
     private Drawable[] hideDrawables;
     private Drawable canceler;
 
-    public CanceListener(EditText editText) {
+    public CancelListener(EditText editText) {
         widget = editText;
         widget.addTextChangedListener(textWatcher);
         widget.setOnTouchListener(touchListener);
@@ -61,7 +61,6 @@ public class CanceListener {
         if (visible) {
             widget.setCompoundDrawablesWithIntrinsicBounds(hideDrawables[0], hideDrawables[1],
                     hideDrawables[2], hideDrawables[3]);
-
         } else {
             widget.setCompoundDrawablesWithIntrinsicBounds(hideDrawables[0], hideDrawables[1],
                     null, hideDrawables[3]);

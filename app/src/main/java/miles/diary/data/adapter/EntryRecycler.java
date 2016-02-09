@@ -19,11 +19,10 @@ import io.realm.RealmResults;
 import miles.diary.R;
 import miles.diary.data.ActivitySubscriber;
 import miles.diary.data.model.Entry;
-import miles.diary.data.model.WeatherResponse;
+import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.ui.activity.BaseActivity;
 import miles.diary.ui.activity.EntryActivity;
 import miles.diary.ui.activity.NewEntryActivity;
-import miles.diary.ui.activity.UriActivity;
 import miles.diary.ui.widget.TypefaceTextView;
 import miles.diary.util.AnimUtils;
 
@@ -111,7 +110,7 @@ public class EntryRecycler extends BackendAdapter<Entry, RecyclerView.ViewHolder
         Uri uri = bundle.getParcelable(NewEntryActivity.RESULT_URI);
         String placeName = bundle.getString(NewEntryActivity.RESULT_PLACE_NAME);
         String placeId = bundle.getString(NewEntryActivity.RESULT_PLACE_ID);
-        WeatherResponse.Weather weather = bundle.getParcelable(NewEntryActivity.RESULT_WEATHER);
+        WeatherResponse weather = bundle.getParcelable(NewEntryActivity.RESULT_WEATHER);
 
         return Entry.construct(realm, body, uri, placeName, placeId, weather);
     }

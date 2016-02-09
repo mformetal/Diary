@@ -10,6 +10,7 @@ import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
+import miles.diary.data.model.weather.WeatherResponse;
 
 /**
  * Created by mbpeele on 1/18/16.
@@ -81,7 +82,7 @@ public class Entry extends RealmObject {
     }
 
     public static Entry construct(Realm realm, String body, Uri uri, String placeName,
-                                  String placeId, WeatherResponse.Weather weather) {
+                                  String placeId, WeatherResponse weather) {
         realm.beginTransaction();
         Entry entry = realm.createObject(Entry.class);
         entry.setBody(body);
@@ -90,7 +91,7 @@ public class Entry extends RealmObject {
             entry.setUri(uri.toString());
         }
         if (weather != null) {
-            entry.setTemperature(weather.formatTemperature());
+//            entry.setTemperature(weather.formatTemperature());
         }
         entry.setPlaceName(placeName);
         entry.setPlaceId(placeId);

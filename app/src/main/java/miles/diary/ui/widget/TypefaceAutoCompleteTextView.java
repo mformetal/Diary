@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.AutoCompleteTextView;
 
-import miles.diary.ui.CanceListener;
+import miles.diary.ui.CancelListener;
 import miles.diary.util.TextUtils;
 
 /**
@@ -38,6 +38,6 @@ public class TypefaceAutoCompleteTextView extends AutoCompleteTextView {
         }
 
         setTypeface(TextUtils.getDefaultFont(getContext()));
-        new CanceListener(this);
+        new CancelListener(this);
     }
 }

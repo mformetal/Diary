@@ -19,7 +19,7 @@ import butterknife.Bind;
 import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 import miles.diary.R;
-import miles.diary.data.model.WeatherResponse;
+import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.ui.widget.TypefaceEditText;
 
 /**
@@ -44,7 +44,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     private String placeName;
     private String placeId;
     private Uri imageUri;
-    private WeatherResponse.Weather weather;
+    private WeatherResponse weather;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -103,7 +103,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                     result.putExtra(NewEntryActivity.RESULT_URI, imageUri);
                     result.putExtra(NewEntryActivity.RESULT_PLACE_NAME, placeName);
                     result.putExtra(NewEntryActivity.RESULT_PLACE_ID, placeId);
-                    result.putExtra(NewEntryActivity.RESULT_WEATHER, weather);
+//                    result.putExtra(NewEntryActivity.RESULT_WEATHER, weather);
                     setResult(Activity.RESULT_OK, result);
                     finish();
                 } else {

@@ -3,15 +3,10 @@ package miles.diary.ui.activity;
 import android.animation.ObjectAnimator;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.support.v7.graphics.Palette;
 import android.transition.Transition;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestListener;
@@ -20,12 +15,11 @@ import com.bumptech.glide.request.target.Target;
 import butterknife.Bind;
 import miles.diary.R;
 import miles.diary.data.model.Entry;
-import miles.diary.ui.PreDrawer;
 import miles.diary.ui.SimpleTransitionListener;
 import miles.diary.ui.widget.CornerImageView;
+import miles.diary.ui.widget.TypefaceTextView;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.Logg;
-import miles.diary.util.ViewUtils;
 
 /**
  * Created by mbpeele on 2/8/16.
@@ -34,9 +28,9 @@ public class EntryActivity extends BaseActivity {
 
     public final static String DATA = "data";
 
-    @Bind(R.id.activity_entry_body) TextView textView;
+    @Bind(R.id.activity_entry_body) TypefaceTextView body;
     @Bind(R.id.activity_entry_image) CornerImageView imageView;
-    @Bind(R.id.activity_entry_toolbar) Toolbar toolbar;
+    @Bind(R.id.activity_entry_time) TypefaceTextView time;
 
     private Entry entry;
 
@@ -50,10 +44,8 @@ public class EntryActivity extends BaseActivity {
                 .equalTo(Entry.KEY, getIntent().getStringExtra(DATA))
                 .findFirst();
 
-        setActionBar(toolbar);
-        getActionBar().setTitle(Entry.formatDateString(entry));
-
-        textView.setText(entry.getBody());
+        body.setText(entry.getBody());
+        time.setText(Entry.formatDateString(entry));
 
         if (entry.getUri() != null) {
             Glide.with(EntryActivity.this)
@@ -70,13 +62,10 @@ public class EntryActivity extends BaseActivity {
                         @Override
                         public boolean onResourceReady(Bitmap resource, String model, Target<Bitmap> target,
                                                        boolean isFromMemoryCache, boolean isFirstResource) {
-                            Palette.from(resource).generate(new Palette.PaletteAsyncListener() {
-                                @Override
-                                public void onGenerated(Palette palette) {
-                                    Palette.Swatch swatch = palette.getVibrantSwatch();
-                                    textView.setTextColor(swatch.getTitleTextColor());
-                                    textView.setHighlightColor(swatch.getRgb());
-                                }
+                            Palette.from(resource).generate(palette -> {
+//                                Palette.Swatch swatch = palette.getLightVibrantSwatch();
+//                                body.setTextColor(swatch.getTitleTextColor());
+//                                body.setHighlightColor(swatch.getRgb());
                             });
                             return false;
                         }

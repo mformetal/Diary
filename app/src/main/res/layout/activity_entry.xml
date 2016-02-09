@@ -1,29 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_entry_root"
+    android:gravity="center"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent">
 
-    <Toolbar
-        android:id="@+id/activity_entry_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?android:attr/actionBarSize"
-        style="@style/AppTheme.Widget.Toolbar" />
-
-    <miles.diary.ui.widget.CornerImageView
+    <miles.diary.ui.widget.MaxCornerImageView
         android:id="@+id/activity_entry_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_gravity="center"
         android:transitionName="@string/transition_image"
         android:adjustViewBounds="true" />
 
     <miles.diary.ui.widget.TypefaceTextView
-        android:id="@+id/activity_entry_body"
-        android:layout_width="wrap_content"
+        android:id="@+id/activity_entry_time"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/large_text_size"
+        android:layout_margin="@dimen/activity_vertical_margin"
+        android:layout_gravity="top|center_horizontal"
+        android:gravity="center"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_anchor="@id/activity_entry_root"
-        app:layout_anchorGravity="center" />
+        tools:text="DATE" />
 
-</android.support.design.widget.CoordinatorLayout>
+    <miles.diary.ui.widget.TypefaceTextView
+        android:id="@+id/activity_entry_body"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/logo_text_size"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        tools:text="BODY"/>
+
+</FrameLayout>

@@ -11,6 +11,7 @@
 
     <miles.diary.ui.widget.TypefaceTextView
         android:id="@+id/adapter_entry_text_time"
+        android:drawableStart="@drawable/ic_access_time_24dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="@dimen/adapter_time_text_size"
@@ -30,6 +31,7 @@
 
     <miles.diary.ui.widget.TypefaceTextView
         android:id="@+id/adapter_entry_text_location"
+        android:drawableStart="@drawable/ic_place_24dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/adapter_entry_margin"

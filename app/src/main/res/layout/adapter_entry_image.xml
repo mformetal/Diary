@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -11,6 +11,7 @@
 
     <miles.diary.ui.widget.TypefaceTextView
         android:id="@+id/adapter_entry_image_time"
+        android:drawableStart="@drawable/ic_access_time_24dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="@dimen/adapter_time_text_size"
@@ -21,8 +22,6 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/adapter_entry_image_view"
-        android:layout_below="@id/adapter_entry_image_time"
-        android:layout_centerHorizontal="true"
         android:layout_width="@dimen/adapter_image_dimens"
         android:layout_height="@dimen/adapter_image_dimens"
         android:layout_marginTop="@dimen/adapter_entry_margin"
@@ -37,15 +36,13 @@
         android:id="@+id/adapter_entry_text_body"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
         android:textSize="@dimen/adapter_title_text_size"
         android:textColor="@android:color/black"
-        android:layout_below="@id/adapter_entry_image_view"
         tools:text="MOUNTAIN BIKING" />
 
     <miles.diary.ui.widget.TypefaceTextView
         android:id="@+id/adapter_entry_image_location"
-        android:layout_below="@id/adapter_entry_text_body"
+        android:drawableStart="@drawable/ic_place_24dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/adapter_entry_margin"
@@ -55,4 +52,4 @@
         android:maxLines="1"
         tools:text="MOUNTAIN BIKING" />
 
-</RelativeLayout>
+</LinearLayout>

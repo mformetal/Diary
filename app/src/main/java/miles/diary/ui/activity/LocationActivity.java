@@ -6,16 +6,13 @@ import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.view.View;
 
@@ -25,14 +22,10 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-
-import java.sql.Blob;
-import java.util.Locale;
 
 import butterknife.Bind;
 import butterknife.OnClick;
@@ -41,19 +34,14 @@ import miles.diary.data.ActivitySubscriber;
 import miles.diary.data.adapter.AutoCompleteAdapter;
 import miles.diary.data.model.weather.Main;
 import miles.diary.data.model.weather.Weather;
-import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.ui.PreDrawer;
 import miles.diary.ui.widget.TypefaceAutoCompleteTextView;
 import miles.diary.ui.widget.TypefaceButton;
-import miles.diary.ui.widget.TypefaceIconTextView;
 import miles.diary.ui.widget.TypefaceTextView;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.IntentUtils;
 import miles.diary.util.Logg;
-import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -67,19 +55,20 @@ public class LocationActivity extends BaseActivity
     private final static int REQUEST_PLACE_PICKER = 2;
     public final static String RESULT_LOCATION_NAME = "name";
     public final static String RESULT_LOCATION_ID = "id";
-    public final static String RESULT_WEATHER = "weather";
+    public final static String RESULT_TEMPERATURE = "temperature";
+    public final static String RESULT_TEMPERATURE_ICON = "icon";
 
     @Bind(R.id.activity_location_neg_button) TypefaceButton negButton;
     @Bind(R.id.activity_location_pos_button) TypefaceButton posButton;
-    @Bind(R.id.activity_location_weather) TypefaceIconTextView weatherText;
+    @Bind(R.id.activity_location_weather) TypefaceTextView weatherText;
     @Bind(R.id.activity_location_autocomplete) TypefaceAutoCompleteTextView autoCompleteTextView;
 
     private GoogleApiClient googleApiClient;
     private AutoCompleteAdapter autoCompleteAdapter;
     private String locationName;
     private String locationId;
-    private WeatherResponse weatherResponse;
-    private Geocoder geocoder;
+    private String temperature;
+    private byte[] temperatureIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,8 +76,6 @@ public class LocationActivity extends BaseActivity
         setContentView(R.layout.activity_location);
 
         setupTransitions();
-
-        geocoder = new Geocoder(this, Locale.US);
 
         googleApiClient = googleApiClientBuilder
                 .enableAutoManage(this, 0, this)
@@ -100,8 +87,13 @@ public class LocationActivity extends BaseActivity
         if (bundle != null) {
             locationName = bundle.getString(RESULT_LOCATION_NAME);
             locationId = bundle.getString(RESULT_LOCATION_ID);
+            temperature = bundle.getString(RESULT_TEMPERATURE);
+            temperatureIcon = bundle.getByteArray(RESULT_TEMPERATURE_ICON);
+
             if (locationName != null) {
                 autoCompleteTextView.setText(locationName, false);
+                weatherText.setCompoundDrawablesWithIntrinsicBounds(getIconFromBytes(), null, null, null);
+                weatherText.setText(temperature);
             }
         }
     }
@@ -153,16 +145,47 @@ public class LocationActivity extends BaseActivity
     }
 
     @Override
+    @OnClick({R.id.activity_location_pos_button, R.id.activity_location_neg_button,
+            R.id.activity_location_image})
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.activity_location_pos_button:
+                if (locationName != null) {
+                    Intent intent = new Intent();
+                    intent.putExtra(RESULT_LOCATION_NAME, locationName);
+                    intent.putExtra(RESULT_LOCATION_ID, locationId);
+                    intent.putExtra(RESULT_TEMPERATURE, weatherText.getStringText());
+                    intent.putExtra(RESULT_TEMPERATURE_ICON, temperatureIcon);
+                    setResult(RESULT_OK, intent);
+                    onBackPressed();
+                } else {
+                    Snackbar.make(root, R.string.activity_location_no_input,
+                            Snackbar.LENGTH_SHORT).show();
+                }
+                break;
+            case R.id.activity_location_neg_button:
+                Intent intent = new Intent();
+                setResult(RESULT_CANCELED, intent);
+                onBackPressed();
+                break;
+            case R.id.activity_location_image:
+                PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+
+                try {
+                    startActivityForResult(builder.build(this), REQUEST_PLACE_PICKER);
+                } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+                    Logg.log(e);
+                }
+                break;
+        }
+    }
+
+    @Override
     public void onConnected(Bundle bundle) {
         if (hasConnection()) {
             String[] permissions = new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
                     Manifest.permission.ACCESS_FINE_LOCATION};
             if (hasPermissions(permissions)) {
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                        && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    return;
-                }
-
                 Location loc = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
                 if (loc != null) {
                     double latitude = loc.getLatitude();
@@ -188,53 +211,10 @@ public class LocationActivity extends BaseActivity
     public void onConnectionSuspended(int i) {
     }
 
-    @Override
-    @OnClick({R.id.activity_location_pos_button, R.id.activity_location_neg_button,
-            R.id.activity_location_image})
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.activity_location_pos_button:
-                if (locationName != null) {
-                    Intent intent = new Intent();
-                    intent.putExtra(RESULT_LOCATION_NAME, locationName);
-                    intent.putExtra(RESULT_LOCATION_ID, locationId);
-//                    intent.putExtra(RESULT_WEATHER, weather);
-                    setResult(RESULT_OK, intent);
-                    onBackPressed();
-                } else {
-                    Snackbar.make(root, R.string.activity_location_no_input,
-                            Snackbar.LENGTH_SHORT).show();
-                }
-                break;
-            case R.id.activity_location_neg_button:
-                Intent intent = new Intent();
-                setResult(RESULT_CANCELED, intent);
-                onBackPressed();
-                break;
-            case R.id.activity_location_image:
-                PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-
-                try {
-                    startActivityForResult(builder.build(this), REQUEST_PLACE_PICKER);
-                } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
-                    Logg.log(e);
-                }
-                break;
-        }
-    }
-
     private void getPlace() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-
         if (locationName == null) {
             Places.PlaceDetectionApi.getCurrentPlace(googleApiClient, null)
                     .setResultCallback(placeLikelihoods -> {
-//                        for (PlaceLikelihood placeLikelihood: placeLikelihoods) {
-//                            Place place = placeLikelihood.getPlace();
-//                            Logg.log(place.getName(), String.valueOf(placeLikelihood.getLikelihood()));
-//                        }
                         Place mostLikely = placeLikelihoods.get(0).getPlace();
 
                         locationId = mostLikely.getId();
@@ -248,20 +228,13 @@ public class LocationActivity extends BaseActivity
     }
 
     private void getWeather() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-
         if (weatherText.getText().toString().isEmpty()) {
             Location loc = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
             if (loc != null) {
                 weatherService.getWeather(loc.getLatitude(), loc.getLongitude())
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .flatMap(weatherResponse1 -> {
-                            weatherResponse = weatherResponse1;
-
+                        .flatMap(weatherResponse -> {
                             Main main = weatherResponse.getMain();
 
                             Weather weather = weatherResponse.getWeather().get(0);
@@ -284,20 +257,23 @@ public class LocationActivity extends BaseActivity
                         .subscribe(new ActivitySubscriber<byte[]>(this) {
                             @Override
                             public void onNext(byte[] bytes) {
-                                Bitmap b = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                                Drawable drawable = new BitmapDrawable(getResources(),
-                                        Bitmap.createScaledBitmap(b,
-                                                weatherText.getMeasuredHeight(),
-                                                weatherText.getMeasuredHeight(), false));
-                                drawable.setColorFilter(
-                                        ContextCompat.getColor(getActivity(), R.color.primary_text),
-                                        PorterDuff.Mode.SRC_IN);
-                                weatherText.setCompoundDrawablesWithIntrinsicBounds(drawable,
-                                        null, null, null);
+                                temperatureIcon = bytes;
+                                weatherText.setCompoundDrawablesWithIntrinsicBounds(
+                                        getIconFromBytes(), null, null, null);
                             }
                         });
             }
         }
+    }
+
+    @NonNull
+    private Drawable getIconFromBytes() {
+        Bitmap b = BitmapFactory.decodeByteArray(temperatureIcon, 0,
+                temperatureIcon.length);
+        return new BitmapDrawable(getResources(),
+                Bitmap.createScaledBitmap(b,
+                        weatherText.getMeasuredHeight(),
+                        weatherText.getMeasuredHeight(), false));
     }
 
     private void setupTransitions() {

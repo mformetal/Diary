@@ -71,7 +71,8 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     public boolean hasPermissions(String[] permissions) {
         for (String permission: permissions) {
-            if (ActivityCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_DENIED) {
+            if (ActivityCompat.checkSelfPermission(this, permission)
+                    != PackageManager.PERMISSION_GRANTED) {
                 return false;
             }
         }

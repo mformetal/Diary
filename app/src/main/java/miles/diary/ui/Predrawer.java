@@ -6,9 +6,9 @@ import android.view.ViewTreeObserver;
 /**
  * Created by mbpeele on 2/2/16.
  */
-public abstract class PreDrawer {
+public abstract class PreDrawer<T extends View> {
 
-    public PreDrawer(final View view) {
+    public PreDrawer(final T view) {
         final ViewTreeObserver viewTreeObserver = view.getViewTreeObserver();
         viewTreeObserver.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
@@ -25,5 +25,5 @@ public abstract class PreDrawer {
         });
     }
 
-    public abstract void notifyPreDraw(View view);
+    public abstract void notifyPreDraw(T view);
 }

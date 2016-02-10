@@ -37,9 +37,9 @@ public class CancelListener {
 
         hideDrawables = new Drawable[4];
 
-        new PreDrawer(widget) {
+        new PreDrawer<EditText>(widget) {
             @Override
-            public void notifyPreDraw(View view) {
+            public void notifyPreDraw(EditText view) {
                 Drawable[] drawables = widget.getCompoundDrawables();
                 for (int i = 0; i < drawables.length; i++) {
                     Drawable drawable = drawables[i];

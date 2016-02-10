@@ -85,7 +85,7 @@ public class AnimUtils {
 
     public final static ViewPropertyAnimation.Animator REVEAL = view -> {
         if (view.getWidth() == 0 || view.getHeight() == 0) {
-            new PreDrawer(view) {
+            new PreDrawer<View>(view) {
                 @Override
                 public void notifyPreDraw(View view1) {
                     Animator reveal = ViewAnimationUtils.createCircularReveal(view1,

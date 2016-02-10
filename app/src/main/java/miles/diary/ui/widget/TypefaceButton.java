@@ -63,9 +63,9 @@ public class TypefaceButton extends Button {
     }
 
     private void tintDrawables(final int color) {
-        new PreDrawer(this) {
+        new PreDrawer<Button>(this) {
             @Override
-            public void notifyPreDraw(View view) {
+            public void notifyPreDraw(Button view) {
                 Drawable[] drawables = getCompoundDrawables();
                 for (Drawable drawable: drawables) {
                     if (drawable != null) {

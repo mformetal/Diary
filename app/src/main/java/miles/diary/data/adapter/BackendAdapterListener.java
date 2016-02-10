@@ -7,9 +7,11 @@ import io.realm.RealmObject;
  */
 public interface BackendAdapterListener<T extends RealmObject> {
 
-    void onCompleted();
+    void onLoadCompleted();
 
-    void onError(Throwable throwable);
+    void onLoadError(Throwable throwable);
 
-    void onEmpty();
+    void onLoadEmpty();
+
+    void onLoadStart();
 }

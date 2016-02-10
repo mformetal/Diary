@@ -5,10 +5,6 @@ import android.support.v7.widget.RecyclerView;
 import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
-import miles.diary.data.model.Entry;
-import rx.Observable;
-import rx.Subscriber;
-import rx.subscriptions.CompositeSubscription;
 
 /**
  * Created by mbpeele on 2/3/16.
@@ -41,25 +37,33 @@ public abstract class BackendAdapter<T extends RealmObject, VH extends RecyclerV
 
     public abstract void loadData(Realm realm);
 
+    public abstract void addData(T object);
+
     public void setData(RealmResults<T> results) {
         data = results;
     }
 
     public void propogateError(Throwable throwable) {
         if (listener != null) {
-            listener.onError(throwable);
+            listener.onLoadError(throwable);
         }
     }
 
     public void propogateCompletion() {
         if (listener != null) {
-            listener.onCompleted();
+            listener.onLoadCompleted();
         }
     }
 
     public void propogateEmpty() {
         if (listener != null) {
-            listener.onEmpty();
+            listener.onLoadEmpty();
+        }
+    }
+
+    public void propogateStart() {
+        if (listener != null) {
+            listener.onLoadStart();
         }
     }
 }

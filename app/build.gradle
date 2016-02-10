@@ -76,7 +76,6 @@ dependencies {
     compile 'com.squareup.okhttp3:okhttp:3.0.1'
     compile 'io.realm:realm-android:0.87.4'
     compile 'com.github.bumptech.glide:glide:3.6.1'
-    compile 'com.joanzapata.iconify:android-iconify-weathericons:2.1.1'
     compile 'joda-time:joda-time:2.3'
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;

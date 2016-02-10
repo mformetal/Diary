@@ -113,18 +113,18 @@ public class HomeActivity extends TransitionActivity implements BackendAdapterLi
     }
 
     @Override
-    public void onCompleted() {
+    public void onLoadCompleted() {
         dismissLoading();
     }
 
     @Override
-    public void onError(Throwable throwable) {
+    public void onLoadError(Throwable throwable) {
         Logg.log(throwable);
         dismissLoading();
     }
 
     @Override
-    public void onEmpty() {
+    public void onLoadEmpty() {
         if (emptyView == null) {
             dismissLoading();
             ViewStub viewStub = (ViewStub) findViewById(R.id.activity_home_no_entries);
@@ -136,14 +136,33 @@ public class HomeActivity extends TransitionActivity implements BackendAdapterLi
         }
     }
 
+    @Override
+    public void onLoadStart() {
+        showLoading();
+    }
+
     private void dismissLoading() {
+        ObjectAnimator scale = ObjectAnimator.ofPropertyValuesHolder(progressBar,
+                PropertyValuesHolder.ofFloat(View.SCALE_X, 0f),
+                PropertyValuesHolder.ofFloat(View.SCALE_Y, 0f));
+        scale.setDuration(AnimUtils.longAnim(this));
+        scale.setInterpolator(new AnticipateOvershootInterpolator());
+
+        ObjectAnimator gone = AnimUtils.gone(progressBar, AnimUtils.longAnim(this));
+
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playTogether(scale, gone);
+        animatorSet.start();
+    }
+
+    private void showLoading() {
         ObjectAnimator scale = ObjectAnimator.ofPropertyValuesHolder(progressBar,
                 PropertyValuesHolder.ofFloat(View.SCALE_X, 1f),
                 PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f));
         scale.setDuration(AnimUtils.longAnim(this));
         scale.setInterpolator(new AnticipateOvershootInterpolator());
 
-        ObjectAnimator gone = AnimUtils.gone(progressBar, AnimUtils.longAnim(this));
+        ObjectAnimator gone = AnimUtils.visible(progressBar, AnimUtils.longAnim(this));
 
         AnimatorSet animatorSet = new AnimatorSet();
         animatorSet.playTogether(scale, gone);

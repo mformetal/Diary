@@ -26,7 +26,6 @@ import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-
 import butterknife.Bind;
 import butterknife.OnClick;
 import miles.diary.R;

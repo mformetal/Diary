@@ -97,4 +97,8 @@ public final class TextUtils {
         // set the scale for the text paint
         textPaint.setTextScaleX(xscale * .6f);
     }
+
+    public static String iconify(String key) {
+        return "{" + key + "}";
+    }
 }

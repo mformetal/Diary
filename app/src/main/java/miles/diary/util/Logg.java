@@ -2,6 +2,8 @@ package miles.diary.util;
 
 import android.util.Log;
 
+import java.util.Arrays;
+
 /**
  * Created by milespeele on 7/3/15.
  */
@@ -116,7 +118,7 @@ public class Logg {
     }
 
     public static void log(String string, Throwable throwable) {
-        mainLog(string + throwable.getLocalizedMessage());
+        mainLog(string + ", " + Arrays.toString(throwable.getStackTrace()));
     }
 
     public static void log(String... strings) {

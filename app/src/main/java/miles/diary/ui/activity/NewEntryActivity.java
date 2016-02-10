@@ -134,6 +134,8 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                 break;
             case R.id.activity_new_entry_location:
                 Intent intent1 = new Intent(this, LocationActivity.class);
+                intent1.putExtra(LocationActivity.RESULT_LOCATION_NAME, placeName);
+                intent1.putExtra(LocationActivity.RESULT_LOCATION_ID, placeId);
                 ActivityOptions transitionActivityOptions =
                         ActivityOptions.makeSceneTransitionAnimation(this, location,
                                 getString(R.string.transition_location));

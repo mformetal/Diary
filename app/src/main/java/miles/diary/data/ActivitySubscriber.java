@@ -31,7 +31,7 @@ public class ActivitySubscriber<T> extends Subscriber<T> {
     public void onError(Throwable e) {
         BaseActivity activity = softReference.get();
         if (activity != null) {
-            Logg.log(activity.getClass().getName(), e);
+            Logg.log("FROM: " + activity.getClass().getName(), e);
         }
         removeSelf();
     }
@@ -46,5 +46,9 @@ public class ActivitySubscriber<T> extends Subscriber<T> {
         if (activity != null) {
             activity.removeSubscription(this);
         }
+    }
+
+    public BaseActivity getActivity() {
+        return softReference.get();
     }
 }

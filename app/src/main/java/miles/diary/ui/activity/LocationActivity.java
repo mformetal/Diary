@@ -4,11 +4,18 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.view.View;
 
@@ -18,10 +25,14 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+
+import java.sql.Blob;
+import java.util.Locale;
 
 import butterknife.Bind;
 import butterknife.OnClick;
@@ -34,11 +45,15 @@ import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.ui.PreDrawer;
 import miles.diary.ui.widget.TypefaceAutoCompleteTextView;
 import miles.diary.ui.widget.TypefaceButton;
+import miles.diary.ui.widget.TypefaceIconTextView;
 import miles.diary.ui.widget.TypefaceTextView;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.IntentUtils;
 import miles.diary.util.Logg;
+import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -56,7 +71,7 @@ public class LocationActivity extends BaseActivity
 
     @Bind(R.id.activity_location_neg_button) TypefaceButton negButton;
     @Bind(R.id.activity_location_pos_button) TypefaceButton posButton;
-    @Bind(R.id.activity_location_weather) TypefaceTextView weatherText;
+    @Bind(R.id.activity_location_weather) TypefaceIconTextView weatherText;
     @Bind(R.id.activity_location_autocomplete) TypefaceAutoCompleteTextView autoCompleteTextView;
 
     private GoogleApiClient googleApiClient;
@@ -64,6 +79,7 @@ public class LocationActivity extends BaseActivity
     private String locationName;
     private String locationId;
     private WeatherResponse weatherResponse;
+    private Geocoder geocoder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,13 +88,22 @@ public class LocationActivity extends BaseActivity
 
         setupTransitions();
 
+        geocoder = new Geocoder(this, Locale.US);
+
         googleApiClient = googleApiClientBuilder
                 .enableAutoManage(this, 0, this)
                 .addConnectionCallbacks(this)
                 .build();
 
-        autoCompleteTextView.setOnItemClickListener((parent, view, position, id) -> {
-        });
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
+        if (bundle != null) {
+            locationName = bundle.getString(RESULT_LOCATION_NAME);
+            locationId = bundle.getString(RESULT_LOCATION_ID);
+            if (locationName != null) {
+                autoCompleteTextView.setText(locationName, false);
+            }
+        }
     }
 
     @Override
@@ -206,6 +231,10 @@ public class LocationActivity extends BaseActivity
         if (locationName == null) {
             Places.PlaceDetectionApi.getCurrentPlace(googleApiClient, null)
                     .setResultCallback(placeLikelihoods -> {
+//                        for (PlaceLikelihood placeLikelihood: placeLikelihoods) {
+//                            Place place = placeLikelihood.getPlace();
+//                            Logg.log(place.getName(), String.valueOf(placeLikelihood.getLikelihood()));
+//                        }
                         Place mostLikely = placeLikelihoods.get(0).getPlace();
 
                         locationId = mostLikely.getId();
@@ -224,33 +253,47 @@ public class LocationActivity extends BaseActivity
             return;
         }
 
-        if (weatherText.getStringText().isEmpty()) {
+        if (weatherText.getText().toString().isEmpty()) {
             Location loc = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
             if (loc != null) {
                 weatherService.getWeather(loc.getLatitude(), loc.getLongitude())
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new ActivitySubscriber<WeatherResponse>(this) {
+                        .flatMap(weatherResponse1 -> {
+                            weatherResponse = weatherResponse1;
+
+                            Main main = weatherResponse.getMain();
+
+                            Weather weather = weatherResponse.getWeather().get(0);
+
+                            weatherText.setAlpha(0f);
+                            weatherText.setScaleX(.8f);
+
+                            weatherText.setText(main.formatTemperature());
+
+                            weatherText.animate()
+                                    .alpha(1f)
+                                    .scaleX(1f)
+                                    .setDuration(AnimUtils.longAnim(LocationActivity.this))
+                                    .setInterpolator(new FastOutSlowInInterpolator());
+
+                            return weatherService.getWeatherIcon(weather.getIcon())
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread());
+                        })
+                        .subscribe(new ActivitySubscriber<byte[]>(this) {
                             @Override
-                            public void onNext(WeatherResponse weatherResponse1) {
-                                weatherResponse = weatherResponse1;
-                                Main weather = weatherResponse.getMain();
-
-                                weatherText.setAlpha(0f);
-                                weatherText.setScaleX(.8f);
-
-                                weatherText.setText(weather.formatTemperature());
-
-                                weatherText.animate()
-                                        .alpha(1f)
-                                        .scaleX(1f)
-                                        .setDuration(AnimUtils.longAnim(LocationActivity.this))
-                                        .setInterpolator(new FastOutSlowInInterpolator());
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                Logg.log(e);
+                            public void onNext(byte[] bytes) {
+                                Bitmap b = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                                Drawable drawable = new BitmapDrawable(getResources(),
+                                        Bitmap.createScaledBitmap(b,
+                                                weatherText.getMeasuredHeight(),
+                                                weatherText.getMeasuredHeight(), false));
+                                drawable.setColorFilter(
+                                        ContextCompat.getColor(getActivity(), R.color.primary_text),
+                                        PorterDuff.Mode.SRC_IN);
+                                weatherText.setCompoundDrawablesWithIntrinsicBounds(drawable,
+                                        null, null, null);
                             }
                         });
             }

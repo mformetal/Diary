@@ -1,6 +1,9 @@
 
 package miles.diary.data.model.weather;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import javax.annotation.Generated;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -9,7 +12,7 @@ import java.util.Locale;
 
 import miles.diary.util.Logg;
 
-public class Main {
+public class Main implements Parcelable {
 
     final String DEGREE  = "\u00b0";
 
@@ -170,4 +173,43 @@ public class Main {
         this.grndLevel = grndLevel;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.DEGREE);
+        dest.writeValue(this.temp);
+        dest.writeValue(this.pressure);
+        dest.writeValue(this.humidity);
+        dest.writeValue(this.tempMin);
+        dest.writeValue(this.tempMax);
+        dest.writeValue(this.seaLevel);
+        dest.writeValue(this.grndLevel);
+    }
+
+    public Main() {
+    }
+
+    protected Main(Parcel in) {
+        this.temp = (Double) in.readValue(Double.class.getClassLoader());
+        this.pressure = (Double) in.readValue(Double.class.getClassLoader());
+        this.humidity = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.tempMin = (Double) in.readValue(Double.class.getClassLoader());
+        this.tempMax = (Double) in.readValue(Double.class.getClassLoader());
+        this.seaLevel = (Double) in.readValue(Double.class.getClassLoader());
+        this.grndLevel = (Double) in.readValue(Double.class.getClassLoader());
+    }
+
+    public static final Parcelable.Creator<Main> CREATOR = new Parcelable.Creator<Main>() {
+        public Main createFromParcel(Parcel source) {
+            return new Main(source);
+        }
+
+        public Main[] newArray(int size) {
+            return new Main[size];
+        }
+    };
 }

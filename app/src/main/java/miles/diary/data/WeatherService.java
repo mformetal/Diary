@@ -40,7 +40,7 @@ public class WeatherService {
                 @Override
                 public void call(Subscriber<? super WeatherResponse> subscriber) {
                     try {
-                        String url = baseUrl + "data/2.5/weather?" +
+                        final String url = baseUrl + "data/2.5/weather?" +
                                 "lat=" + latitude + "&lon=" + longitude + "&APPID=" + apiKey;
 
                         Response response = client.newCall(new Request.Builder()
@@ -55,6 +55,7 @@ public class WeatherService {
                         Logg.log(e);
                         subscriber.onError(e);
                     } catch (JsonSyntaxException e1) {
+                        subscriber.onError(e1);
                         Logg.log(e1);
                     }
                 }
@@ -62,5 +63,25 @@ public class WeatherService {
         }
 
         return weatherResponseObservable;
+    }
+
+    public Observable<byte[]> getWeatherIcon(String imageUri) {
+        return Observable.create(new Observable.OnSubscribe<byte[]>() {
+            @Override
+            public void call(Subscriber<? super byte[]> subscriber) {
+                final String url = baseUrl + "img/w/" + imageUri + ".png";
+
+                try {
+                    Response response = client.newCall(new Request.Builder()
+                            .url(url)
+                            .build()).execute();
+
+                    subscriber.onNext(response.body().bytes());
+                    subscriber.onCompleted();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }

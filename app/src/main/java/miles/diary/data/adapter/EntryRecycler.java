@@ -16,6 +16,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.target.ViewTarget;
 
 import org.w3c.dom.Text;
 
@@ -182,36 +187,22 @@ public class EntryRecycler extends BackendAdapter<Entry, RecyclerView.ViewHolder
 
     private void loadTemperatureIcon(RecyclerView.ViewHolder viewHolder, Entry entry) {
         byte[] temperatureIcon = entry.getTemperatureIcon();
-        Logg.log(temperatureIcon != null);
         if (temperatureIcon != null) {
-            TextView view;
-            if (viewHolder instanceof TextViewHolder) {
-                view = ((TextViewHolder) viewHolder).temperature;
-            } else {
-                view = ((ImageViewHolder) viewHolder).temperature;
-            }
-            Bitmap b = BitmapFactory.decodeByteArray(temperatureIcon, 0,
-                    temperatureIcon.length);
-            if (view.getMeasuredHeight() == 0) {
-                new PreDrawer<TextView>(view) {
-                    @Override
-                    public void notifyPreDraw(TextView view) {
-                        Drawable drawable = new BitmapDrawable(host.getResources(),
-                                Bitmap.createScaledBitmap(b,
-                                        view.getMeasuredHeight(),
-                                        view.getMeasuredHeight(), false));
-                        view.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
-                        view.setText(entry.getTemperature());
-                    }
-                };
-            } else {
-                Drawable drawable = new BitmapDrawable(host.getResources(),
-                        Bitmap.createScaledBitmap(b,
-                                view.getMeasuredHeight(),
-                                view.getMeasuredHeight(), false));
-                view.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
-                view.setText(entry.getTemperature());
-            }
+            final TypefaceTextView view = (viewHolder instanceof TextViewHolder) ?
+                    ((TextViewHolder) viewHolder).temperature :
+                    ((ImageViewHolder) viewHolder).temperature;
+
+            Glide.with(host)
+                    .load(temperatureIcon)
+                    .asBitmap()
+                    .into(new ViewTarget<TypefaceTextView, Bitmap>(view) {
+                        @Override
+                        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                            Drawable drawable = new BitmapDrawable(host.getResources(), resource);
+                            view.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
+                            view.setText(entry.getTemperature());
+                        }
+                    });
         }
     }
 

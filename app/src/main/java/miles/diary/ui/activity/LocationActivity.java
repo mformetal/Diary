@@ -25,13 +25,11 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
-import java.sql.Blob;
 import java.util.Locale;
 
 import butterknife.Bind;
@@ -45,15 +43,11 @@ import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.ui.PreDrawer;
 import miles.diary.ui.widget.TypefaceAutoCompleteTextView;
 import miles.diary.ui.widget.TypefaceButton;
-import miles.diary.ui.widget.TypefaceIconTextView;
 import miles.diary.ui.widget.TypefaceTextView;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.IntentUtils;
 import miles.diary.util.Logg;
-import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -71,7 +65,7 @@ public class LocationActivity extends BaseActivity
 
     @Bind(R.id.activity_location_neg_button) TypefaceButton negButton;
     @Bind(R.id.activity_location_pos_button) TypefaceButton posButton;
-    @Bind(R.id.activity_location_weather) TypefaceIconTextView weatherText;
+    @Bind(R.id.activity_location_weather) TypefaceTextView weatherText;
     @Bind(R.id.activity_location_autocomplete) TypefaceAutoCompleteTextView autoCompleteTextView;
 
     private GoogleApiClient googleApiClient;

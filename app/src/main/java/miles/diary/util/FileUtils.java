@@ -3,6 +3,8 @@ package miles.diary.util;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.webkit.MimeTypeMap;
@@ -21,8 +23,9 @@ import java.util.Locale;
  */
 public class FileUtils {
 
-    public final static String MIME_IMAGE = "image/jpeg";
-    public final static String MIME_VIDEO = "video/mp4";
+    private final static String MIME_IMAGE = "image/jpeg";
+    private final static String MIME_VIDEO = "video/mp4";
+    private final static String AUTH_BITMAP_FILENAME = "miles:diary:auth:bitmap";
 
     private FileUtils() {}
 
@@ -75,5 +78,27 @@ public class FileUtils {
         }
 
         return false;
+    }
+
+    public static Bitmap getAuthBitmap(Context context) {
+        Bitmap bitmap = null;
+        try {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            options.inMutable = true;
+            options.inPreferQualityOverSpeed = true;
+
+            InputStream test = context.openFileInput(AUTH_BITMAP_FILENAME);
+            bitmap = BitmapFactory.decodeStream(test, null, options);
+            test.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return bitmap;
+    }
+
+    public static void deleteAuthBitmap(Context context) {
+        context.deleteFile(AUTH_BITMAP_FILENAME);
     }
 }

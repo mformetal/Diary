@@ -22,8 +22,6 @@ import miles.diary.util.Logg;
 public class AutoCompleteAdapter
         extends ArrayAdapter<AutoCompleteAdapter.AdapterAutoCompleteItem> implements Filterable {
 
-    private static final String TAG = "PlaceAutocompleteAdapter";
-
     private ArrayList<AdapterAutoCompleteItem> mResultList;
 
     final GoogleApiClient mGoogleApiClient;

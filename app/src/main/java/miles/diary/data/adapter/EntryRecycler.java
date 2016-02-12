@@ -143,16 +143,13 @@ public class EntryRecycler extends BackendAdapter<Entry, RecyclerView.ViewHolder
     }
 
     private void bindImageViewHolder(ImageViewHolder holder, Entry entry) {
-        holder.image.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(host, EntryActivity.class);
-                intent.putExtra(EntryActivity.DATA, entry.getBody());
-                ActivityOptions transitionActivityOptions =
-                        ActivityOptions.makeSceneTransitionAnimation(host, holder.image,
-                                host.getString(R.string.transition_image));
-                host.startActivity(intent, transitionActivityOptions.toBundle());
-            }
+        holder.image.setOnClickListener(v -> {
+            Intent intent = new Intent(host, EntryActivity.class);
+            intent.putExtra(EntryActivity.DATA, entry.getBody());
+            ActivityOptions transitionActivityOptions =
+                    ActivityOptions.makeSceneTransitionAnimation(host, holder.image,
+                            host.getString(R.string.transition_image));
+            host.startActivity(intent, transitionActivityOptions.toBundle());
         });
         holder.time.setText(Entry.formatDateString(entry));
         holder.body.setText(entry.getBody());
@@ -161,8 +158,6 @@ public class EntryRecycler extends BackendAdapter<Entry, RecyclerView.ViewHolder
         String placeName = entry.getPlaceName();
         if (placeName != null) {
             holder.location.setText(entry.getPlaceName());
-        } else {
-            holder.location.setVisibility(View.GONE);
         }
 
         Glide.with(host)
@@ -173,6 +168,14 @@ public class EntryRecycler extends BackendAdapter<Entry, RecyclerView.ViewHolder
     }
 
     private void bindTextViewHolder(TextViewHolder holder, Entry entry) {
+        holder.body.setOnClickListener(v -> {
+//            Intent intent = new Intent(host, EntryActivity.class);
+//            intent.putExtra(EntryActivity.DATA, entry.getBody());
+//            ActivityOptions transitionActivityOptions =
+//                    ActivityOptions.makeSceneTransitionAnimation(host, holder.image,
+//                            host.getString(R.string.transition_image));
+//            host.startActivity(intent, transitionActivityOptions.toBundle());
+        });
         holder.body.setText(entry.getBody());
         holder.time.setText(Entry.formatDateString(entry));
         loadTemperatureIcon(holder, entry);
@@ -180,8 +183,6 @@ public class EntryRecycler extends BackendAdapter<Entry, RecyclerView.ViewHolder
         String placeName = entry.getPlaceName();
         if (placeName != null) {
             holder.location.setText(entry.getPlaceName());
-        } else {
-            holder.location.setVisibility(View.GONE);
         }
     }
 

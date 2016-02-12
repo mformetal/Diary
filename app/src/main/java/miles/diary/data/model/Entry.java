@@ -19,7 +19,6 @@ public class Entry extends RealmObject {
 
     private final static SimpleDateFormat dateFormatter
             = new SimpleDateFormat("EEE, MMM d, ''yy", Locale.getDefault());
-
     public final static String KEY = "body";
 
     @PrimaryKey private String body;

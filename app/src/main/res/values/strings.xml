@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Diary</string>
     <string name="activity_new_entry_name">New Diary Entry</string>
+    <string name="activity_auth_name">AUTHENTICATE</string>
     <string name="realm_name">Realm</string>
 
     <string name="activity_location_text_hint">Type place or click above</string>

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -16,6 +15,9 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.view.View;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.ViewTarget;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -26,6 +28,7 @@ import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+
 import butterknife.Bind;
 import butterknife.OnClick;
 import miles.diary.R;
@@ -67,6 +70,7 @@ public class LocationActivity extends BaseActivity
     private String locationName;
     private String locationId;
     private String temperature;
+    private boolean hasPreviousInfo = false;
     private byte[] temperatureIcon;
 
     @Override
@@ -90,9 +94,10 @@ public class LocationActivity extends BaseActivity
             temperatureIcon = bundle.getByteArray(RESULT_TEMPERATURE_ICON);
 
             if (locationName != null) {
+                hasPreviousInfo = true;
                 autoCompleteTextView.setText(locationName, false);
-                weatherText.setCompoundDrawablesWithIntrinsicBounds(getIconFromBytes(), null, null, null);
                 weatherText.setText(temperature);
+                getWeatherIconAndText();
             }
         }
     }
@@ -211,7 +216,7 @@ public class LocationActivity extends BaseActivity
     }
 
     private void getPlace() {
-        if (locationName == null) {
+        if (!hasPreviousInfo) {
             Places.PlaceDetectionApi.getCurrentPlace(googleApiClient, null)
                     .setResultCallback(placeLikelihoods -> {
                         Place mostLikely = placeLikelihoods.get(0).getPlace();
@@ -227,7 +232,7 @@ public class LocationActivity extends BaseActivity
     }
 
     private void getWeather() {
-        if (weatherText.getText().toString().isEmpty()) {
+        if (!hasPreviousInfo) {
             Location loc = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
             if (loc != null) {
                 weatherService.getWeather(loc.getLatitude(), loc.getLongitude())
@@ -257,24 +262,27 @@ public class LocationActivity extends BaseActivity
                             @Override
                             public void onNext(byte[] bytes) {
                                 temperatureIcon = bytes;
-                                weatherText.setCompoundDrawablesWithIntrinsicBounds(
-                                        getIconFromBytes(), null, null, null);
+                                getWeatherIconAndText();
                             }
                         });
             }
         }
     }
 
-    @NonNull
-    private Drawable getIconFromBytes() {
-        Bitmap b = BitmapFactory.decodeByteArray(temperatureIcon, 0,
-                temperatureIcon.length);
-        return new BitmapDrawable(getResources(),
-                Bitmap.createScaledBitmap(b,
-                        weatherText.getMeasuredHeight(),
-                        weatherText.getMeasuredHeight(), false));
+    private void getWeatherIconAndText() {
+        Glide.with(this)
+                .load(temperatureIcon)
+                .asBitmap()
+                .into(new ViewTarget<TypefaceTextView, Bitmap>(weatherText) {
+                    @Override
+                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                        Drawable drawable = new BitmapDrawable(getResources(), resource);
+                        view.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
+                    }
+                });
     }
 
+    @SuppressWarnings("unchecked")
     private void setupTransitions() {
         new PreDrawer(root) {
             @Override

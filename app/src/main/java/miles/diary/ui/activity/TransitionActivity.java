@@ -53,28 +53,6 @@ public abstract class TransitionActivity extends BaseActivity {
     }
 
     @Override
-    public void setContentView(View view) {
-        super.setContentView(view);
-        new PreDrawer(view) {
-            @Override
-            public void notifyPreDraw(View view) {
-                onEnter(root, intent, hasSavedInstanceState);
-            }
-        };
-    }
-
-    @Override
-    public void setContentView(View view, ViewGroup.LayoutParams params) {
-        super.setContentView(view, params);
-        new PreDrawer(view) {
-            @Override
-            public void notifyPreDraw(View view) {
-                onEnter(root, intent, hasSavedInstanceState);
-            }
-        };
-    }
-
-    @Override
     public void onBackPressed() {
         onExit(root, intent, hasSavedInstanceState);
     }
@@ -88,7 +66,7 @@ public abstract class TransitionActivity extends BaseActivity {
         overridePendingTransition(0, 0);
     }
 
-    public abstract void onEnter(View root, Intent calledIntent, boolean hasSavedInstanceState);
+    abstract void onEnter(View root, Intent calledIntent, boolean hasSavedInstanceState);
 
-    public abstract void onExit(View root, Intent calledIntent, boolean hasSavedInstanceState);
+    abstract void onExit(View root, Intent calledIntent, boolean hasSavedInstanceState);
 }

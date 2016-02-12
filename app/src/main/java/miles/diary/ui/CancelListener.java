@@ -20,6 +20,18 @@ public class CancelListener {
     public CancelListener(EditText editText) {
         widget = editText;
         widget.addTextChangedListener(textWatcher);
+        View.OnTouchListener touchListener = (v, event) -> {
+            if (canceler != null && event.getX() > widget.getWidth() - widget.getPaddingRight() -
+                    canceler.getIntrinsicWidth()) {
+                if (widget instanceof AutoCompleteTextView) {
+                    ((AutoCompleteTextView) widget).setText("", false);
+                } else {
+                    widget.setText("");
+                }
+                setCancelVisible(false);
+            }
+            return false;
+        };
         widget.setOnTouchListener(touchListener);
         widget.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
             @Override
@@ -84,19 +96,4 @@ public class CancelListener {
         }
     };
 
-    private final View.OnTouchListener touchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            if (canceler != null && event.getX() > widget.getWidth() - widget.getPaddingRight() -
-                    canceler.getIntrinsicWidth()) {
-                if (widget instanceof AutoCompleteTextView) {
-                    ((AutoCompleteTextView) widget).setText("", false);
-                } else {
-                    widget.setText("");
-                }
-                setCancelVisible(false);
-            }
-            return false;
-        }
-    };
 }

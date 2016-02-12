@@ -53,7 +53,7 @@ public class NotebookEditText extends TypefaceEditText {
             mPaint.setColor(mFocusedColor);
             mPaint.setStrokeWidth(5f);
         } else {
-            mPaint.setColor(Color.BLACK);
+            mPaint.setColor(mUnfocusedColor);
             mPaint.setStrokeWidth(defaultWidth);
         }
 

@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <miles.diary.ui.widget.MaxCornerImageView
+    <miles.diary.ui.widget.SquareCornerImageView
         android:id="@+id/activity_entry_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

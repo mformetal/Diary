@@ -27,15 +27,6 @@ public class Entry extends RealmObject {
     private String placeName;
     private String placeId;
     private String temperature;
-    private byte[] temperatureIcon;
-
-    public byte[] getTemperatureIcon() {
-        return temperatureIcon;
-    }
-
-    public void setTemperatureIcon(byte[] temperatureIcon) {
-        this.temperatureIcon = temperatureIcon;
-    }
 
     public String getTemperature() {
         return temperature;
@@ -90,7 +81,7 @@ public class Entry extends RealmObject {
     }
 
     public static Entry construct(Realm realm, String body, Uri uri, String placeName,
-                                  String placeId, String temperature, byte[] temperatureIcon) {
+                                  String placeId, String temperature) {
         realm.beginTransaction();
         Entry entry = realm.createObject(Entry.class);
         entry.setBody(body);
@@ -101,7 +92,6 @@ public class Entry extends RealmObject {
         entry.setPlaceName(placeName);
         entry.setPlaceId(placeId);
         entry.setTemperature(temperature);
-        entry.setTemperatureIcon(temperatureIcon);
         realm.commitTransaction();
         realm.refresh();
         return entry;

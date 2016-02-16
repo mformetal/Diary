@@ -4,6 +4,8 @@
     <string name="activity_auth_name">AUTHENTICATE</string>
     <string name="realm_name">Realm</string>
 
+    <string name="no_internet">No internet connection found.</string>
+
     <string name="activity_location_text_hint">Type place or click above</string>
     <string name="activity_location_no_input">Choose a place first!</string>
 
@@ -18,5 +20,10 @@
     <string name="menu_entry_done">Add Entry</string>
 
     <string name="menu_home_new_entry">New Entry</string>
+
+    <string name="transition_image">image</string>
+    <string name="transition_location">location</string>
+
+    <string name="weather_base">http://api.openweathermap.org/</string>
 
 </resources>

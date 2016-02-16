@@ -20,9 +20,9 @@ import java.util.concurrent.TimeUnit;
 import miles.diary.util.Logg;
 
 public class AutoCompleteAdapter
-        extends ArrayAdapter<AutoCompleteAdapter.AdapterAutoCompleteItem> implements Filterable {
+        extends ArrayAdapter<AutoCompleteAdapter.AutoCompleteAdapterItem> implements Filterable {
 
-    private ArrayList<AdapterAutoCompleteItem> mResultList;
+    private ArrayList<AutoCompleteAdapterItem> mResultList;
 
     final GoogleApiClient mGoogleApiClient;
 
@@ -44,7 +44,7 @@ public class AutoCompleteAdapter
     }
 
     @Override
-    public AdapterAutoCompleteItem getItem(int position) {
+    public AutoCompleteAdapterItem getItem(int position) {
         return mResultList.get(position);
     }
 
@@ -95,7 +95,7 @@ public class AutoCompleteAdapter
      * @return Results from the autocomplete API or null if the query was not successful.
      * @see Places#GEO_DATA_API#getAutocomplete(CharSequence)
      */
-    private ArrayList<AdapterAutoCompleteItem> getAutocomplete(CharSequence constraint) {
+    private ArrayList<AutoCompleteAdapterItem> getAutocomplete(CharSequence constraint) {
         if (mGoogleApiClient.isConnected()) {
 
             // Submit the query to the autocomplete API and retrieve a PendingResult that will
@@ -126,7 +126,7 @@ public class AutoCompleteAdapter
             while (iterator.hasNext()) {
                 AutocompletePrediction prediction = iterator.next();
                 // Get the details of this prediction and copy it into a new PlaceAutocomplete object
-                resultList.add(new AdapterAutoCompleteItem(prediction.getPlaceId(),
+                resultList.add(new AutoCompleteAdapterItem(prediction.getPlaceId(),
                         prediction.getPrimaryText(null)));
             }
 
@@ -141,12 +141,12 @@ public class AutoCompleteAdapter
     /**
      * Holder for Places Geo Data Autocomplete API results.
      */
-    public class AdapterAutoCompleteItem {
+    public class AutoCompleteAdapterItem {
 
         public CharSequence placeId;
         public CharSequence description;
 
-        AdapterAutoCompleteItem(CharSequence placeId, CharSequence description) {
+        AutoCompleteAdapterItem(CharSequence placeId, CharSequence description) {
             this.placeId = placeId;
             this.description = description;
         }

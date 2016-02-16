@@ -13,7 +13,7 @@ import miles.diary.util.TextUtils;
 /**
  * Created by mbpeele on 1/14/16.
  */
-public class TypefaceTextView extends TextView {
+public class TypefaceTextView extends AppCompatTextView {
 
     public TypefaceTextView(Context context) {
         super(context);

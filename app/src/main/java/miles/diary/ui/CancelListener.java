@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 
+import java.util.Arrays;
+
 /**
  * Created by mbpeele on 2/6/16.
  */
@@ -19,24 +21,11 @@ public class CancelListener {
 
     public CancelListener(EditText editText) {
         widget = editText;
-        widget.addTextChangedListener(textWatcher);
-        View.OnTouchListener touchListener = (v, event) -> {
-            if (canceler != null && event.getX() > widget.getWidth() - widget.getPaddingRight() -
-                    canceler.getIntrinsicWidth()) {
-                if (widget instanceof AutoCompleteTextView) {
-                    ((AutoCompleteTextView) widget).setText("", false);
-                } else {
-                    widget.setText("");
-                }
-                setCancelVisible(false);
-            }
-            return false;
-        };
-        widget.setOnTouchListener(touchListener);
         widget.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
             @Override
             public void onViewAttachedToWindow(View v) {
-
+                widget.addTextChangedListener(textWatcher);
+                widget.setOnTouchListener(touchListener);
             }
 
             @Override
@@ -53,23 +42,14 @@ public class CancelListener {
             @Override
             public void notifyPreDraw(EditText view) {
                 Drawable[] drawables = widget.getCompoundDrawables();
-                for (int i = 0; i < drawables.length; i++) {
-                    Drawable drawable = drawables[i];
-                    if (drawable != null) {
-                        hideDrawables[i] = drawable;
-                    }
-                }
-
+                hideDrawables = Arrays.copyOf(drawables, drawables.length);
                 canceler = hideDrawables[2];
             }
         };
+
     }
 
-    public void showOrHideCancel() {
-        setCancelVisible(widget.getText().length() > 0);
-    }
-
-    private void setCancelVisible(boolean visible) {
+    private void showOrHideCancel(boolean visible) {
         if (visible) {
             widget.setCompoundDrawablesWithIntrinsicBounds(hideDrawables[0], hideDrawables[1],
                     hideDrawables[2], hideDrawables[3]);
@@ -87,13 +67,28 @@ public class CancelListener {
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            showOrHideCancel();
+            showOrHideCancel(true);
         }
 
         @Override
         public void afterTextChanged(Editable s) {
 
         }
+    };
+
+    View.OnTouchListener touchListener = (v, event) -> {
+        if (canceler != null && event.getX() > widget.getWidth() - widget.getPaddingRight() -
+                canceler.getIntrinsicWidth()) {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                if (widget instanceof AutoCompleteTextView) {
+                    ((AutoCompleteTextView) widget).setText("", false);
+                } else {
+                    widget.setText("");
+                }
+                showOrHideCancel(false);
+            }
+        }
+        return false;
     };
 
 }

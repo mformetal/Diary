@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.support.v7.widget.AppCompatButton;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
@@ -21,7 +22,7 @@ import miles.diary.util.TextUtils;
 /**
  * Created by mbpeele on 1/14/16.
  */
-public class TypefaceButton extends Button {
+public class TypefaceButton extends AppCompatButton {
 
     public TypefaceButton(Context context) {
         super(context);

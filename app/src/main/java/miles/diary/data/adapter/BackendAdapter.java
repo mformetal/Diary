@@ -25,7 +25,7 @@ public abstract class BackendAdapter<T extends RealmObject, VH extends RecyclerV
         return data != null ? data.size() : 0;
     }
 
-    public void setListener(BackendAdapterListener backendAdapterListener) {
+    public void setListener(BackendAdapterListener<T> backendAdapterListener) {
         listener = backendAdapterListener;
     }
 

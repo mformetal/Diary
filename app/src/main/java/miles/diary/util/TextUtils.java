@@ -8,11 +8,15 @@ import android.graphics.Typeface;
 import android.text.InputType;
 import android.widget.TextView;
 
+import com.joanzapata.iconify.fonts.WeathericonsIcons;
+import com.joanzapata.iconify.fonts.WeathericonsModule;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Random;
 
 import miles.diary.R;
+import miles.diary.data.model.weather.Weather;
 
 /**
  * Created by mbpeele on 1/14/16.
@@ -96,5 +100,55 @@ public final class TextUtils {
         float xscale = ((float) (width - paddingLeft - paddingRight)) / w;
         // set the scale for the text paint
         textPaint.setTextScaleX(xscale * .6f);
+    }
+
+    public static String getWeatherIcon(String iconFromAPI) {
+        String icon;
+        switch (iconFromAPI) {
+            case "01d":
+                icon = WeathericonsIcons.wi_forecast_io_clear_day.key();
+                break;
+            case "01n":
+                icon = WeathericonsIcons.wi_forecast_io_clear_night.key();
+                break;
+            case "02d":
+                icon = WeathericonsIcons.wi_forecast_io_partly_cloudy_day.key();
+                break;
+            case "02n":
+                icon = WeathericonsIcons.wi_forecast_io_partly_cloudy_night.key();
+                break;
+            case "03n":
+            case "03d":
+            case "04d":
+            case "04n":
+                icon = WeathericonsIcons.wi_cloudy.key();
+                break;
+            case "09d":
+            case "09n":
+                icon = WeathericonsIcons.wi_rain.key();
+                break;
+            case "10d":
+                icon = WeathericonsIcons.wi_day_rain.key();
+                break;
+            case "10n":
+                icon = WeathericonsIcons.wi_night_rain.key();
+                break;
+            case "11d":
+            case "11n":
+                icon = WeathericonsIcons.wi_thunderstorm.key();
+                break;
+            case "13d":
+            case "13n":
+                icon = WeathericonsIcons.wi_snow.key();
+                break;
+            case "50d":
+            case "50n":
+                icon = WeathericonsIcons.wi_cloudy_gusts.key();
+                break;
+            default:
+                icon = WeathericonsIcons.wi_day_sunny.key();
+                break;
+        }
+        return "{" + icon + "}";
     }
 }

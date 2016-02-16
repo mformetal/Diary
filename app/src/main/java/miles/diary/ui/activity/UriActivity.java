@@ -2,6 +2,7 @@ package miles.diary.ui.activity;
 
 import android.Manifest;
 import android.animation.ObjectAnimator;
+import android.app.SharedElementCallback;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -22,9 +23,11 @@ import com.bumptech.glide.Glide;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.OnClick;
+import icepick.State;
 import miles.diary.R;
 import miles.diary.ui.SimpleTransitionListener;
 import miles.diary.ui.widget.CornerImageView;
@@ -32,11 +35,12 @@ import miles.diary.ui.widget.TypefaceButton;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.IntentUtils;
 import miles.diary.util.FileUtils;
+import miles.diary.util.Logg;
 
 /**
  * Created by mbpeele on 1/29/16.
  */
-public class UriActivity extends BaseActivity implements View.OnClickListener {
+public class UriActivity extends BaseActivity implements View.OnClickListener{
 
     private final static int REQUEST_GALLERY = 1;
     private final static int REQUEST_CAMERA = 2;
@@ -54,7 +58,8 @@ public class UriActivity extends BaseActivity implements View.OnClickListener {
     private File mFile;
     private Uri uri;
 
-    private boolean hasAnimatedIn;
+    @State
+    boolean uriChanged;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +110,7 @@ public class UriActivity extends BaseActivity implements View.OnClickListener {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
+            Uri oldUri = uri;
             switch (requestCode) {
                 case REQUEST_GALLERY:
                     uri = data.getData();
@@ -119,6 +125,8 @@ public class UriActivity extends BaseActivity implements View.OnClickListener {
                     loadVideoUri();
                     break;
             }
+
+            uriChanged = oldUri != uri;
         }
     }
 
@@ -129,7 +137,12 @@ public class UriActivity extends BaseActivity implements View.OnClickListener {
             intent.setData(uri);
             setResult(RESULT_OK, intent);
         }
-        super.onBackPressed();
+        if (uriChanged) {
+            overridePendingTransition(0, android.R.anim.fade_out);
+            finish();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -158,10 +171,6 @@ public class UriActivity extends BaseActivity implements View.OnClickListener {
                 }
                 break;
             case R.id.activity_uri_video:
-//                Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-//                if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
-//                    startActivityForResult(takeVideoIntent, REQUEST_VIDEO);
-//                }
                 break;
         }
     }
@@ -192,53 +201,50 @@ public class UriActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void setupTransitions() {
-        Transition enterTransition = getWindow().getSharedElementEnterTransition();
-        Transition returnTransition = getWindow().getSharedElementReturnTransition();
+        final Transition enterTransition = getWindow().getSharedElementEnterTransition();
+        final Transition returnTransition = getWindow().getSharedElementReturnTransition();
 
         if (enterTransition != null && returnTransition != null) {
             enterTransition.addListener(new SimpleTransitionListener() {
                 @Override
                 public void onTransitionStart(Transition transition) {
                     super.onTransitionStart(transition);
+                    enterTransition.removeListener(this);
+
+                    returnTransition.addListener(new SimpleTransitionListener() {
+                        @Override
+                        public void onTransitionStart(Transition transition) {
+                            super.onTransitionEnd(transition);
+
+                            buttonRow.animate()
+                                    .translationY(root.getHeight())
+                                    .alpha(0f)
+                                    .setDuration(AnimUtils.mediumAnim(getApplicationContext()))
+                                    .setInterpolator(new FastOutSlowInInterpolator())
+                                    .start();
+
+                            ObjectAnimator corner = ObjectAnimator.ofFloat(imageView,
+                                    CornerImageView.CORNERS,
+                                    0, Math.min(imageView.getWidth(), imageView.getHeight()) / 2f);
+                            corner.setDuration(AnimUtils.longAnim(getApplicationContext()));
+                            corner.setInterpolator(new FastOutSlowInInterpolator());
+                            corner.start();
+                        }
+                    });
+
+                    buttonRow.setTranslationY(root.getHeight());
+                    buttonRow.setAlpha(0f);
+
+                    buttonRow.animate()
+                            .translationY(0f)
+                            .alpha(1f)
+                            .setDuration(AnimUtils.mediumAnim(getApplicationContext()))
+                            .setInterpolator(new FastOutSlowInInterpolator())
+                            .start();
+
                     ObjectAnimator corner = ObjectAnimator.ofFloat(imageView,
                             CornerImageView.CORNERS,
                             Math.max(imageView.getWidth(), imageView.getHeight()) / 2f, 0);
-                    corner.setDuration(AnimUtils.longAnim(getApplicationContext()));
-                    corner.setInterpolator(new FastOutSlowInInterpolator());
-                    corner.start();
-
-                    if (!hasAnimatedIn) {
-                        buttonRow.setTranslationY(root.getHeight());
-                        buttonRow.setAlpha(0f);
-
-                        buttonRow.animate()
-                                .translationY(0f)
-                                .alpha(1f)
-                                .setDuration(AnimUtils.mediumAnim(getApplicationContext()))
-                                .setInterpolator(new FastOutSlowInInterpolator())
-                                .withEndAction(() -> hasAnimatedIn = true)
-                                .start();
-                    }
-                }
-            });
-
-            returnTransition.addListener(new SimpleTransitionListener() {
-                @Override
-                public void onTransitionStart(Transition transition) {
-                    super.onTransitionEnd(transition);
-
-                    if (hasAnimatedIn) {
-                        buttonRow.animate()
-                                .translationY(root.getHeight())
-                                .alpha(0f)
-                                .setDuration(AnimUtils.mediumAnim(getApplicationContext()))
-                                .setInterpolator(new FastOutSlowInInterpolator())
-                                .start();
-                    }
-
-                    ObjectAnimator corner = ObjectAnimator.ofFloat(imageView,
-                            CornerImageView.CORNERS,
-                            0, Math.min(imageView.getWidth(), imageView.getHeight()) / 2f);
                     corner.setDuration(AnimUtils.longAnim(getApplicationContext()));
                     corner.setInterpolator(new FastOutSlowInInterpolator());
                     corner.start();

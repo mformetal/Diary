@@ -14,6 +14,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.view.View;
+import android.widget.AdapterView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
@@ -31,18 +32,22 @@ import com.google.android.gms.maps.model.LatLngBounds;
 
 import butterknife.Bind;
 import butterknife.OnClick;
+import icepick.State;
 import miles.diary.R;
 import miles.diary.data.ActivitySubscriber;
 import miles.diary.data.adapter.AutoCompleteAdapter;
 import miles.diary.data.model.weather.Main;
 import miles.diary.data.model.weather.Weather;
+import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.ui.PreDrawer;
 import miles.diary.ui.widget.TypefaceAutoCompleteTextView;
 import miles.diary.ui.widget.TypefaceButton;
+import miles.diary.ui.widget.TypefaceIconTextView;
 import miles.diary.ui.widget.TypefaceTextView;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.IntentUtils;
 import miles.diary.util.Logg;
+import miles.diary.util.TextUtils;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -58,20 +63,24 @@ public class LocationActivity extends BaseActivity
     public final static String RESULT_LOCATION_NAME = "name";
     public final static String RESULT_LOCATION_ID = "id";
     public final static String RESULT_TEMPERATURE = "temperature";
-    public final static String RESULT_TEMPERATURE_ICON = "icon";
 
-    @Bind(R.id.activity_location_neg_button) TypefaceButton negButton;
-    @Bind(R.id.activity_location_pos_button) TypefaceButton posButton;
-    @Bind(R.id.activity_location_weather) TypefaceTextView weatherText;
-    @Bind(R.id.activity_location_autocomplete) TypefaceAutoCompleteTextView autoCompleteTextView;
+    @Bind(R.id.activity_location_neg_button)
+    TypefaceButton negButton;
+    @Bind(R.id.activity_location_pos_button)
+    TypefaceButton posButton;
+    @Bind(R.id.activity_location_weather)
+    TypefaceIconTextView weatherText;
+    @Bind(R.id.activity_location_autocomplete)
+    TypefaceAutoCompleteTextView autoCompleteTextView;
 
-    private GoogleApiClient googleApiClient;
     private AutoCompleteAdapter autoCompleteAdapter;
-    private String locationName;
-    private String locationId;
-    private String temperature;
-    private boolean hasPreviousInfo = false;
-    private byte[] temperatureIcon;
+    private GoogleApiClient googleApiClient;
+    @State
+    String locationName;
+    @State
+    String locationId;
+    @State
+    String temperature;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,26 +89,37 @@ public class LocationActivity extends BaseActivity
 
         setupTransitions();
 
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            locationName = bundle.getString(RESULT_LOCATION_NAME);
+            locationId = bundle.getString(RESULT_LOCATION_ID);
+            temperature = bundle.getString(RESULT_TEMPERATURE);
+
+            if (locationName != null) {
+                autoCompleteTextView.setText(locationName, false);
+            }
+
+            if (temperature != null) {
+                weatherText.setText(temperature);
+            }
+        }
+
         googleApiClient = googleApiClientBuilder
                 .enableAutoManage(this, 0, this)
                 .addConnectionCallbacks(this)
                 .build();
 
-        Intent intent = getIntent();
-        Bundle bundle = intent.getExtras();
-        if (bundle != null) {
-            locationName = bundle.getString(RESULT_LOCATION_NAME);
-            locationId = bundle.getString(RESULT_LOCATION_ID);
-            temperature = bundle.getString(RESULT_TEMPERATURE);
-            temperatureIcon = bundle.getByteArray(RESULT_TEMPERATURE_ICON);
+        autoCompleteAdapter =
+                new AutoCompleteAdapter(this, R.layout.autocomplete_adapter,
+                        googleApiClient, null);
+        autoCompleteTextView.setAdapter(autoCompleteAdapter);
 
-            if (locationName != null) {
-                hasPreviousInfo = true;
-                autoCompleteTextView.setText(locationName, false);
-                weatherText.setText(temperature);
-                getWeatherIconAndText();
-            }
-        }
+        autoCompleteTextView.setOnItemClickListener((parent, view, position, id) -> {
+            final AutoCompleteAdapter.AutoCompleteAdapterItem item =
+                    autoCompleteAdapter.getItem(position);
+            locationId = String.valueOf(item.placeId);
+            locationName = String.valueOf(item.description);
+        });
     }
 
     @Override
@@ -158,8 +178,7 @@ public class LocationActivity extends BaseActivity
                     Intent intent = new Intent();
                     intent.putExtra(RESULT_LOCATION_NAME, locationName);
                     intent.putExtra(RESULT_LOCATION_ID, locationId);
-                    intent.putExtra(RESULT_TEMPERATURE, weatherText.getStringText());
-                    intent.putExtra(RESULT_TEMPERATURE_ICON, temperatureIcon);
+                    intent.putExtra(RESULT_TEMPERATURE, temperature);
                     setResult(RESULT_OK, intent);
                     onBackPressed();
                 } else {
@@ -186,28 +205,25 @@ public class LocationActivity extends BaseActivity
 
     @Override
     public void onConnected(Bundle bundle) {
-        if (hasConnection()) {
-            String[] permissions = new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION};
-            if (hasPermissions(permissions)) {
+        String[] permissions = new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION};
+        if (hasPermissions(permissions)) {
+            if (hasConnection()) {
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
+
                 Location loc = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
                 if (loc != null) {
-                    double latitude = loc.getLatitude();
-                    double longitude = loc.getLongitude();
-                    LatLngBounds bounds = new LatLngBounds(
-                            new LatLng(latitude - 0.05, longitude - 0.05),
-                            new LatLng(latitude + 0.05, longitude + 0.05));
-                    autoCompleteAdapter = new AutoCompleteAdapter(this, R.layout.autocomplete_adapter,
-                            googleApiClient, bounds);
-                    autoCompleteTextView.setAdapter(autoCompleteAdapter);
-
                     getWeather();
 
                     getPlace();
                 }
             } else {
-                ActivityCompat.requestPermissions(this, permissions, REQUEST_LOCATION_PERMISSION);
+                noInternet();
             }
+        } else {
+            ActivityCompat.requestPermissions(this, permissions, REQUEST_LOCATION_PERMISSION);
         }
     }
 
@@ -216,7 +232,11 @@ public class LocationActivity extends BaseActivity
     }
 
     private void getPlace() {
-        if (!hasPreviousInfo) {
+        if (locationName == null && locationId == null) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+
             Places.PlaceDetectionApi.getCurrentPlace(googleApiClient, null)
                     .setResultCallback(placeLikelihoods -> {
                         Place mostLikely = placeLikelihoods.get(0).getPlace();
@@ -232,54 +252,40 @@ public class LocationActivity extends BaseActivity
     }
 
     private void getWeather() {
-        if (!hasPreviousInfo) {
+        if (temperature == null) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+
             Location loc = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
             if (loc != null) {
                 weatherService.getWeather(loc.getLatitude(), loc.getLongitude())
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .flatMap(weatherResponse -> {
-                            Main main = weatherResponse.getMain();
-
-                            Weather weather = weatherResponse.getWeather().get(0);
-
-                            weatherText.setAlpha(0f);
-                            weatherText.setScaleX(.8f);
-
-                            weatherText.setText(main.formatTemperature());
-
-                            weatherText.animate()
-                                    .alpha(1f)
-                                    .scaleX(1f)
-                                    .setDuration(AnimUtils.longAnim(LocationActivity.this))
-                                    .setInterpolator(new FastOutSlowInInterpolator());
-
-                            return weatherService.getWeatherIcon(weather.getIcon())
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread());
-                        })
-                        .subscribe(new ActivitySubscriber<byte[]>(this) {
+                        .subscribe(new ActivitySubscriber<WeatherResponse>(this) {
                             @Override
-                            public void onNext(byte[] bytes) {
-                                temperatureIcon = bytes;
-                                getWeatherIconAndText();
+                            public void onNext(WeatherResponse weatherResponse) {
+                                Main main = weatherResponse.getMain();
+
+                                Weather weather = weatherResponse.getWeather().get(0);
+
+                                weatherText.setAlpha(0f);
+                                weatherText.setScaleX(.8f);
+
+                                temperature = TextUtils.getWeatherIcon(weather.getIcon()) + " " +
+                                        main.formatTemperature();
+
+                                weatherText.setText(temperature);
+
+                                weatherText.animate()
+                                        .alpha(1f)
+                                        .scaleX(1f)
+                                        .setDuration(AnimUtils.mediumAnim(LocationActivity.this))
+                                        .setInterpolator(new FastOutSlowInInterpolator());
                             }
                         });
             }
         }
-    }
-
-    private void getWeatherIconAndText() {
-        Glide.with(this)
-                .load(temperatureIcon)
-                .asBitmap()
-                .into(new ViewTarget<TypefaceTextView, Bitmap>(weatherText) {
-                    @Override
-                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                        Drawable drawable = new BitmapDrawable(getResources(), resource);
-                        view.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
-                    }
-                });
     }
 
     @SuppressWarnings("unchecked")
@@ -287,7 +293,7 @@ public class LocationActivity extends BaseActivity
         new PreDrawer(root) {
             @Override
             public void notifyPreDraw(View view) {
-                float offset = root.getHeight() / 3;
+                float offset = root.getHeight() / 4;
                 for (int i = 0; i < root.getChildCount(); i++) {
                     View v = root.getChildAt(i);
                     v.setTranslationY(offset);
@@ -295,7 +301,7 @@ public class LocationActivity extends BaseActivity
                     v.animate()
                             .alpha(1f)
                             .translationY(0f)
-                            .setDuration(AnimUtils.shortAnim(LocationActivity.this))
+                            .setDuration(AnimUtils.mediumAnim(LocationActivity.this))
                             .setStartDelay(150)
                             .setInterpolator(new FastOutSlowInInterpolator());
 

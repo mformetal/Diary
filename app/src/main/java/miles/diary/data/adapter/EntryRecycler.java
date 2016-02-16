@@ -36,6 +36,7 @@ import miles.diary.ui.PreDrawer;
 import miles.diary.ui.activity.BaseActivity;
 import miles.diary.ui.activity.EntryActivity;
 import miles.diary.ui.activity.NewEntryActivity;
+import miles.diary.ui.widget.TypefaceIconTextView;
 import miles.diary.ui.widget.TypefaceTextView;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.Logg;
@@ -135,29 +136,26 @@ public class EntryRecycler extends BackendAdapter<Entry, RecyclerView.ViewHolder
         String placeName = bundle.getString(NewEntryActivity.RESULT_PLACE_NAME);
         String placeId = bundle.getString(NewEntryActivity.RESULT_PLACE_ID);
         String temperature = bundle.getString(NewEntryActivity.RESULT_TEMPERATURE);
-        byte[] temperatureIcon = bundle.getByteArray(NewEntryActivity.RESULT_TEMPERATURE_ICON);
 
-        Entry entry = Entry.construct(realm, body, uri, placeName, placeId, temperature, temperatureIcon);
+        Entry entry = Entry.construct(realm, body, uri, placeName, placeId, temperature);
         addData(entry);
         return entry;
     }
 
     private void bindImageViewHolder(ImageViewHolder holder, Entry entry) {
         holder.image.setOnClickListener(v -> {
-            Intent intent = new Intent(host, EntryActivity.class);
-            intent.putExtra(EntryActivity.DATA, entry.getBody());
-            ActivityOptions transitionActivityOptions =
-                    ActivityOptions.makeSceneTransitionAnimation(host, holder.image,
-                            host.getString(R.string.transition_image));
-            host.startActivity(intent, transitionActivityOptions.toBundle());
         });
         holder.time.setText(Entry.formatDateString(entry));
         holder.body.setText(entry.getBody());
-        loadTemperatureIcon(holder, entry);
+
+        String temperature = entry.getTemperature();
+        if (temperature != null) {
+            holder.temperature.setText(temperature);
+        }
 
         String placeName = entry.getPlaceName();
         if (placeName != null) {
-            holder.location.setText(entry.getPlaceName());
+            holder.location.setText(placeName);
         }
 
         Glide.with(host)
@@ -169,41 +167,18 @@ public class EntryRecycler extends BackendAdapter<Entry, RecyclerView.ViewHolder
 
     private void bindTextViewHolder(TextViewHolder holder, Entry entry) {
         holder.body.setOnClickListener(v -> {
-//            Intent intent = new Intent(host, EntryActivity.class);
-//            intent.putExtra(EntryActivity.DATA, entry.getBody());
-//            ActivityOptions transitionActivityOptions =
-//                    ActivityOptions.makeSceneTransitionAnimation(host, holder.image,
-//                            host.getString(R.string.transition_image));
-//            host.startActivity(intent, transitionActivityOptions.toBundle());
         });
         holder.body.setText(entry.getBody());
         holder.time.setText(Entry.formatDateString(entry));
-        loadTemperatureIcon(holder, entry);
+
+        String temperature = entry.getTemperature();
+        if (temperature != null) {
+            holder.temperature.setText(temperature);
+        }
 
         String placeName = entry.getPlaceName();
         if (placeName != null) {
             holder.location.setText(entry.getPlaceName());
-        }
-    }
-
-    private void loadTemperatureIcon(RecyclerView.ViewHolder viewHolder, Entry entry) {
-        byte[] temperatureIcon = entry.getTemperatureIcon();
-        if (temperatureIcon != null) {
-            final TypefaceTextView view = (viewHolder instanceof TextViewHolder) ?
-                    ((TextViewHolder) viewHolder).temperature :
-                    ((ImageViewHolder) viewHolder).temperature;
-
-            Glide.with(host)
-                    .load(temperatureIcon)
-                    .asBitmap()
-                    .into(new ViewTarget<TypefaceTextView, Bitmap>(view) {
-                        @Override
-                        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                            Drawable drawable = new BitmapDrawable(host.getResources(), resource);
-                            view.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
-                            view.setText(entry.getTemperature());
-                        }
-                    });
         }
     }
 
@@ -212,7 +187,7 @@ public class EntryRecycler extends BackendAdapter<Entry, RecyclerView.ViewHolder
         @Bind(R.id.adapter_entry_text_body) TypefaceTextView body;
         @Bind(R.id.adapter_entry_text_time) TypefaceTextView time;
         @Bind(R.id.adapter_entry_text_location) TypefaceTextView location;
-        @Bind(R.id.adapter_entry_text_temperature) TypefaceTextView temperature;
+        @Bind(R.id.adapter_entry_text_temperature) TypefaceIconTextView temperature;
 
         public TextViewHolder(View itemView) {
             super(itemView);
@@ -226,7 +201,7 @@ public class EntryRecycler extends BackendAdapter<Entry, RecyclerView.ViewHolder
         @Bind(R.id.adapter_entry_image_view) ImageView image;
         @Bind(R.id.adapter_entry_image_body) TypefaceTextView body;
         @Bind(R.id.adapter_entry_image_location) TypefaceTextView location;
-        @Bind(R.id.adapter_entry_image_temperature) TypefaceTextView temperature;
+        @Bind(R.id.adapter_entry_image_temperature) TypefaceIconTextView temperature;
 
         public ImageViewHolder(View itemView) {
             super(itemView);

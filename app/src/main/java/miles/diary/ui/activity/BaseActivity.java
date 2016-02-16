@@ -3,6 +3,7 @@ package miles.diary.ui.activity;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ViewGroup;
@@ -12,8 +13,10 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
+import icepick.Icepick;
 import io.realm.Realm;
 import miles.diary.DiaryApplication;
+import miles.diary.R;
 import miles.diary.data.DataStore;
 import miles.diary.data.WeatherService;
 import rx.Subscription;
@@ -38,6 +41,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         ((DiaryApplication) getApplication()).getComponent().inject(this);
         compositeSubscription = new CompositeSubscription();
         realm = Realm.getDefaultInstance();
+        Icepick.restoreInstanceState(this, savedInstanceState);
     }
 
     @Override
@@ -53,6 +57,17 @@ public abstract class BaseActivity extends AppCompatActivity {
         realm.close();
         ButterKnife.unbind(this);
         compositeSubscription.unsubscribe();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Icepick.saveInstanceState(this, outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
     }
 
     public void addSubscription(Subscription subscription) {
@@ -92,5 +107,9 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
 
         return true;
+    }
+
+    public void noInternet() {
+        Snackbar.make(root, getString(R.string.no_internet), Snackbar.LENGTH_SHORT).show();
     }
 }

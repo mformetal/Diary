@@ -1,27 +1,7 @@
-buildscript {
-    repositories {
-        maven {
-            url 'https://maven.fabric.io/public'
-        }
-
-        maven {
-            url 'https://clojars.org/repo'
-        }
-    }
-
-    dependencies {
-        classpath 'io.fabric.tools:gradle:1.+'
-    }
-}
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'me.tatarka.retrolambda'
-
-repositories {
-    maven { url 'https://maven.fabric.io/public' }
-}
-
 
 android {
     compileSdkVersion 23
@@ -77,8 +57,14 @@ dependencies {
     compile 'io.realm:realm-android:0.87.4'
     compile 'com.github.bumptech.glide:glide:3.6.1'
     compile 'joda-time:joda-time:2.3'
+    compile 'com.joanzapata.iconify:android-iconify-weathericons:2.1.1'
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }
-    compile project(':libs:opencv')
+    compile 'frankiesardo:icepick:3.1.0'
+    provided 'frankiesardo:icepick-processor:3.1.0'
+
+    compile 'com.squareup.retrofit2:retrofit:2.0.0-beta3'
+    compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta3'
+    compile 'com.squareup.retrofit2:adapter-rxjava:2.0.0-beta3'
 }

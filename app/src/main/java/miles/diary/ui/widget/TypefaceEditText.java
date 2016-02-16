@@ -14,7 +14,7 @@ import miles.diary.util.TextUtils;
 /**
  * Created by mbpeele on 1/14/16.
  */
-public class TypefaceEditText extends EditText {
+public class TypefaceEditText extends AppCompatEditText {
 
     public TypefaceEditText(Context context) {
         super(context);

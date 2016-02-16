@@ -10,11 +10,14 @@
         <item name="android:textColorPrimary">@color/primary_text</item>
         <item name="android:textColorSecondary">@color/secondary_text</item>
         <item name="android:textColorHint">@color/half_opacity_gray</item>
+        <item name="android:windowBackground">@color/scrim</item>
+        <item name="android:textColor">@color/primary_text</item>
         <item name="icon">@color/icons</item>
         <item name="android:windowActivityTransitions">true</item>
+        <item name="android:windowContentTransitions">true</item>
     </style>
 
-    <style name="AppTheme.Home" >
+    <style name="AppTheme.Home" parent="AppTheme" >
     </style>
 
     <style name="AppTheme.DialogActivity" parent="AppTheme">

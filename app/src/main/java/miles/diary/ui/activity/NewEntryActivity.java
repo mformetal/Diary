@@ -21,6 +21,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import miles.diary.R;
 import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.ui.widget.TypefaceEditText;
+import miles.diary.util.Logg;
 
 /**
  * Created by mbpeele on 1/16/16.
@@ -38,14 +39,12 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     public static final String RESULT_PLACE_NAME = "place";
     public static final String RESULT_PLACE_ID = "placeId";
     public static final String RESULT_TEMPERATURE = "temperature";
-    public static final String RESULT_TEMPERATURE_ICON = "icon";
     private final static int REQUEST_LOCATION = 1;
     private final static int REQUEST_IMAGE = 2;
 
     private String placeName;
     private String placeId;
     private String temperature;
-    private byte[] temperatureIcon;
     private Uri imageUri;
 
     @Override
@@ -67,12 +66,10 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                     placeName = extras.getString(LocationActivity.RESULT_LOCATION_NAME);
                     placeId = extras.getString(LocationActivity.RESULT_LOCATION_ID);
                     temperature = extras.getString(LocationActivity.RESULT_TEMPERATURE);
-                    temperatureIcon = extras.getByteArray(LocationActivity.RESULT_TEMPERATURE_ICON);
                 } else {
                     placeName = null;
                     placeId = null;
                     temperature = null;
-                    temperatureIcon = null;
                 }
 
                 tintImages();
@@ -109,7 +106,6 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                     result.putExtra(NewEntryActivity.RESULT_PLACE_NAME, placeName);
                     result.putExtra(NewEntryActivity.RESULT_PLACE_ID, placeId);
                     result.putExtra(NewEntryActivity.RESULT_TEMPERATURE, temperature);
-                    result.putExtra(NewEntryActivity.RESULT_TEMPERATURE_ICON, temperatureIcon);
                     setResult(Activity.RESULT_OK, result);
                     finish();
                 } else {
@@ -142,7 +138,6 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                 Intent intent1 = new Intent(this, LocationActivity.class);
                 intent1.putExtra(LocationActivity.RESULT_LOCATION_NAME, placeName);
                 intent1.putExtra(LocationActivity.RESULT_LOCATION_ID, placeId);
-                intent1.putExtra(LocationActivity.RESULT_TEMPERATURE_ICON, temperatureIcon);
                 intent1.putExtra(LocationActivity.RESULT_TEMPERATURE, temperature);
                 ActivityOptions transitionActivityOptions =
                         ActivityOptions.makeSceneTransitionAnimation(this, location,

@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="weather_base">http://api.openweathermap.org/</string>
-</resources>

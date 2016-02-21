@@ -16,6 +16,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.transition.Transition;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
@@ -69,7 +70,7 @@ public class LocationActivity extends BaseActivity
 
     @Bind(R.id.activity_location_pos_button) TypefaceButton posButton;
     @Bind(R.id.activity_location_autocomplete) TypefaceAutoCompleteTextView autoCompleteTextView;
-    @Bind(R.id.activity_location_image) CornerImageView locationImage;
+    @Bind(R.id.activity_location_image) ImageView locationImage;
 
     private GoogleApiClient googleApiClient;
     @State String locationName;
@@ -80,12 +81,14 @@ public class LocationActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location);
 
+        if (savedInstanceState == null) {
+            slideUp();
+        }
+
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             locationName = bundle.getString(NewEntryActivity.RESULT_PLACE_NAME);
             locationId = bundle.getString(NewEntryActivity.RESULT_PLACE_ID);
-
-            loadGooglePlacePhoto();
 
             if (locationName != null) {
                 autoCompleteTextView.setText(locationName, false);
@@ -107,8 +110,6 @@ public class LocationActivity extends BaseActivity
                     autoCompleteAdapter.getItem(position);
             locationId = String.valueOf(item.placeId);
             locationName = String.valueOf(item.description);
-
-            getPlacePhoto();
         });
     }
 
@@ -126,8 +127,6 @@ public class LocationActivity extends BaseActivity
                     Place place = PlacePicker.getPlace(this, data);
                     locationName = place.getName().toString();
                     locationId = place.getId();
-
-                    getPlacePhoto();
 
                     autoCompleteTextView.setText(locationName, false);
                 }
@@ -228,8 +227,6 @@ public class LocationActivity extends BaseActivity
 
                             autoCompleteTextView.setText(locationName, false);
 
-                            getPlacePhoto();
-
                             placeLikelihoods.release();
                         }
                     });
@@ -248,102 +245,6 @@ public class LocationActivity extends BaseActivity
             intent.putExtras(transitionActivityOptions.toBundle());
         }
         setResult(RESULT_OK, intent);
-    }
-
-    private void getPlacePhoto() {
-        if (locationId != null) {
-            GoogleUtils.getPlacePhoto(locationId, googleApiClient)
-                    .flatMap(placePhotoResult -> {
-                        Bitmap bitmap = placePhotoResult.getBitmap();
-                        locationImage.setImageBitmap(bitmap);
-                        AnimUtils.pop(locationImage, -1);
-
-                        return FileUtils.saveBitmap(LocationActivity.this, placePhotoResult.getBitmap(),
-                                NewEntryActivity.LOCATION_IMAGE);
-                    })
-                    .subscribe(new ActivitySubscriber<>(this));
-        }
-    }
-
-    private void loadGooglePlacePhoto() {
-        if (FileUtils.isFileAvailable(this, NewEntryActivity.LOCATION_IMAGE)) {
-            locationImage.setImageDrawable(null);
-
-            postponeEnterTransition();
-
-            final Transition enterTransition = getWindow().getSharedElementEnterTransition();
-            final Transition returnTransition = getWindow().getSharedElementReturnTransition();
-
-            if (enterTransition != null && returnTransition != null) {
-                enterTransition.addListener(new SimpleTransitionListener() {
-                    @Override
-                    public void onTransitionStart(Transition transition) {
-                        super.onTransitionStart(transition);
-                        enterTransition.removeListener(this);
-
-                        slideUp();
-
-                        returnTransition.addListener(new SimpleTransitionListener() {
-                            @Override
-                            public void onTransitionStart(Transition transition) {
-                                super.onTransitionEnd(transition);
-
-                                ObjectAnimator corner = ObjectAnimator.ofFloat(locationImage,
-                                        CornerImageView.CORNERS,
-                                        0, Math.min(locationImage.getWidth(), locationImage.getHeight()) / 2f);
-                                corner.setDuration(AnimUtils.longAnim(getApplicationContext()));
-                                corner.setInterpolator(new FastOutSlowInInterpolator());
-                                corner.start();
-                            }
-                        });
-
-                        ObjectAnimator corner = ObjectAnimator.ofFloat(locationImage,
-                                CornerImageView.CORNERS,
-                                Math.max(locationImage.getWidth(), locationImage.getHeight()) / 2f, 0);
-                        corner.setDuration(AnimUtils.longAnim(getApplicationContext()));
-                        corner.setInterpolator(new FastOutSlowInInterpolator());
-                        corner.start();
-                    }
-                });
-            }
-
-            FileUtils.getBitmapBytes(this, NewEntryActivity.LOCATION_IMAGE)
-                    .subscribe(new ActivitySubscriber<byte[]>(LocationActivity.this) {
-                        @Override
-                        public void onNext(byte[] bytes) {
-                            super.onNext(bytes);
-                            Glide.with(getSubscribedActivity())
-                                    .load(bytes)
-                                    .asBitmap()
-                                    .dontAnimate()
-                                    .centerCrop()
-                                    .listener(new RequestListener<byte[], Bitmap>() {
-                                        @Override
-                                        public boolean onException(Exception e,
-                                                                   byte[] model,
-                                                                   Target<Bitmap> target,
-                                                                   boolean isFirstResource) {
-                                            Logg.log(e);
-                                            return false;
-                                        }
-
-                                        @Override
-                                        public boolean onResourceReady(Bitmap resource,
-                                                                       byte[] model,
-                                                                       Target<Bitmap> target,
-                                                                       boolean isFromMemoryCache,
-                                                                       boolean isFirstResource) {
-                                            startPostponedEnterTransition();
-                                            return false;
-                                        }
-                                    })
-                                    .into(locationImage);
-                        }
-                    });
-        } else {
-            locationImage.setImageResource(R.drawable.ic_place_24dp);
-            slideUp();
-        }
     }
 
     private void slideUp() {

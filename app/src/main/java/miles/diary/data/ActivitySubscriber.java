@@ -28,6 +28,7 @@ public class ActivitySubscriber<T> extends Subscriber<T> {
 
     @Override
     public void onCompleted() {
+        removeSelf();
     }
 
     @Override

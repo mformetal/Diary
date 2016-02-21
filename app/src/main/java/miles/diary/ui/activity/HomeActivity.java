@@ -23,6 +23,7 @@ import miles.diary.R;
 import miles.diary.data.adapter.BackendAdapterListener;
 import miles.diary.data.adapter.EntryRecycler;
 import miles.diary.data.model.Entry;
+import miles.diary.ui.PreDrawer;
 import miles.diary.ui.SpacingDecoration;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.Logg;
@@ -61,23 +62,23 @@ public class HomeActivity extends TransitionActivity implements BackendAdapterLi
     }
 
     @Override
-    public void onEnter(View root, Intent intent, boolean hasSavedInstanceState) {
+    void onEnter(View root, Intent calledIntent, boolean hasSavedInstanceState) {
         fab.setScaleX(0f);
         fab.setScaleY(0f);
 
-        ObjectAnimator scale = ObjectAnimator.ofPropertyValuesHolder(fab,
-                PropertyValuesHolder.ofFloat(View.SCALE_X, 1f),
-                PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f));
-        scale.setDuration(AnimUtils.longAnim(this));
-        scale.setInterpolator(new AnticipateOvershootInterpolator());
-        scale.start();
+        fab.animate()
+                .scaleYBy(1f)
+                .scaleXBy(1f)
+                .setDuration(AnimUtils.longAnim(this))
+                .setInterpolator(new AnticipateOvershootInterpolator())
+                .start();
 
-        View view = toolbar.getChildAt(0);
-        if (view != null && view instanceof TextView) {
-            view.setAlpha(0f);
-            view.setScaleX(0.8f);
+        View textView = toolbar.getChildAt(0);
+        if (textView != null && textView instanceof TextView) {
+            textView.setAlpha(0f);
+            textView.setScaleX(0.8f);
 
-            view.animate()
+            textView.animate()
                     .alpha(1f)
                     .scaleX(1f)
                     .setDuration(AnimUtils.longAnim(this))
@@ -86,7 +87,7 @@ public class HomeActivity extends TransitionActivity implements BackendAdapterLi
     }
 
     @Override
-    public void onExit(View root, Intent intent, boolean hasSavedInstanceState) {
+    void onExit(View root) {
         finishWithDefaultTransition();
     }
 

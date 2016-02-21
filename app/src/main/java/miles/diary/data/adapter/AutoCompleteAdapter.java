@@ -112,8 +112,7 @@ public class AutoCompleteAdapter
             ArrayList<AutoCompleteAdapterItem> resultList = new ArrayList<>(autocompletePredictions.getCount());
             while (iterator.hasNext()) {
                 AutocompletePrediction prediction = iterator.next();
-                resultList.add(
-                        new AutoCompleteAdapterItem(prediction.getPlaceId(), prediction.getFullText(null)));
+                resultList.add(new AutoCompleteAdapterItem(prediction.getPlaceId(), prediction.getFullText(null)));
             }
 
             autocompletePredictions.release();

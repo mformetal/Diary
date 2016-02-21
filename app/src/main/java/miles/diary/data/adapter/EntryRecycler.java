@@ -78,33 +78,35 @@ public class EntryRecycler extends BackendAdapter<Entry, RecyclerView.ViewHolder
 
     @Override
     public void loadData(Realm realm) {
-        realm.where(Entry.class)
-                .findAllAsync()
-                .asObservable()
-                .filter(RealmResults::isLoaded)
-                .subscribe(new ActivitySubscriber<RealmResults<Entry>>(host) {
-                    @Override
-                    public void onNext(RealmResults<Entry> entries) {
-                        super.onNext(entries);
-                        setData(entries);
-                        if (getData().isEmpty()) {
-                            propagateEmpty();
-                        } else {
-                            propagateCompletion();
+        if (!realm.isClosed()) {
+            realm.where(Entry.class)
+                    .findAllAsync()
+                    .asObservable()
+                    .filter(RealmResults::isLoaded)
+                    .subscribe(new ActivitySubscriber<RealmResults<Entry>>(host) {
+                        @Override
+                        public void onNext(RealmResults<Entry> entries) {
+                            super.onNext(entries);
+                            setData(entries);
+                            if (getData().isEmpty()) {
+                                propagateEmpty();
+                            } else {
+                                propagateCompletion();
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        super.onError(e);
-                        propagateError(e);
-                    }
+                        @Override
+                        public void onError(Throwable e) {
+                            super.onError(e);
+                            propagateError(e);
+                        }
 
-                    @Override
-                    public void onStart() {
-                        propagateStart();
-                    }
-                });
+                        @Override
+                        public void onStart() {
+                            propagateStart();
+                        }
+                    });
+        }
     }
 
     @Override

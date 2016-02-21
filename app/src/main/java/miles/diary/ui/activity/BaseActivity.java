@@ -36,7 +36,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Inject GoogleApiClient.Builder googleApiClientBuilder;
 
     private CompositeSubscription compositeSubscription;
-    private List<Observable> observableList;
     protected Realm realm;
     public ViewGroup root;
 
@@ -44,10 +43,12 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ((DiaryApplication) getApplication()).getComponent().inject(this);
+
         compositeSubscription = new CompositeSubscription();
+
         realm = Realm.getDefaultInstance();
+
         Icepick.restoreInstanceState(this, savedInstanceState);
-        observableList = new ArrayList<>();
     }
 
     @Override
@@ -60,20 +61,15 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        compositeSubscription.unsubscribe();
         realm.close();
         ButterKnife.unbind(this);
-        compositeSubscription.unsubscribe();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         Icepick.saveInstanceState(this, outState);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
     }
 
     public void addSubscription(Subscription subscription) {
@@ -88,6 +84,10 @@ public abstract class BaseActivity extends AppCompatActivity {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         return connectivityManager.getActiveNetworkInfo() != null &&
                 connectivityManager.getActiveNetworkInfo().isConnectedOrConnecting();
+    }
+
+    public void noInternet() {
+        Snackbar.make(root, getString(R.string.no_internet), Snackbar.LENGTH_SHORT).show();
     }
 
     public boolean hasPermissions(String[] permissions) {
@@ -113,9 +113,5 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
 
         return true;
-    }
-
-    public void noInternet() {
-        Snackbar.make(root, getString(R.string.no_internet), Snackbar.LENGTH_SHORT).show();
     }
 }

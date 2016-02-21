@@ -6,6 +6,7 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.VectorDrawable;
 import android.location.Location;
 import android.net.Uri;
@@ -85,12 +86,6 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        FileUtils.deleteBitmapFile(this, LOCATION_IMAGE);
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case REQUEST_LOCATION:
@@ -98,8 +93,6 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                     Bundle extras = data.getExtras();
                     placeName = extras.getString(NewEntryActivity.RESULT_PLACE_NAME);
                     placeId = extras.getString(NewEntryActivity.RESULT_PLACE_ID);
-
-                    getPlacePhoto();
                 }
                 break;
             case REQUEST_IMAGE:
@@ -131,7 +124,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                     result.putExtra(NewEntryActivity.RESULT_URI, imageUri);
                     result.putExtra(NewEntryActivity.RESULT_PLACE_NAME, placeName);
                     result.putExtra(NewEntryActivity.RESULT_PLACE_ID, placeId);
-                    result.putExtra(NewEntryActivity.RESULT_TEMPERATURE, temperature);
+                    result.putExtra(NewEntryActivity.RESULT_TEMPERATURE, temperature.replace("\n", ""));
                     setResult(Activity.RESULT_OK, result);
                     finish();
                 } else {
@@ -243,11 +236,13 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                             placeId = mostLikely.getId();
                             placeName = mostLikely.getName().toString();
 
-                            getPlacePhoto();
+                            location.setColorFilter(Color.WHITE);
 
                             placeLikelihoods.release();
                         }
                     });
+        } else {
+            location.setColorFilter(Color.WHITE);
         }
     }
 
@@ -282,36 +277,6 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                     .load(imageUri)
                     .centerCrop()
                     .into(photo);
-        }
-    }
-
-    private void getPlacePhoto() {
-        if (FileUtils.isFileAvailable(this, LOCATION_IMAGE)) {
-            FileUtils.getBitmapBytes(this, NewEntryActivity.LOCATION_IMAGE)
-                    .subscribe(new ActivitySubscriber<byte[]>(this) {
-                        @Override
-                        public void onNext(byte[] bytes) {
-                            super.onNext(bytes);
-                            Glide.with(getSubscribedActivity())
-                                    .load(bytes)
-                                    .asBitmap()
-                                    .animate(AnimUtils.REVEAL)
-                                    .into(location);
-                        }
-                    });
-        } else {
-            if (placeId != null) {
-                GoogleUtils.getPlacePhoto(placeId, googleApiClient)
-                        .flatMap(placePhotoResult -> {
-                            Bitmap bitmap = placePhotoResult.getBitmap();
-                            location.setImageBitmap(bitmap);
-                            AnimUtils.pop(location, -1);
-
-                            return FileUtils.saveBitmap(NewEntryActivity.this, bitmap,
-                                    LOCATION_IMAGE);
-                        })
-                        .subscribe(new ActivitySubscriber<>(this));
-            }
         }
     }
 }

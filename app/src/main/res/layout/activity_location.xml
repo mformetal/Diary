@@ -10,12 +10,13 @@
     android:layout_width="@dimen/dialog_min_width"
     android:layout_height="wrap_content">
 
-    <miles.diary.ui.widget.SquareCornerImageView
+    <ImageView
         android:id="@+id/activity_location_image"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="@dimen/activity_location_image_size"
+        android:layout_height="@dimen/activity_location_image_size"
         android:layout_gravity="center_horizontal"
         android:scaleType="centerCrop"
+        android:src="@drawable/ic_place_24dp"
         android:transitionName="@string/transition_image"
         android:layout_margin="@dimen/activity_vertical_margin" />
 

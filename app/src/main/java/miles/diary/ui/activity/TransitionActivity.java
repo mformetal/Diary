@@ -9,6 +9,7 @@ import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.ViewGroup;
 
+import icepick.State;
 import miles.diary.R;
 import miles.diary.ui.PreDrawer;
 
@@ -17,32 +18,22 @@ import miles.diary.ui.PreDrawer;
  */
 public abstract class TransitionActivity extends BaseActivity {
 
-    protected ViewGroup root;
     private boolean hasSavedInstanceState;
     private Intent intent;
-    public ValueAnimator enterColor, exitColor;
+    @State boolean runCustomExitTransition = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         hasSavedInstanceState = savedInstanceState != null;
         intent = getIntent();
-
-        ValueAnimator.AnimatorUpdateListener updateListener = animation ->
-                getWindow().getDecorView().setBackgroundColor((int) animation.getAnimatedValue());
-        exitColor = ValueAnimator.ofObject(new ArgbEvaluator(),
-                ContextCompat.getColor(this, R.color.scrim), Color.TRANSPARENT);
-        exitColor.addUpdateListener(updateListener);
-        enterColor = ValueAnimator.ofObject(new ArgbEvaluator(),
-                Color.TRANSPARENT, ContextCompat.getColor(this, R.color.scrim));
-        enterColor.addUpdateListener(updateListener);
     }
 
     @Override
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
         root = (ViewGroup) ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
-        new PreDrawer(root) {
+        new PreDrawer<View>(root) {
             @Override
             public void notifyPreDraw(View view) {
                 onEnter(root, intent, hasSavedInstanceState);
@@ -52,19 +43,19 @@ public abstract class TransitionActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        onExit(root, intent, hasSavedInstanceState);
+        if (runCustomExitTransition) {
+            onExit(root);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     public void finishWithDefaultTransition() {
-        finish();
-    }
-
-    public void finishWithoutDefaultTransition() {
-        finish();
-        overridePendingTransition(0, 0);
+        runCustomExitTransition = false;
+        onBackPressed();
     }
 
     abstract void onEnter(View root, Intent calledIntent, boolean hasSavedInstanceState);
 
-    abstract void onExit(View root, Intent calledIntent, boolean hasSavedInstanceState);
+    abstract void onExit(View root);
 }

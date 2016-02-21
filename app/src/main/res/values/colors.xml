@@ -16,5 +16,5 @@
     <color name="toolbar">#ff333333</color>
     <color name="muted_red">#D32F2F</color>
     <color name="muted_green">#4CAF50</color>
-    <color name="muted_gray">#455A64</color>
+    <color name="muted_gray">#80455A64</color>
 </resources>

@@ -76,7 +76,7 @@ public class CancelListener {
         }
     };
 
-    View.OnTouchListener touchListener = (v, event) -> {
+    private final View.OnTouchListener touchListener = (v, event) -> {
         if (canceler != null && event.getX() > widget.getWidth() - widget.getPaddingRight() -
                 canceler.getIntrinsicWidth()) {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {

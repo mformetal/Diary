@@ -2,7 +2,6 @@ package miles.diary.ui.activity;
 
 import android.Manifest;
 import android.animation.ObjectAnimator;
-import android.app.SharedElementCallback;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -23,7 +22,6 @@ import com.bumptech.glide.Glide;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.OnClick;
@@ -33,9 +31,8 @@ import miles.diary.ui.SimpleTransitionListener;
 import miles.diary.ui.widget.CornerImageView;
 import miles.diary.ui.widget.TypefaceButton;
 import miles.diary.util.AnimUtils;
-import miles.diary.util.IntentUtils;
 import miles.diary.util.FileUtils;
-import miles.diary.util.Logg;
+import miles.diary.util.IntentUtils;
 
 /**
  * Created by mbpeele on 1/29/16.

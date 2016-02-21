@@ -51,7 +51,6 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/ic_add_24dp"
-        app:layout_behavior="miles.diary.ui.ScrollingFabBehavior"
         app:layout_anchor="@id/activity_home_root"
         app:layout_anchorGravity="bottom|end" />
 

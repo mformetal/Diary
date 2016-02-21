@@ -1,6 +1,6 @@
 package miles.diary.data;
 
-import android.app.Activity;
+import android.support.annotation.Nullable;
 
 import java.lang.ref.SoftReference;
 
@@ -13,14 +13,17 @@ import rx.Subscriber;
  */
 public class ActivitySubscriber<T> extends Subscriber<T> {
 
-    private final SoftReference<BaseActivity> softReference;
+    private SoftReference<BaseActivity> softReference;
 
     public ActivitySubscriber(BaseActivity activity) {
         if (activity == null) {
             onError(new NullPointerException("Activity subscriber is null"));
+            return;
         }
 
-        softReference = new SoftReference<BaseActivity>(activity);
+        activity.addSubscription(this);
+
+        softReference = new SoftReference<>(activity);
     }
 
     @Override
@@ -31,7 +34,8 @@ public class ActivitySubscriber<T> extends Subscriber<T> {
     public void onError(Throwable e) {
         BaseActivity activity = softReference.get();
         if (activity != null) {
-            Logg.log("FROM: " + activity.getClass().getName(), e);
+            e.printStackTrace();
+            Logg.log("ERROR FROM:", activity.getClass().getName());
         }
         removeSelf();
     }
@@ -48,7 +52,8 @@ public class ActivitySubscriber<T> extends Subscriber<T> {
         }
     }
 
-    public BaseActivity getActivity() {
+    @Nullable
+    public BaseActivity getSubscribedActivity() {
         return softReference.get();
     }
 }

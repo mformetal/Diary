@@ -1,6 +1,5 @@
 package miles.diary.ui;
 
-import android.animation.LayoutTransition;
 import android.transition.Transition;
 
 /**

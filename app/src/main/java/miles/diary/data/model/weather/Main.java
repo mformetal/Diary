@@ -4,13 +4,10 @@ package miles.diary.data.model.weather;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import javax.annotation.Generated;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.Locale;
-
-import miles.diary.util.Logg;
 
 public class Main implements Parcelable {
 

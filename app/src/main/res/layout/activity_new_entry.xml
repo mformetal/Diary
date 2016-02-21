@@ -24,8 +24,8 @@
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
         android:layout_marginBottom="@dimen/action_bar_margin"
         android:gravity="start|top"
-        android:background="@null"
-        android:hint="@string/activity_entry_body_hint" />
+        android:hint="@string/activity_entry_body_hint"
+        tools:text="LONG STRING MOTHERFUCKER"/>
 
     <RelativeLayout
         android:id="@+id/activity_entry_fab_menu"
@@ -45,10 +45,18 @@
             android:layout_margin="@dimen/activity_entry_fab_margin"
             android:layout_alignParentStart="true" />
 
+        <miles.diary.ui.widget.TypefaceIconTextView
+            android:id="@+id/activity_new_entry_temperature"
+            android:layout_width="@dimen/fab_normal_dimens"
+            android:layout_height="@dimen/fab_normal_dimens"
+            android:gravity="center"
+            android:background="@drawable/fab_normal_background"
+            android:layout_centerInParent="true" />
+
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/activity_new_entry_location"
             android:src="@drawable/ic_place_24dp"
-            android:transitionName="@string/transition_location"
+            android:transitionName="@string/transition_image"
             android:layout_width="@dimen/fab_normal_dimens"
             android:layout_height="@dimen/fab_normal_dimens"
             android:layout_margin="@dimen/activity_entry_fab_margin"

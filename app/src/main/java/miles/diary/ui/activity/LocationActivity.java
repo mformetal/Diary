@@ -1,34 +1,39 @@
 package miles.diary.ui.activity;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
+import android.graphics.drawable.VectorDrawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
+import android.transition.Transition;
 import android.view.View;
-import android.widget.AdapterView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.ViewTarget;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.Places;
+import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
+import com.google.android.gms.location.places.PlacePhotoResult;
 import com.google.android.gms.location.places.ui.PlacePicker;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
+
+import java.io.File;
 
 import butterknife.Bind;
 import butterknife.OnClick;
@@ -36,19 +41,20 @@ import icepick.State;
 import miles.diary.R;
 import miles.diary.data.ActivitySubscriber;
 import miles.diary.data.adapter.AutoCompleteAdapter;
-import miles.diary.data.model.weather.Main;
-import miles.diary.data.model.weather.Weather;
-import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.ui.PreDrawer;
+import miles.diary.ui.SimpleTransitionListener;
+import miles.diary.ui.widget.CornerImageView;
 import miles.diary.ui.widget.TypefaceAutoCompleteTextView;
 import miles.diary.ui.widget.TypefaceButton;
-import miles.diary.ui.widget.TypefaceIconTextView;
-import miles.diary.ui.widget.TypefaceTextView;
 import miles.diary.util.AnimUtils;
+import miles.diary.util.FileUtils;
+import miles.diary.util.GoogleUtils;
 import miles.diary.util.IntentUtils;
 import miles.diary.util.Logg;
-import miles.diary.util.TextUtils;
+import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -60,47 +66,29 @@ public class LocationActivity extends BaseActivity
 
     private final static int REQUEST_LOCATION_PERMISSION = 1;
     private final static int REQUEST_PLACE_PICKER = 2;
-    public final static String RESULT_LOCATION_NAME = "name";
-    public final static String RESULT_LOCATION_ID = "id";
-    public final static String RESULT_TEMPERATURE = "temperature";
 
-    @Bind(R.id.activity_location_neg_button)
-    TypefaceButton negButton;
-    @Bind(R.id.activity_location_pos_button)
-    TypefaceButton posButton;
-    @Bind(R.id.activity_location_weather)
-    TypefaceIconTextView weatherText;
-    @Bind(R.id.activity_location_autocomplete)
-    TypefaceAutoCompleteTextView autoCompleteTextView;
+    @Bind(R.id.activity_location_pos_button) TypefaceButton posButton;
+    @Bind(R.id.activity_location_autocomplete) TypefaceAutoCompleteTextView autoCompleteTextView;
+    @Bind(R.id.activity_location_image) CornerImageView locationImage;
 
-    private AutoCompleteAdapter autoCompleteAdapter;
     private GoogleApiClient googleApiClient;
-    @State
-    String locationName;
-    @State
-    String locationId;
-    @State
-    String temperature;
+    @State String locationName;
+    @State String locationId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location);
 
-        setupTransitions();
-
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
-            locationName = bundle.getString(RESULT_LOCATION_NAME);
-            locationId = bundle.getString(RESULT_LOCATION_ID);
-            temperature = bundle.getString(RESULT_TEMPERATURE);
+            locationName = bundle.getString(NewEntryActivity.RESULT_PLACE_NAME);
+            locationId = bundle.getString(NewEntryActivity.RESULT_PLACE_ID);
+
+            loadGooglePlacePhoto();
 
             if (locationName != null) {
                 autoCompleteTextView.setText(locationName, false);
-            }
-
-            if (temperature != null) {
-                weatherText.setText(temperature);
             }
         }
 
@@ -109,7 +97,7 @@ public class LocationActivity extends BaseActivity
                 .addConnectionCallbacks(this)
                 .build();
 
-        autoCompleteAdapter =
+        AutoCompleteAdapter autoCompleteAdapter =
                 new AutoCompleteAdapter(this, R.layout.autocomplete_adapter,
                         googleApiClient, null);
         autoCompleteTextView.setAdapter(autoCompleteAdapter);
@@ -119,7 +107,15 @@ public class LocationActivity extends BaseActivity
                     autoCompleteAdapter.getItem(position);
             locationId = String.valueOf(item.placeId);
             locationName = String.valueOf(item.description);
+
+            getPlacePhoto();
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        setReturnData();
+        super.onBackPressed();
     }
 
     @Override
@@ -130,6 +126,8 @@ public class LocationActivity extends BaseActivity
                     Place place = PlacePicker.getPlace(this, data);
                     locationName = place.getName().toString();
                     locationId = place.getId();
+
+                    getPlacePhoto();
 
                     autoCompleteTextView.setText(locationName, false);
                 }
@@ -144,7 +142,6 @@ public class LocationActivity extends BaseActivity
         switch (requestCode) {
             case REQUEST_LOCATION_PERMISSION:
                 if (permissionsGranted(grantResults, 1)) {
-                    getWeather();
                     getPlace();
                 } else {
                     finish();
@@ -169,27 +166,17 @@ public class LocationActivity extends BaseActivity
     }
 
     @Override
-    @OnClick({R.id.activity_location_pos_button, R.id.activity_location_neg_button,
-            R.id.activity_location_image})
+    @OnClick({R.id.activity_location_pos_button, R.id.activity_location_image})
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.activity_location_pos_button:
-                if (locationName != null) {
-                    Intent intent = new Intent();
-                    intent.putExtra(RESULT_LOCATION_NAME, locationName);
-                    intent.putExtra(RESULT_LOCATION_ID, locationId);
-                    intent.putExtra(RESULT_TEMPERATURE, temperature);
-                    setResult(RESULT_OK, intent);
+                if (locationName != null && locationId != null) {
+                    setReturnData();
                     onBackPressed();
                 } else {
                     Snackbar.make(root, R.string.activity_location_no_input,
                             Snackbar.LENGTH_SHORT).show();
                 }
-                break;
-            case R.id.activity_location_neg_button:
-                Intent intent = new Intent();
-                setResult(RESULT_CANCELED, intent);
-                onBackPressed();
                 break;
             case R.id.activity_location_image:
                 PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
@@ -215,8 +202,6 @@ public class LocationActivity extends BaseActivity
 
                 Location loc = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
                 if (loc != null) {
-                    getWeather();
-
                     getPlace();
                 }
             } else {
@@ -228,69 +213,141 @@ public class LocationActivity extends BaseActivity
     }
 
     @Override
-    public void onConnectionSuspended(int i) {
-    }
+    public void onConnectionSuspended(int i) {}
 
     private void getPlace() {
         if (locationName == null && locationId == null) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return;
-            }
+            GoogleUtils.getCurrentPlace(googleApiClient, null)
+                    .subscribe(new ActivitySubscriber<PlaceLikelihoodBuffer>(this) {
+                        @Override
+                        public void onNext(PlaceLikelihoodBuffer placeLikelihoods) {
+                            Place mostLikely = placeLikelihoods.get(0).getPlace();
 
-            Places.PlaceDetectionApi.getCurrentPlace(googleApiClient, null)
-                    .setResultCallback(placeLikelihoods -> {
-                        Place mostLikely = placeLikelihoods.get(0).getPlace();
+                            locationId = mostLikely.getId();
+                            locationName = mostLikely.getName().toString();
 
-                        locationId = mostLikely.getId();
-                        locationName = mostLikely.getName().toString();
+                            autoCompleteTextView.setText(locationName, false);
 
-                        autoCompleteTextView.setText(locationName, false);
+                            getPlacePhoto();
 
-                        placeLikelihoods.release();
+                            placeLikelihoods.release();
+                        }
                     });
         }
     }
 
-    private void getWeather() {
-        if (temperature == null) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return;
-            }
+    private void setReturnData() {
+        Intent intent = new Intent();
+        intent.putExtra(NewEntryActivity.RESULT_PLACE_NAME, locationName);
+        intent.putExtra(NewEntryActivity.RESULT_PLACE_ID, locationId);
+        if (!(locationImage.getDrawable() instanceof VectorDrawable) &&
+                getWindow().getSharedElementReturnTransition() == null) {
+            ActivityOptions transitionActivityOptions =
+                    ActivityOptions.makeSceneTransitionAnimation(this, locationImage,
+                            getString(R.string.transition_image));
+            intent.putExtras(transitionActivityOptions.toBundle());
+        }
+        setResult(RESULT_OK, intent);
+    }
 
-            Location loc = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-            if (loc != null) {
-                weatherService.getWeather(loc.getLatitude(), loc.getLongitude())
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new ActivitySubscriber<WeatherResponse>(this) {
-                            @Override
-                            public void onNext(WeatherResponse weatherResponse) {
-                                Main main = weatherResponse.getMain();
+    private void getPlacePhoto() {
+        if (locationId != null) {
+            GoogleUtils.getPlacePhoto(locationId, googleApiClient)
+                    .flatMap(placePhotoResult -> {
+                        Bitmap bitmap = placePhotoResult.getBitmap();
+                        locationImage.setImageBitmap(bitmap);
+                        AnimUtils.pop(locationImage, -1);
 
-                                Weather weather = weatherResponse.getWeather().get(0);
-
-                                weatherText.setAlpha(0f);
-                                weatherText.setScaleX(.8f);
-
-                                temperature = TextUtils.getWeatherIcon(weather.getIcon()) + " " +
-                                        main.formatTemperature();
-
-                                weatherText.setText(temperature);
-
-                                weatherText.animate()
-                                        .alpha(1f)
-                                        .scaleX(1f)
-                                        .setDuration(AnimUtils.mediumAnim(LocationActivity.this))
-                                        .setInterpolator(new FastOutSlowInInterpolator());
-                            }
-                        });
-            }
+                        return FileUtils.saveBitmap(LocationActivity.this, placePhotoResult.getBitmap(),
+                                NewEntryActivity.LOCATION_IMAGE);
+                    })
+                    .subscribe(new ActivitySubscriber<>(this));
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private void setupTransitions() {
-        new PreDrawer(root) {
+    private void loadGooglePlacePhoto() {
+        if (FileUtils.isFileAvailable(this, NewEntryActivity.LOCATION_IMAGE)) {
+            locationImage.setImageDrawable(null);
+
+            postponeEnterTransition();
+
+            final Transition enterTransition = getWindow().getSharedElementEnterTransition();
+            final Transition returnTransition = getWindow().getSharedElementReturnTransition();
+
+            if (enterTransition != null && returnTransition != null) {
+                enterTransition.addListener(new SimpleTransitionListener() {
+                    @Override
+                    public void onTransitionStart(Transition transition) {
+                        super.onTransitionStart(transition);
+                        enterTransition.removeListener(this);
+
+                        slideUp();
+
+                        returnTransition.addListener(new SimpleTransitionListener() {
+                            @Override
+                            public void onTransitionStart(Transition transition) {
+                                super.onTransitionEnd(transition);
+
+                                ObjectAnimator corner = ObjectAnimator.ofFloat(locationImage,
+                                        CornerImageView.CORNERS,
+                                        0, Math.min(locationImage.getWidth(), locationImage.getHeight()) / 2f);
+                                corner.setDuration(AnimUtils.longAnim(getApplicationContext()));
+                                corner.setInterpolator(new FastOutSlowInInterpolator());
+                                corner.start();
+                            }
+                        });
+
+                        ObjectAnimator corner = ObjectAnimator.ofFloat(locationImage,
+                                CornerImageView.CORNERS,
+                                Math.max(locationImage.getWidth(), locationImage.getHeight()) / 2f, 0);
+                        corner.setDuration(AnimUtils.longAnim(getApplicationContext()));
+                        corner.setInterpolator(new FastOutSlowInInterpolator());
+                        corner.start();
+                    }
+                });
+            }
+
+            FileUtils.getBitmapBytes(this, NewEntryActivity.LOCATION_IMAGE)
+                    .subscribe(new ActivitySubscriber<byte[]>(LocationActivity.this) {
+                        @Override
+                        public void onNext(byte[] bytes) {
+                            super.onNext(bytes);
+                            Glide.with(getSubscribedActivity())
+                                    .load(bytes)
+                                    .asBitmap()
+                                    .dontAnimate()
+                                    .centerCrop()
+                                    .listener(new RequestListener<byte[], Bitmap>() {
+                                        @Override
+                                        public boolean onException(Exception e,
+                                                                   byte[] model,
+                                                                   Target<Bitmap> target,
+                                                                   boolean isFirstResource) {
+                                            Logg.log(e);
+                                            return false;
+                                        }
+
+                                        @Override
+                                        public boolean onResourceReady(Bitmap resource,
+                                                                       byte[] model,
+                                                                       Target<Bitmap> target,
+                                                                       boolean isFromMemoryCache,
+                                                                       boolean isFirstResource) {
+                                            startPostponedEnterTransition();
+                                            return false;
+                                        }
+                                    })
+                                    .into(locationImage);
+                        }
+                    });
+        } else {
+            locationImage.setImageResource(R.drawable.ic_place_24dp);
+            slideUp();
+        }
+    }
+
+    private void slideUp() {
+        new PreDrawer<View>(root) {
             @Override
             public void notifyPreDraw(View view) {
                 float offset = root.getHeight() / 4;

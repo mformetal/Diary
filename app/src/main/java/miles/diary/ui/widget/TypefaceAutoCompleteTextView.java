@@ -3,7 +3,6 @@ package miles.diary.ui.widget;
 import android.content.Context;
 import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.util.AttributeSet;
-import android.widget.AutoCompleteTextView;
 
 import miles.diary.ui.CancelListener;
 import miles.diary.util.TextUtils;
@@ -35,5 +34,10 @@ public class TypefaceAutoCompleteTextView extends AppCompatAutoCompleteTextView 
 
         setTypeface(TextUtils.getDefaultFont(getContext()));
         new CancelListener(this);
+    }
+
+    @Override
+    protected void replaceText(CharSequence text) {
+        setText(text);
     }
 }

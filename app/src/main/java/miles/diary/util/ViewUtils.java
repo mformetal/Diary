@@ -1,14 +1,10 @@
 package miles.diary.util;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.util.Property;
 import android.util.TypedValue;
 import android.view.View;
 

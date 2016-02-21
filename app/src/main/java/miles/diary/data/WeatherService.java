@@ -16,6 +16,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 import rx.Observable;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by mbpeele on 2/4/16.
@@ -59,7 +61,7 @@ public class WeatherService {
                         Logg.log(e1);
                     }
                 }
-            });
+            }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
         }
 
         return weatherResponseObservable;

@@ -1,22 +1,17 @@
 package miles.diary.ui.widget;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.AppCompatButton;
 import android.util.AttributeSet;
-import android.view.View;
 import android.widget.Button;
 
 import me.grantland.widget.AutofitHelper;
-import miles.diary.DiaryApplication;
 import miles.diary.R;
 import miles.diary.ui.PreDrawer;
-import miles.diary.util.Logg;
 import miles.diary.util.TextUtils;
 
 /**

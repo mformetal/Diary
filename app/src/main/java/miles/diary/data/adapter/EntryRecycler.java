@@ -1,11 +1,5 @@
 package miles.diary.data.adapter;
 
-import android.app.ActivityOptions;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -13,16 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.Target;
-import com.bumptech.glide.request.target.ViewTarget;
-
-import org.w3c.dom.Text;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -31,15 +17,11 @@ import io.realm.RealmResults;
 import miles.diary.R;
 import miles.diary.data.ActivitySubscriber;
 import miles.diary.data.model.Entry;
-import miles.diary.data.model.weather.WeatherResponse;
-import miles.diary.ui.PreDrawer;
 import miles.diary.ui.activity.BaseActivity;
-import miles.diary.ui.activity.EntryActivity;
 import miles.diary.ui.activity.NewEntryActivity;
 import miles.diary.ui.widget.TypefaceIconTextView;
 import miles.diary.ui.widget.TypefaceTextView;
 import miles.diary.util.AnimUtils;
-import miles.diary.util.Logg;
 
 /**
  * Created by mbpeele on 1/14/16.
@@ -106,21 +88,21 @@ public class EntryRecycler extends BackendAdapter<Entry, RecyclerView.ViewHolder
                         super.onNext(entries);
                         setData(entries);
                         if (getData().isEmpty()) {
-                            propogateEmpty();
+                            propagateEmpty();
                         } else {
-                            propogateCompletion();
+                            propagateCompletion();
                         }
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         super.onError(e);
-                        propogateError(e);
+                        propagateError(e);
                     }
 
                     @Override
                     public void onStart() {
-                        propogateStart();
+                        propagateStart();
                     }
                 });
     }
@@ -201,7 +183,8 @@ public class EntryRecycler extends BackendAdapter<Entry, RecyclerView.ViewHolder
         @Bind(R.id.adapter_entry_image_view) ImageView image;
         @Bind(R.id.adapter_entry_image_body) TypefaceTextView body;
         @Bind(R.id.adapter_entry_image_location) TypefaceTextView location;
-        @Bind(R.id.adapter_entry_image_temperature) TypefaceIconTextView temperature;
+        @Bind(R.id.adapter_entry_image_temperature)
+        TypefaceIconTextView temperature;
 
         public ImageViewHolder(View itemView) {
             super(itemView);

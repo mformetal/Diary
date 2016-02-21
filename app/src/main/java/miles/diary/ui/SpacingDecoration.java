@@ -1,16 +1,9 @@
 package miles.diary.ui;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.LinearGradient;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-
-import miles.diary.util.Logg;
 
 /**
  * Created by mbpeele on 1/28/16.

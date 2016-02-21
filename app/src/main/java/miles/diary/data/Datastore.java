@@ -3,7 +3,6 @@ package miles.diary.data;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 
 /**
  * Created by mbpeele on 1/18/16.

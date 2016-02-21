@@ -5,18 +5,26 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Environment;
 import android.webkit.MimeTypeMap;
+
+import com.google.common.io.ByteStreams;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by mbpeele on 1/20/16.
@@ -25,7 +33,6 @@ public class FileUtils {
 
     private final static String MIME_IMAGE = "image/jpeg";
     private final static String MIME_VIDEO = "video/mp4";
-    private final static String AUTH_BITMAP_FILENAME = "miles:diary:auth:bitmap";
 
     private FileUtils() {}
 
@@ -50,20 +57,6 @@ public class FileUtils {
         return contentUri;
     }
 
-    public static byte[] readBytes(InputStream inputStream) throws IOException {
-        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
-
-        int bufferSize = 1024;
-        byte[] buffer = new byte[bufferSize];
-
-        int len = 0;
-        while ((len = inputStream.read(buffer)) != -1) {
-            byteBuffer.write(buffer, 0, len);
-        }
-
-        return byteBuffer.toByteArray();
-    }
-
     public static boolean isImageUri(Context context, Uri uri) {
         ContentResolver contentResolver = context.getContentResolver();
         String contentResolverType = contentResolver.getType(uri);
@@ -80,25 +73,87 @@ public class FileUtils {
         return false;
     }
 
-    public static Bitmap getAuthBitmap(Context context) {
-        Bitmap bitmap = null;
-        try {
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-            options.inMutable = true;
-            options.inPreferQualityOverSpeed = true;
+    public static Observable<byte[]> saveBitmap(Context context, Bitmap bitmap, String name) {
+        return Observable.create(new Observable.OnSubscribe<byte[]>() {
+            @Override
+            public void call(Subscriber<? super byte[]> subscriber) {
+                subscriber.onStart();
 
-            InputStream test = context.openFileInput(AUTH_BITMAP_FILENAME);
-            bitmap = BitmapFactory.decodeStream(test, null, options);
-            test.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+                try {
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                    byte[] bytes = stream.toByteArray();
 
-        return bitmap;
+                    OutputStream outputStream
+                            = context.openFileOutput(name, Context.MODE_PRIVATE);
+                    outputStream.write(bytes);
+
+                    subscriber.onNext(bytes);
+                } catch (Exception e) {
+                    subscriber.onError(e);
+                } finally {
+                    subscriber.onCompleted();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
     }
 
-    public static void deleteAuthBitmap(Context context) {
-        context.deleteFile(AUTH_BITMAP_FILENAME);
+    public static Observable<Bitmap> getBitmap(Context context, String name,
+                                               int reqWidth, int reqHeight) {
+        return Observable.create(new Observable.OnSubscribe<Bitmap>() {
+            @Override
+            public void call(Subscriber<? super Bitmap> subscriber) {
+                subscriber.onStart();
+
+                try {
+                    InputStream test = context.openFileInput(name);
+                    Bitmap bitmap = BitmapFactory.decodeStream(test);
+
+                    int width = bitmap.getWidth();
+                    int height = bitmap.getHeight();
+                    float scaleWidth = ((float) reqWidth) / width;
+                    float scaleHeight = ((float) reqHeight) / height;
+
+                    Matrix matrix = new Matrix();
+                    matrix.postScale(scaleWidth, scaleHeight);
+                    Bitmap resizedBitmap = Bitmap.createBitmap(
+                            bitmap, 0, 0, width, height, matrix, false);
+                    bitmap.recycle();
+
+                    subscriber.onNext(resizedBitmap);
+                } catch (IOException e) {
+                    subscriber.onError(e);
+                }
+
+                subscriber.onCompleted();
+            }
+        });
+    }
+
+    public static Observable<byte[]> getBitmapBytes(Context context, String name) {
+        return Observable.create(new Observable.OnSubscribe<byte[]>() {
+            @Override
+            public void call(Subscriber<? super byte[]> subscriber) {
+                subscriber.onStart();
+
+                try {
+                    InputStream inputStream = context.openFileInput(name);
+                    subscriber.onNext(ByteStreams.toByteArray(inputStream));
+                } catch (IOException e) {
+                    subscriber.onError(e);
+                }
+
+                subscriber.onCompleted();
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public static void deleteBitmapFile(Context context, String name) {
+        context.deleteFile(name);
+    }
+
+    public static boolean isFileAvailable(Context context, String name) {
+        File file = context.getFileStreamPath(name);
+        return !(file == null || !file.exists());
     }
 }

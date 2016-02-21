@@ -3,14 +3,13 @@ package miles.diary.util;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.util.Property;
 import android.view.View;
 import android.view.ViewAnimationUtils;
+import android.view.ViewPropertyAnimator;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.ImageView;
 
 import com.bumptech.glide.request.animation.ViewPropertyAnimation;
 
@@ -25,7 +24,9 @@ public class AnimUtils {
 
     public static int shortAnim(Context context) {
         if (SHORT_ANIM < 0) {
-            SHORT_ANIM = context.getResources().getInteger(android.R.integer.config_shortAnimTime);
+            SHORT_ANIM = context != null ?
+                    context.getResources().getInteger(android.R.integer.config_shortAnimTime) :
+                    200;
         }
 
         return SHORT_ANIM;
@@ -33,7 +34,9 @@ public class AnimUtils {
 
     public static int mediumAnim(Context context) {
         if (MEDIUM_ANIM < 0) {
-            MEDIUM_ANIM = context.getResources().getInteger(android.R.integer.config_mediumAnimTime);
+            MEDIUM_ANIM = context != null ?
+                    context.getResources().getInteger(android.R.integer.config_mediumAnimTime) :
+                    400;
         }
 
         return MEDIUM_ANIM;
@@ -41,7 +44,9 @@ public class AnimUtils {
 
     public static int longAnim(Context context) {
         if (LONG_ANIM < 0) {
-            LONG_ANIM = context.getResources().getInteger(android.R.integer.config_longAnimTime);
+            LONG_ANIM = context != null ?
+                    context.getResources().getInteger(android.R.integer.config_longAnimTime) :
+                    500;
         }
 
         return LONG_ANIM;
@@ -49,7 +54,7 @@ public class AnimUtils {
 
     public static ObjectAnimator gone(final View view, int duration) {
         ObjectAnimator alpha = ObjectAnimator.ofFloat(view, View.ALPHA, 1f, 0f);
-        alpha.setDuration(shortAnim(view.getContext()));
+        alpha.setDuration(duration == -1 ? shortAnim(view.getContext()) : duration);
         alpha.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
@@ -61,7 +66,7 @@ public class AnimUtils {
 
     public static ObjectAnimator visible(final View view, int duration) {
         ObjectAnimator alpha = ObjectAnimator.ofFloat(view, View.ALPHA, 0f, 1f);
-        alpha.setDuration(shortAnim(view.getContext()));
+        alpha.setDuration(duration == -1 ? shortAnim(view.getContext()) : duration);
         alpha.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
@@ -73,7 +78,7 @@ public class AnimUtils {
 
     public static ObjectAnimator invisible(final View view, int duration) {
         ObjectAnimator alpha = ObjectAnimator.ofFloat(view, View.ALPHA, 1f, 0f);
-        alpha.setDuration(shortAnim(view.getContext()));
+        alpha.setDuration(duration == -1 ? shortAnim(view.getContext()) : duration);
         alpha.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
@@ -81,6 +86,17 @@ public class AnimUtils {
             }
         });
         return alpha;
+    }
+
+    public static ViewPropertyAnimator pop(final View view, int duration) {
+        view.setScaleX(0f);
+        view.setScaleY(0f);
+
+        return view.animate()
+                .scaleXBy(1f)
+                .scaleYBy(1f)
+                .setDuration(duration == -1 ? shortAnim(view.getContext()) : duration)
+                .setInterpolator(new FastOutSlowInInterpolator());
     }
 
     public final static ViewPropertyAnimation.Animator REVEAL = view -> {

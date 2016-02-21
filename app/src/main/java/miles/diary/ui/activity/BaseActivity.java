@@ -10,6 +10,9 @@ import android.view.ViewGroup;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
@@ -19,6 +22,7 @@ import miles.diary.DiaryApplication;
 import miles.diary.R;
 import miles.diary.data.DataStore;
 import miles.diary.data.WeatherService;
+import rx.Observable;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
 
@@ -32,6 +36,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Inject GoogleApiClient.Builder googleApiClientBuilder;
 
     private CompositeSubscription compositeSubscription;
+    private List<Observable> observableList;
     protected Realm realm;
     public ViewGroup root;
 
@@ -42,6 +47,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         compositeSubscription = new CompositeSubscription();
         realm = Realm.getDefaultInstance();
         Icepick.restoreInstanceState(this, savedInstanceState);
+        observableList = new ArrayList<>();
     }
 
     @Override

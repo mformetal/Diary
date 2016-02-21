@@ -5,18 +5,13 @@ import android.content.res.AssetManager;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.text.InputType;
-import android.widget.TextView;
 
 import com.joanzapata.iconify.fonts.WeathericonsIcons;
-import com.joanzapata.iconify.fonts.WeathericonsModule;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Random;
 
 import miles.diary.R;
-import miles.diary.data.model.weather.Weather;
 
 /**
  * Created by mbpeele on 1/14/16.

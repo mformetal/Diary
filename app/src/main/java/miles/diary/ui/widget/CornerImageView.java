@@ -8,7 +8,6 @@ import android.util.AttributeSet;
 import android.widget.ImageView;
 
 import miles.diary.util.AnimUtils;
-import miles.diary.util.Logg;
 
 /**
  * Created by mbpeele on 2/5/16.

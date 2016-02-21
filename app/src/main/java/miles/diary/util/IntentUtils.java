@@ -1,8 +1,5 @@
 package miles.diary.util;
 
-import android.app.Activity;
-import android.content.Intent;
-
 /**
  * Created by mbpeele on 2/2/16.
  */

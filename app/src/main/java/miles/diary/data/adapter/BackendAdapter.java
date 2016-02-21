@@ -43,25 +43,25 @@ public abstract class BackendAdapter<T extends RealmObject, VH extends RecyclerV
         data = results;
     }
 
-    public void propogateError(Throwable throwable) {
+    public void propagateError(Throwable throwable) {
         if (listener != null) {
             listener.onLoadError(throwable);
         }
     }
 
-    public void propogateCompletion() {
+    public void propagateCompletion() {
         if (listener != null) {
             listener.onLoadCompleted();
         }
     }
 
-    public void propogateEmpty() {
+    public void propagateEmpty() {
         if (listener != null) {
             listener.onLoadEmpty();
         }
     }
 
-    public void propogateStart() {
+    public void propagateStart() {
         if (listener != null) {
             listener.onLoadStart();
         }

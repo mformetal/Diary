@@ -1,6 +1,5 @@
 package miles.diary.data.model.weather;
 
-import javax.annotation.Generated;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 

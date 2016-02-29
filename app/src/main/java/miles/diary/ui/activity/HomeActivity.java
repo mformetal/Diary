@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -21,14 +20,13 @@ import butterknife.Bind;
 import jp.wasabeef.recyclerview.animators.FadeInAnimator;
 import miles.diary.R;
 import miles.diary.data.adapter.BackendAdapterListener;
-import miles.diary.data.adapter.EntryRecycler;
+import miles.diary.data.adapter.EntryAdapter;
 import miles.diary.data.model.Entry;
-import miles.diary.ui.PreDrawer;
 import miles.diary.ui.SpacingDecoration;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.Logg;
 
-public class HomeActivity extends TransitionActivity implements BackendAdapterListener<Entry> {
+public class HomeActivity extends TransitionActivity implements BackendAdapterListener {
 
     @Bind(R.id.activity_home_recycler) RecyclerView recyclerView;
     @Bind(R.id.activity_home_toolbar) Toolbar toolbar;
@@ -37,7 +35,7 @@ public class HomeActivity extends TransitionActivity implements BackendAdapterLi
 
     private final static int RESULT_CODE_ENTRY = 1;
 
-    private EntryRecycler entryRecycler;
+    private EntryAdapter entryAdapter;
     private View emptyView;
 
     @Override
@@ -47,42 +45,37 @@ public class HomeActivity extends TransitionActivity implements BackendAdapterLi
 
         setActionBar(toolbar);
 
-        entryRecycler = new EntryRecycler(this, realm);
+        entryAdapter = new EntryAdapter(this, realm);
         recyclerView.setItemAnimator(new FadeInAnimator());
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(entryRecycler);
+        recyclerView.setAdapter(entryAdapter);
         recyclerView.addItemDecoration(new SpacingDecoration(
                 ContextCompat.getDrawable(this, R.drawable.recycler_divider)));
 
-        fab.setOnClickListener(v -> {
-            Intent intent = new Intent(v.getContext(), NewEntryActivity.class);
-            startActivityForResult(intent, RESULT_CODE_ENTRY);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), NewEntryActivity.class);
+                startActivityForResult(intent, RESULT_CODE_ENTRY);
+            }
         });
     }
 
     @Override
     void onEnter(View root, Intent calledIntent, boolean hasSavedInstanceState) {
-        fab.setScaleX(0f);
-        fab.setScaleY(0f);
-
-        fab.animate()
-                .scaleYBy(1f)
-                .scaleXBy(1f)
-                .setDuration(AnimUtils.longAnim(this))
-                .setInterpolator(new AnticipateOvershootInterpolator())
-                .start();
-
-        View textView = toolbar.getChildAt(0);
-        if (textView != null && textView instanceof TextView) {
-            textView.setAlpha(0f);
-            textView.setScaleX(0.8f);
-
-            textView.animate()
-                    .alpha(1f)
-                    .scaleX(1f)
-                    .setDuration(AnimUtils.longAnim(this))
-                    .setInterpolator(new FastOutSlowInInterpolator());
+        View view = toolbar.getChildAt(0);
+        if (view != null && view instanceof TextView) {
+            TextView textView = (TextView) view;
+            AnimatorSet animatorSet = new AnimatorSet();
+            animatorSet.playTogether(
+                    AnimUtils.pop(fab, 0f, 1f)
+                            .setDuration(AnimUtils.longAnim(this)),
+                    AnimUtils.textScale(textView, null, .8f, 1f)
+                            .setDuration(AnimUtils.longAnim(this)),
+                    AnimUtils.alpha(textView, 0f, 1f)
+                            .setDuration(AnimUtils.longAnim(this)));
+            animatorSet.start();
         }
     }
 
@@ -98,7 +91,7 @@ public class HomeActivity extends TransitionActivity implements BackendAdapterLi
                 if (resultCode == RESULT_OK) {
                     Bundle extras = data.getExtras();
                     if (extras != null) {
-                        entryRecycler.addEntry(extras);
+                        entryAdapter.addEntry(extras);
 
                         if (emptyView != null) {
                             root.removeView(emptyView);
@@ -126,9 +119,12 @@ public class HomeActivity extends TransitionActivity implements BackendAdapterLi
             dismissLoading();
             ViewStub viewStub = (ViewStub) findViewById(R.id.activity_home_no_entries);
             emptyView = viewStub.inflate();
-            emptyView.setOnClickListener(v -> {
-                Intent intent = new Intent(v.getContext(), NewEntryActivity.class);
-                startActivityForResult(intent, RESULT_CODE_ENTRY);
+            emptyView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(v.getContext(), NewEntryActivity.class);
+                    startActivityForResult(intent, RESULT_CODE_ENTRY);
+                }
             });
         }
     }
@@ -145,7 +141,7 @@ public class HomeActivity extends TransitionActivity implements BackendAdapterLi
         scale.setDuration(AnimUtils.longAnim(this));
         scale.setInterpolator(new AnticipateOvershootInterpolator());
 
-        ObjectAnimator gone = AnimUtils.gone(progressBar, AnimUtils.longAnim(this));
+        ObjectAnimator gone = AnimUtils.gone(progressBar).setDuration(AnimUtils.longAnim(this));
 
         AnimatorSet animatorSet = new AnimatorSet();
         animatorSet.playTogether(scale, gone);
@@ -159,7 +155,7 @@ public class HomeActivity extends TransitionActivity implements BackendAdapterLi
         scale.setDuration(AnimUtils.longAnim(this));
         scale.setInterpolator(new AnticipateOvershootInterpolator());
 
-        ObjectAnimator gone = AnimUtils.visible(progressBar, AnimUtils.longAnim(this));
+        ObjectAnimator gone = AnimUtils.visible(progressBar).setDuration(AnimUtils.longAnim(this));
 
         AnimatorSet animatorSet = new AnimatorSet();
         animatorSet.playTogether(scale, gone);

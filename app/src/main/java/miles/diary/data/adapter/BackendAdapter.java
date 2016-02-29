@@ -14,7 +14,7 @@ public abstract class BackendAdapter<T extends RealmObject, VH extends RecyclerV
 
     private RealmResults<T> data;
     protected Realm realm;
-    private BackendAdapterListener<T> listener;
+    private BackendAdapterListener listener;
 
     public BackendAdapter(Realm realm1) {
         realm = realm1;
@@ -25,7 +25,7 @@ public abstract class BackendAdapter<T extends RealmObject, VH extends RecyclerV
         return data != null ? data.size() : 0;
     }
 
-    public void setListener(BackendAdapterListener<T> backendAdapterListener) {
+    public void setListener(BackendAdapterListener backendAdapterListener) {
         listener = backendAdapterListener;
     }
 
@@ -38,6 +38,8 @@ public abstract class BackendAdapter<T extends RealmObject, VH extends RecyclerV
     public abstract void loadData(Realm realm);
 
     public abstract void addData(T object);
+
+    public abstract boolean verifyDataSource(Realm realm);
 
     public void setData(RealmResults<T> results) {
         data = results;

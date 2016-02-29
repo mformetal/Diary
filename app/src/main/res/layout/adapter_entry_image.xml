@@ -43,9 +43,6 @@
         android:layout_marginTop="@dimen/adapter_entry_margin"
         android:layout_marginBottom="@dimen/adapter_entry_margin"
         android:layout_gravity="center_horizontal"
-        android:transitionName="@string/transition_image"
-        app:civ_border_width="@dimen/adapter_image_border_width"
-        app:civ_border_color="@color/accent"
         tools:text="MOUNTAIN BIKING" />
 
     <miles.diary.ui.widget.TypefaceTextView

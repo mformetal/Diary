@@ -36,17 +36,14 @@ public class WeatherService {
         baseUrl = application.getResources().getString(R.string.weather_base);
     }
 
-    public Observable<WeatherResponse> getWeather(Double latitude, Double longitude) {
+    public Observable<WeatherResponse> getWeather(final Double latitude, final Double longitude) {
         if (weatherResponseObservable == null) {
             weatherResponseObservable = Observable.create(new Observable.OnSubscribe<WeatherResponse>() {
                 @Override
                 public void call(Subscriber<? super WeatherResponse> subscriber) {
                     try {
-                        final String url = baseUrl + "data/2.5/weather?" +
-                                "lat=" + latitude + "&lon=" + longitude + "&APPID=" + apiKey;
-
                         Response response = client.newCall(new Request.Builder()
-                                .url(url)
+                                .url(formatUrl(latitude, longitude))
                                 .build()).execute();
 
                         Reader reader = response.body().charStream();
@@ -65,5 +62,10 @@ public class WeatherService {
         }
 
         return weatherResponseObservable;
+    }
+
+    private String formatUrl(final double latitude, final double longitude) {
+        return baseUrl + "data/2.5/weather?" +
+                "lat=" + latitude + "&lon=" + longitude + "&APPID=" + apiKey;
     }
 }

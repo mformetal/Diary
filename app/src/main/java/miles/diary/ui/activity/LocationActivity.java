@@ -1,29 +1,25 @@
 package miles.diary.ui.activity;
 
 import android.Manifest;
-import android.animation.ObjectAnimator;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.VectorDrawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.transition.Transition;
+import android.transition.TransitionSet;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SimpleTarget;
-import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -31,10 +27,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
-import com.google.android.gms.location.places.PlacePhotoResult;
 import com.google.android.gms.location.places.ui.PlacePicker;
-
-import java.io.File;
 
 import butterknife.Bind;
 import butterknife.OnClick;
@@ -43,20 +36,13 @@ import miles.diary.R;
 import miles.diary.data.ActivitySubscriber;
 import miles.diary.data.adapter.AutoCompleteAdapter;
 import miles.diary.ui.PreDrawer;
-import miles.diary.ui.SimpleTransitionListener;
-import miles.diary.ui.widget.CornerImageView;
+import miles.diary.ui.transition.ColorTransition;
 import miles.diary.ui.widget.TypefaceAutoCompleteTextView;
 import miles.diary.ui.widget.TypefaceButton;
 import miles.diary.util.AnimUtils;
-import miles.diary.util.FileUtils;
 import miles.diary.util.GoogleUtils;
 import miles.diary.util.IntentUtils;
 import miles.diary.util.Logg;
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
 /**
  * Created by mbpeele on 2/6/16.
@@ -82,13 +68,13 @@ public class LocationActivity extends BaseActivity
         setContentView(R.layout.activity_location);
 
         if (savedInstanceState == null) {
-            slideUp();
+            transitionSetup();
         }
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
-            locationName = bundle.getString(NewEntryActivity.RESULT_PLACE_NAME);
-            locationId = bundle.getString(NewEntryActivity.RESULT_PLACE_ID);
+            locationName = bundle.getString(NewEntryActivity.PLACE_NAME);
+            locationId = bundle.getString(NewEntryActivity.PLACE_ID);
 
             if (locationName != null) {
                 autoCompleteTextView.setText(locationName, false);
@@ -100,16 +86,19 @@ public class LocationActivity extends BaseActivity
                 .addConnectionCallbacks(this)
                 .build();
 
-        AutoCompleteAdapter autoCompleteAdapter =
+        final AutoCompleteAdapter autoCompleteAdapter =
                 new AutoCompleteAdapter(this, R.layout.autocomplete_adapter,
                         googleApiClient, null);
         autoCompleteTextView.setAdapter(autoCompleteAdapter);
 
-        autoCompleteTextView.setOnItemClickListener((parent, view, position, id) -> {
-            final AutoCompleteAdapter.AutoCompleteAdapterItem item =
-                    autoCompleteAdapter.getItem(position);
-            locationId = String.valueOf(item.placeId);
-            locationName = String.valueOf(item.description);
+        autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                final AutoCompleteAdapter.AutoCompleteAdapterItem item =
+                        autoCompleteAdapter.getItem(position);
+                locationId = String.valueOf(item.placeId);
+                locationName = String.valueOf(item.description);
+            }
         });
     }
 
@@ -140,7 +129,7 @@ public class LocationActivity extends BaseActivity
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case REQUEST_LOCATION_PERMISSION:
-                if (permissionsGranted(grantResults, 1)) {
+                if (permissionsGranted(grantResults)) {
                     getPlace();
                 } else {
                     finish();
@@ -235,19 +224,19 @@ public class LocationActivity extends BaseActivity
 
     private void setReturnData() {
         Intent intent = new Intent();
-        intent.putExtra(NewEntryActivity.RESULT_PLACE_NAME, locationName);
-        intent.putExtra(NewEntryActivity.RESULT_PLACE_ID, locationId);
+        intent.putExtra(NewEntryActivity.PLACE_NAME, locationName);
+        intent.putExtra(NewEntryActivity.PLACE_ID, locationId);
         if (!(locationImage.getDrawable() instanceof VectorDrawable) &&
                 getWindow().getSharedElementReturnTransition() == null) {
             ActivityOptions transitionActivityOptions =
                     ActivityOptions.makeSceneTransitionAnimation(this, locationImage,
-                            getString(R.string.transition_image));
+                            getString(R.string.transition_location_image));
             intent.putExtras(transitionActivityOptions.toBundle());
         }
         setResult(RESULT_OK, intent);
     }
 
-    private void slideUp() {
+    private void transitionSetup() {
         new PreDrawer<View>(root) {
             @Override
             public void notifyPreDraw(View view) {
@@ -267,5 +256,18 @@ public class LocationActivity extends BaseActivity
                 }
             }
         };
+
+        Transition returnTransition = getWindow().getSharedElementReturnTransition();
+
+        if (locationName != null && locationId != null) {
+            TransitionSet set = new TransitionSet();
+            set.addTransition(returnTransition);
+            ColorTransition colorTransition = new ColorTransition(
+                    ContextCompat.getColor(this, R.color.accent), Color.WHITE);
+            colorTransition.addTarget(locationImage);
+            set.addTransition(colorTransition);
+
+            getWindow().setSharedElementReturnTransition(set);
+        }
     }
 }

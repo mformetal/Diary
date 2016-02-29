@@ -9,8 +9,6 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-feature android:name="android.hardware.camera" android:required="false" />
-    <uses-feature android:name="android.hardware.camera.autofocus" />
 
     <application
         android:icon="@mipmap/ic_launcher"
@@ -22,11 +20,11 @@
         <activity
             android:name="miles.diary.ui.activity.HomeActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.Home" > <intent-filter>
-            <action android:name="android.intent.action.MAIN"/>
-            <category android:name="android.intent.category.LAUNCHER"/>
-        </intent-filter>
-
+            android:theme="@style/AppTheme.Home" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
         </activity>
 
         <activity
@@ -34,6 +32,12 @@
             android:screenOrientation="portrait"
             android:label="@string/activity_new_entry_name"
             android:windowSoftInputMode="stateHidden|adjustPan" >
+        </activity>
+
+        <activity
+            android:name=".ui.activity.WeatherActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.DialogActivity" >
         </activity>
 
         <activity

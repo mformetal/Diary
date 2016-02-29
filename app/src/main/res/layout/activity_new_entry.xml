@@ -28,7 +28,7 @@
         tools:text="LONG STRING MOTHERFUCKER"/>
 
     <RelativeLayout
-        android:id="@+id/activity_entry_fab_menu"
+        android:id="@+id/activity_new_entry_fab_menu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -38,8 +38,8 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/activity_new_entry_photo"
-            android:src="@drawable/ic_photo_24dp_accent"
-            android:transitionName="@string/transition_image"
+            android:src="@drawable/ic_photo_24dp"
+            android:transitionName="@string/transition_location_image"
             android:layout_width="@dimen/fab_normal_dimens"
             android:layout_height="@dimen/fab_normal_dimens"
             android:layout_margin="@dimen/activity_entry_fab_margin"
@@ -56,7 +56,7 @@
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/activity_new_entry_location"
             android:src="@drawable/ic_place_24dp"
-            android:transitionName="@string/transition_image"
+            android:transitionName="@string/transition_location_image"
             android:layout_width="@dimen/fab_normal_dimens"
             android:layout_height="@dimen/fab_normal_dimens"
             android:layout_margin="@dimen/activity_entry_fab_margin"

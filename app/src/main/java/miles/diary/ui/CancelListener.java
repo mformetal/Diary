@@ -76,19 +76,21 @@ public class CancelListener {
         }
     };
 
-    private final View.OnTouchListener touchListener = (v, event) -> {
-        if (canceler != null && event.getX() > widget.getWidth() - widget.getPaddingRight() -
-                canceler.getIntrinsicWidth()) {
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                if (widget instanceof AutoCompleteTextView) {
-                    ((AutoCompleteTextView) widget).setText("", false);
-                } else {
-                    widget.setText("");
+    private final View.OnTouchListener touchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            if (canceler != null && event.getX() > widget.getWidth() - widget.getPaddingRight() -
+                    canceler.getIntrinsicWidth()) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    if (widget instanceof AutoCompleteTextView) {
+                        ((AutoCompleteTextView) widget).setText("", false);
+                    } else {
+                        widget.setText("");
+                    }
+                    showOrHideCancel(false);
                 }
-                showOrHideCancel(false);
             }
+            return false;
         }
-        return false;
     };
-
 }

@@ -21,7 +21,7 @@
 
     <string name="menu_home_new_entry">New Entry</string>
 
-    <string name="transition_image">image</string>
+    <string name="transition_location_image">image</string>
 
     <string name="weather_base">http://api.openweathermap.org/</string>
 

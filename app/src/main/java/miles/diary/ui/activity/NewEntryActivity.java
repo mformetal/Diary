@@ -5,9 +5,8 @@ import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.VectorDrawable;
+import android.location.Address;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,18 +14,20 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
+import com.google.gson.Gson;
+
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.OnClick;
@@ -34,17 +35,15 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import icepick.State;
 import miles.diary.R;
 import miles.diary.data.ActivitySubscriber;
-import miles.diary.data.model.weather.Main;
-import miles.diary.data.model.weather.Weather;
 import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.ui.widget.TypefaceEditText;
 import miles.diary.ui.widget.TypefaceIconTextView;
 import miles.diary.util.AnimUtils;
-import miles.diary.util.FileUtils;
 import miles.diary.util.GoogleUtils;
 import miles.diary.util.IntentUtils;
 import miles.diary.util.Logg;
-import miles.diary.util.TextUtils;
+import rx.Observable;
+import rx.functions.Func1;
 
 public class NewEntryActivity extends BaseActivity implements View.OnClickListener,
         GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
@@ -56,12 +55,12 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     @Bind(R.id.activity_new_entry_location) CircleImageView location;
     @Bind(R.id.activity_new_entry_temperature) TypefaceIconTextView weatherText;
 
-    public static final String RESULT_BODY = "body";
-    public static final String RESULT_URI = "uri";
-    public static final String RESULT_PLACE_NAME = "place";
-    public static final String RESULT_PLACE_ID = "placeId";
-    public static final String RESULT_TEMPERATURE = "temperature";
-    public static final String LOCATION_IMAGE = "image";
+    public static final String BODY = "entryBody";
+    public static final String URI = "uri";
+    public static final String PLACE_NAME = "entryPlace";
+    public static final String PLACE_ID = "placeId";
+    public static final String TEMPERATURE = "temperature";
+    public static final String ADDRESS = "address";
     private final static int REQUEST_LOCATION = 1;
     private final static int REQUEST_IMAGE = 2;
     private final static int REQUEST_LOCATION_PERMISSION = 3;
@@ -70,6 +69,8 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     @State String placeId;
     @State String temperature;
     @State Uri imageUri;
+    @State String address;
+    private WeatherResponse weather;
     private GoogleApiClient googleApiClient;
 
     @Override
@@ -83,6 +84,10 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                 .enableAutoManage(this, 0, this)
                 .addConnectionCallbacks(this)
                 .build();
+
+        int color = ContextCompat.getColor(this, R.color.accent);
+        photo.setColorFilter(color);
+        location.setColorFilter(color);
     }
 
     @Override
@@ -91,8 +96,8 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
             case REQUEST_LOCATION:
                 if (resultCode == RESULT_OK) {
                     Bundle extras = data.getExtras();
-                    placeName = extras.getString(NewEntryActivity.RESULT_PLACE_NAME);
-                    placeId = extras.getString(NewEntryActivity.RESULT_PLACE_ID);
+                    placeName = extras.getString(NewEntryActivity.PLACE_NAME);
+                    placeId = extras.getString(NewEntryActivity.PLACE_ID);
                 }
                 break;
             case REQUEST_IMAGE:
@@ -120,11 +125,12 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                 String body = bodyInput.getTextAsString();
                 if (!body.isEmpty()) {
                     Intent result = new Intent();
-                    result.putExtra(NewEntryActivity.RESULT_BODY, body);
-                    result.putExtra(NewEntryActivity.RESULT_URI, imageUri);
-                    result.putExtra(NewEntryActivity.RESULT_PLACE_NAME, placeName);
-                    result.putExtra(NewEntryActivity.RESULT_PLACE_ID, placeId);
-                    result.putExtra(NewEntryActivity.RESULT_TEMPERATURE, temperature.replace("\n", ""));
+                    result.putExtra(NewEntryActivity.BODY, body);
+                    result.putExtra(NewEntryActivity.URI, imageUri);
+                    result.putExtra(NewEntryActivity.PLACE_NAME, placeName);
+                    result.putExtra(NewEntryActivity.PLACE_ID, placeId);
+                    result.putExtra(NewEntryActivity.TEMPERATURE,
+                            new Gson().toJson(weather, WeatherResponse.class));
                     setResult(Activity.RESULT_OK, result);
                     finish();
                 } else {
@@ -137,7 +143,8 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     }
 
     @Override
-    @OnClick({R.id.activity_new_entry_photo, R.id.activity_new_entry_location})
+    @OnClick({R.id.activity_new_entry_photo, R.id.activity_new_entry_location,
+                R.id.activity_new_entry_temperature})
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.activity_new_entry_photo:
@@ -149,18 +156,26 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                 } else {
                     ActivityOptions transitionActivityOptions =
                             ActivityOptions.makeSceneTransitionAnimation(this, photo,
-                                    getString(R.string.transition_image));
+                                    getString(R.string.transition_location_image));
                     startActivityForResult(intent, REQUEST_IMAGE, transitionActivityOptions.toBundle());
                 }
                 break;
             case R.id.activity_new_entry_location:
                 Intent intent1 = new Intent(this, LocationActivity.class);
-                intent1.putExtra(NewEntryActivity.RESULT_PLACE_NAME, placeName);
-                intent1.putExtra(NewEntryActivity.RESULT_PLACE_ID, placeId);
+                intent1.putExtra(NewEntryActivity.PLACE_NAME, placeName);
+                intent1.putExtra(NewEntryActivity.PLACE_ID, placeId);
                 ActivityOptions transitionActivityOptions =
                         ActivityOptions.makeSceneTransitionAnimation(this, location,
-                                getString(R.string.transition_image));
+                                getString(R.string.transition_location_image));
                 startActivityForResult(intent1, REQUEST_LOCATION, transitionActivityOptions.toBundle());
+                break;
+            case R.id.activity_new_entry_temperature:
+                if (temperature != null) {
+                    Intent intent2 = new Intent(this, WeatherActivity.class);
+                    intent2.putExtra(NewEntryActivity.TEMPERATURE, temperature);
+                    intent2.putExtra(NewEntryActivity.ADDRESS, address);
+                    startActivity(intent2);
+                }
                 break;
         }
     }
@@ -169,10 +184,12 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case REQUEST_LOCATION_PERMISSION:
-                if (permissionsGranted(grantResults, 1)) {
+                if (permissionsGranted(grantResults)) {
                     getWeather();
 
                     getPlace();
+                } else {
+                    finish();
                 }
                 break;
             default:
@@ -236,7 +253,13 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                             placeId = mostLikely.getId();
                             placeName = mostLikely.getName().toString();
 
-                            location.setColorFilter(Color.WHITE);
+                            Activity activity = getSubscribedActivity();
+                            if (activity != null) {
+                                AnimUtils.colorfilter(location,
+                                        ContextCompat.getColor(activity, R.color.accent),
+                                        Color.WHITE)
+                                        .start();
+                            }
 
                             placeLikelihoods.release();
                         }
@@ -248,19 +271,31 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
 
     private void getWeather() {
         if (temperature == null) {
-           GoogleUtils.getLocation(this)
-                    .flatMap(location1 -> weatherService.getWeather(location1.getLatitude(), location1.getLongitude()))
+            GoogleUtils.getLocation(this)
+                    .flatMap(new Func1<Location, Observable<List<Address>>>() {
+                        @Override
+                        public Observable<List<Address>> call(Location location) {
+                            return GoogleUtils.getAddress(NewEntryActivity.this, location);
+                        }
+                    })
+                    .flatMap(new Func1<List<Address>, Observable<WeatherResponse>>() {
+                        @Override
+                        public Observable<WeatherResponse> call(List<Address> addresses) {
+                            Address address1 = addresses.get(0);
+                            address = address1.getLocality();
+                            return weatherService.getWeather(address1.getLatitude(),
+                                    address1.getLongitude());
+                        }
+                    })
                     .subscribe(new ActivitySubscriber<WeatherResponse>(this) {
                         @Override
                         public void onNext(WeatherResponse weatherResponse) {
-                            Main main = weatherResponse.getMain();
+                            weather = weatherResponse;
 
-                            Weather weather = weatherResponse.getWeather().get(0);
+                            String[] array = weather.getTemperatureParts();
+                            temperature = array[0] + "\n" + array[1];
 
-                            temperature = TextUtils.getWeatherIcon(weather.getIcon()) + "\n" +
-                                    main.formatTemperature();
-
-                            weatherText.setText(temperature);
+                            AnimUtils.textScale(weatherText, temperature, .2f, 1f).start();
                         }
                     });
         } else {

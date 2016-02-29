@@ -4,12 +4,14 @@ import android.Manifest;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.transition.Transition;
 import android.view.View;
@@ -27,12 +29,13 @@ import butterknife.Bind;
 import butterknife.OnClick;
 import icepick.State;
 import miles.diary.R;
-import miles.diary.ui.SimpleTransitionListener;
+import miles.diary.ui.transition.SimpleTransitionListener;
 import miles.diary.ui.widget.CornerImageView;
 import miles.diary.ui.widget.TypefaceButton;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.FileUtils;
 import miles.diary.util.IntentUtils;
+import miles.diary.util.Logg;
 
 /**
  * Created by mbpeele on 1/29/16.
@@ -44,7 +47,6 @@ public class UriActivity extends BaseActivity implements View.OnClickListener{
     private final static int REQUEST_VIDEO = 3;
     private final static int REQUESET_IMAGE_PERMISSION = 4;
 
-    @Bind(R.id.activity_uri_root) ViewGroup root;
     @Bind(R.id.activity_uri_image_view) CornerImageView imageView;
     @Bind(R.id.activity_uri_video_view) VideoView videoView;
     @Bind(R.id.activity_uri_button_row) LinearLayout buttonRow;
@@ -72,9 +74,12 @@ public class UriActivity extends BaseActivity implements View.OnClickListener{
             }
         } else {
             Snackbar.make(root, R.string.activity_entry_no_camera_error,
-                    Snackbar.LENGTH_INDEFINITE).setAction(android.R.string.ok, v -> {
-                        finish();
-                    }).show();
+                    Snackbar.LENGTH_INDEFINITE).setAction(android.R.string.ok, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
         }
 
         Intent intent = getIntent();
@@ -94,7 +99,7 @@ public class UriActivity extends BaseActivity implements View.OnClickListener{
                                            @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case REQUESET_IMAGE_PERMISSION:
-                if (!permissionsGranted(grantResults, 2)) {
+                if (!permissionsGranted(grantResults)) {
                     finish();
                 }
                 break;
@@ -179,8 +184,9 @@ public class UriActivity extends BaseActivity implements View.OnClickListener{
 
             Glide.with(this)
                     .fromUri()
-                    .animate(android.R.anim.fade_in)
+                    .animate(AnimUtils.REVEAL)
                     .load(uri)
+                    .centerCrop()
                     .into(imageView);
         }
     }

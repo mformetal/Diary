@@ -1,4 +1,4 @@
-package miles.diary.ui;
+package miles.diary.ui.transition;
 
 import android.transition.Transition;
 

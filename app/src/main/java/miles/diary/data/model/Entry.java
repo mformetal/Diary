@@ -25,14 +25,14 @@ public class Entry extends RealmObject {
     private String uri;
     private String placeName;
     private String placeId;
-    private String temperature;
+    private String weather;
 
-    public String getTemperature() {
-        return temperature;
+    public String getWeather() {
+        return weather;
     }
 
-    public void setTemperature(String temperature) {
-        this.temperature = temperature;
+    public void setWeather(String weather) {
+        this.weather = weather;
     }
 
     public String getPlaceId() {
@@ -90,7 +90,7 @@ public class Entry extends RealmObject {
         }
         entry.setPlaceName(placeName);
         entry.setPlaceId(placeId);
-        entry.setTemperature(temperature);
+        entry.setWeather(temperature);
         realm.commitTransaction();
         realm.refresh();
         return entry;

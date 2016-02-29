@@ -24,7 +24,7 @@ public class SquareCornerImageView extends CornerImageView {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        int max = Math.max(getMeasuredHeight(), getMeasuredWidth());
-        setMeasuredDimension(max, max);
+        int width = getMeasuredWidth();
+        setMeasuredDimension(width, width);
     }
 }

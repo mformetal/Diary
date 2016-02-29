@@ -101,8 +101,8 @@ public abstract class BaseActivity extends AppCompatActivity {
         return true;
     }
 
-    public boolean permissionsGranted(int[] results, int expectedLength) {
-        if (results == null || results.length != expectedLength) {
+    public boolean permissionsGranted(int[] results) {
+        if (results == null) {
             return false;
         }
 

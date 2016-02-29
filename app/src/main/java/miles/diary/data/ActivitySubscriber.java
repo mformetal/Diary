@@ -28,7 +28,6 @@ public class ActivitySubscriber<T> extends Subscriber<T> {
 
     @Override
     public void onCompleted() {
-        removeSelf();
     }
 
     @Override
@@ -38,6 +37,7 @@ public class ActivitySubscriber<T> extends Subscriber<T> {
             e.printStackTrace();
             Logg.log("ERROR FROM:", activity.getClass().getName());
         }
+
         removeSelf();
     }
 

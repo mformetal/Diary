@@ -4,9 +4,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.support.annotation.NonNull;
 import android.util.TypedValue;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 /**
  * Created by mbpeele on 1/14/16.
@@ -18,6 +24,33 @@ public class ViewUtils {
     private static int actionBarSize = -1;
 
     private ViewUtils() {}
+
+    public static void setLightStatusBar(@NonNull View view) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            int flags = view.getSystemUiVisibility();
+            flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            view.setSystemUiVisibility(flags);
+        }
+    }
+
+    public static Drawable mutate(Drawable drawable, int color) {
+        drawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        return drawable;
+    }
+
+    public static Drawable mutate(ImageView imageView, int color) {
+        Drawable drawable = imageView.getDrawable();
+        drawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        return drawable;
+    }
+
+    public static void mutate(Drawable[] drawables, int color) {
+        for (Drawable drawable: drawables) {
+            if (drawable != null) {
+                mutate(drawable, color);
+            }
+        }
+    }
 
     public static int getActionBarSize(Context context) {
         if (actionBarSize < 0) {

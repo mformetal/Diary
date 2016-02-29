@@ -73,7 +73,8 @@ public class FileUtils {
         return false;
     }
 
-    public static Observable<byte[]> saveBitmap(Context context, Bitmap bitmap, String name) {
+    public static Observable<byte[]> saveBitmap(final Context context, final Bitmap bitmap,
+                                                final String name) {
         return Observable.create(new Observable.OnSubscribe<byte[]>() {
             @Override
             public void call(Subscriber<? super byte[]> subscriber) {
@@ -98,8 +99,8 @@ public class FileUtils {
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
     }
 
-    public static Observable<Bitmap> getBitmap(Context context, String name,
-                                               int reqWidth, int reqHeight) {
+    public static Observable<Bitmap> getBitmap(final Context context, final String name,
+                                               final int reqWidth, final int reqHeight) {
         return Observable.create(new Observable.OnSubscribe<Bitmap>() {
             @Override
             public void call(Subscriber<? super Bitmap> subscriber) {
@@ -130,7 +131,7 @@ public class FileUtils {
         });
     }
 
-    public static Observable<byte[]> getBitmapBytes(Context context, String name) {
+    public static Observable<byte[]> getBitmapBytes(final Context context, final String name) {
         return Observable.create(new Observable.OnSubscribe<byte[]>() {
             @Override
             public void call(Subscriber<? super byte[]> subscriber) {

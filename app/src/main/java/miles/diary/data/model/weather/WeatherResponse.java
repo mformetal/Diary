@@ -7,6 +7,8 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
+import miles.diary.util.TextUtils;
+
 public class WeatherResponse {
 
     @SerializedName("coord")
@@ -42,6 +44,16 @@ public class WeatherResponse {
     @SerializedName("cod")
     @Expose
     private Integer cod;
+
+    public String[] getTemperatureParts() {
+        Main main = getMain();
+
+        Weather weather = getWeather().get(0);
+        return new String[] {
+                TextUtils.getWeatherIcon(weather.getIcon()),
+                main.formatTemperature()
+        };
+    }
 
     /**
      * 

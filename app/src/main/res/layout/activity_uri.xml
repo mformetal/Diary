@@ -8,12 +8,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <miles.diary.ui.widget.SquareCornerImageView
+    <miles.diary.ui.widget.CornerImageView
         android:id="@+id/activity_uri_image_view"
-        android:layout_gravity="center"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:transitionName="@string/transition_image"
+        android:scaleType="fitXY"
+        android:transitionName="@string/transition_location_image"
         android:visibility="gone" />
 
     <VideoView

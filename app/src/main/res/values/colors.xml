@@ -5,13 +5,14 @@
     <color name="primary_light">#F5F5F5</color>
     <color name="accent">#607D8B</color>
     <color name="primary_text">#FFFFFF</color>
-    <color name="secondary_text">#0288D1</color>
+    <color name="secondary_text">#0273b1</color>
     <color name="icons">#FFFFFF</color>
     <color name="divider">#B6B6B6</color>
     <color name="super_dark">#11261c</color>
     <color name="hint_text">#80FFFFFF</color>
     <color name="half_opacity_gray">#80888888</color>
-    <color name="scrim">#99323232</color>
+    <color name="scrim">#323232</color>
+    <color name="scrim_with_alpha">#99323232</color>
     <color name="time">#00444C</color>
     <color name="toolbar">#ff333333</color>
     <color name="muted_red">#D32F2F</color>

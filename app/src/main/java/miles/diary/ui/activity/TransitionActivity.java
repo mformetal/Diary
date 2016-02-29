@@ -20,6 +20,7 @@ public abstract class TransitionActivity extends BaseActivity {
 
     private boolean hasSavedInstanceState;
     private Intent intent;
+
     @State boolean runCustomExitTransition = true;
 
     @Override

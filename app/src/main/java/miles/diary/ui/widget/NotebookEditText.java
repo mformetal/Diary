@@ -9,6 +9,7 @@ import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 
 import miles.diary.R;
+import miles.diary.util.Logg;
 
 /**
  * Created by mbpeele on 1/28/16.
@@ -43,7 +44,7 @@ public class NotebookEditText extends TypefaceEditText {
         defaultWidth = mPaint.getStrokeWidth();
 
         mFocusedColor = ContextCompat.getColor(getContext(), R.color.accent);
-        mUnfocusedColor = Color.TRANSPARENT;
+        mUnfocusedColor = Color.WHITE;
 
         setBackground(null);
     }
@@ -68,7 +69,8 @@ public class NotebookEditText extends TypefaceEditText {
         int baseline = getLineBounds(0, mRect) + Math.round(height * .01f);
 
         for (int i = 0; i < count; i++) {
-            canvas.drawLine(mRect.left, baseline + 1, mRect.right, baseline + 1, mPaint);
+            int bottom = baseline + 1;
+            canvas.drawLine(mRect.left, bottom, mRect.right, bottom, mPaint);
             baseline += getLineHeight();
         }
 

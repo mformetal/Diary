@@ -6,20 +6,16 @@ import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.graphics.Color;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.util.Property;
 import android.view.View;
 import android.view.ViewAnimationUtils;
-import android.view.ViewPropertyAnimator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.request.animation.ViewPropertyAnimation;
 
-import miles.diary.R;
 import miles.diary.ui.PreDrawer;
 
 /**
@@ -152,21 +148,35 @@ public class AnimUtils {
         return color;
     }
 
+    public static ValueAnimator background(final View view, int... colors) {
+        ValueAnimator color = ValueAnimator.ofArgb(colors);
+        color.setDuration(AnimUtils.mediumAnim(view.getContext()));
+        color.setInterpolator(new DecelerateInterpolator());
+        color.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                view.setBackgroundColor((int) animation.getAnimatedValue());
+            }
+        });
+        return color;
+    }
+
     public final static ViewPropertyAnimation.Animator REVEAL = new ViewPropertyAnimation.Animator() {
         @Override
         public void animate(View view) {
             if (view.getWidth() == 0 || view.getHeight() == 0) {
-                new PreDrawer<View>(view) {
+                PreDrawer.addPreDrawer(view, new PreDrawer.OnPreDrawListener<View>() {
                     @Override
-                    public void notifyPreDraw(View view1) {
-                        Animator reveal = ViewAnimationUtils.createCircularReveal(view1,
-                                view1.getWidth() / 2, view1.getHeight() / 2, 0,
-                                Math.max(view1.getWidth(), view1.getHeight()));
-                        reveal.setDuration(longAnim(view1.getContext()));
+                    public boolean onPreDraw(View view) {
+                        Animator reveal = ViewAnimationUtils.createCircularReveal(view,
+                                view.getWidth() / 2, view.getHeight() / 2, 0,
+                                Math.max(view.getWidth(), view.getHeight()));
+                        reveal.setDuration(longAnim(view.getContext()));
                         reveal.setInterpolator(new DecelerateInterpolator());
                         reveal.start();
+                        return true;
                     }
-                };
+                });
             } else {
                 Animator reveal = ViewAnimationUtils.createCircularReveal(view,
                         view.getWidth() / 2, view.getHeight() / 2, 0,

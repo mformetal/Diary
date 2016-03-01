@@ -2,14 +2,15 @@ package miles.diary.util;
 
 import android.content.Context;
 import android.content.res.AssetManager;
-import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.Typeface;
 
 import com.joanzapata.iconify.fonts.WeathericonsIcons;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 
 import miles.diary.R;
 
@@ -18,18 +19,22 @@ import miles.diary.R;
  */
 public final class TextUtils {
 
+    public final static String LINE_SEPERATOR = System.lineSeparator();
+    public final static String ELLIPSIS = "\u2026";
+    public final static String TAB = "\u0009";
+
+    private static HashMap<String, Typeface> fontMap;
+
     private TextUtils() {}
 
-    private static HashMap<String, Typeface> mFontMap;
-
     private static void initializeFontMap(Context context) {
-        mFontMap = new HashMap<>();
+        fontMap = new HashMap<>();
         AssetManager assetManager = context.getAssets();
         try {
             String[] fontFileNames = assetManager.list("fonts");
             for (String fontFileName : fontFileNames) {
                 Typeface typeface = Typeface.createFromAsset(assetManager, "fonts/" + fontFileName);
-                mFontMap.put(fontFileName, typeface);
+                fontMap.put(fontFileName, typeface);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -37,11 +42,11 @@ public final class TextUtils {
     }
 
     public static Typeface getDefaultFont(Context context) {
-        if (mFontMap == null) {
+        if (fontMap == null) {
             initializeFontMap(context);
         }
         String font = context.getResources().getString(R.string.default_font);
-        Typeface typeface = mFontMap.get(font);
+        Typeface typeface = fontMap.get(font);
         if (typeface == null) {
             throw new IllegalArgumentException(
                     "Font name must match file name in assets/fonts/ directory: " + font);
@@ -50,10 +55,10 @@ public final class TextUtils {
     }
 
     public static Typeface getFont(Context context, String font) {
-        if (mFontMap == null) {
+        if (fontMap == null) {
             initializeFontMap(context);
         }
-        Typeface typeface = mFontMap.get(font);
+        Typeface typeface = fontMap.get(font);
         if (typeface == null) {
             throw new IllegalArgumentException(
                     "Font name must match file name in assets/fonts/ directory: " + font);
@@ -61,40 +66,25 @@ public final class TextUtils {
         return typeface;
     }
 
-    public static void adjustTextSize(Paint textPaint, String text, int height) {
-        textPaint.setTextSize(100);
-        textPaint.setTextScaleX(1.0f);
-        Rect bounds = new Rect();
-        // ask the paint for the bounding rect if it were to draw this
-        // text
-        textPaint.getTextBounds(text, 0, text.length(), bounds);
-        // get the height that would have been produced
-        int h = bounds.height();
-        // make the text text up 70% of the height
-        float target = (float) height * .2f;
-        // figure out what textSize setting would create that height
-        // of text
-        float size = ((target/h) * 100f);
-        // and set it into the paint
-        textPaint.setTextSize(size);
+    public static String repeat(int count, String toRepeat) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            stringBuilder.append(toRepeat);
+        }
+
+        return stringBuilder.toString();
     }
 
-    public static  void adjustTextScale(Paint textPaint, String text, float width, int paddingLeft,
-                                        int paddingRight) {
-        // do calculation with scale of 1.0 (no scale)
-        textPaint.setTextScaleX(1.0f);
-        Rect bounds = new Rect();
-        // ask the paint for the bounding rect if it were to draw this
-        // text.
-        textPaint.getTextBounds(text, 0, text.length(), bounds);
-        // determine the width
-        int w = bounds.width();
-        // calculate the baseline to use so that the
-        // entire text is visible including the descenders
-        // determine how much to scale the width to fit the view
-        float xscale = ((float) (width - paddingLeft - paddingRight)) / w;
-        // set the scale for the text paint
-        textPaint.setTextScaleX(xscale * .6f);
+    public static String formatDate(Date date) {
+        SimpleDateFormat dateFormatter
+                = new SimpleDateFormat("MMMM d, yyyy", Locale.getDefault());
+        return dateFormatter.format(date);
+    }
+
+    public static String formatTime(Date date) {
+        SimpleDateFormat dateFormat
+                = new SimpleDateFormat("HH:mm a", Locale.getDefault());
+        return dateFormat.format(date);
     }
 
     public static String getWeatherIcon(String iconFromAPI) {

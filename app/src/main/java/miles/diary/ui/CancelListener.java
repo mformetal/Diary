@@ -38,15 +38,15 @@ public class CancelListener {
 
         hideDrawables = new Drawable[4];
 
-        new PreDrawer<EditText>(widget) {
+        PreDrawer.addPreDrawer(widget, new PreDrawer.OnPreDrawListener<EditText>() {
             @Override
-            public void notifyPreDraw(EditText view) {
-                Drawable[] drawables = widget.getCompoundDrawables();
+            public boolean onPreDraw(EditText view) {
+                Drawable[] drawables = view.getCompoundDrawables();
                 hideDrawables = Arrays.copyOf(drawables, drawables.length);
                 canceler = hideDrawables[2];
+                return true;
             }
-        };
-
+        });
     }
 
     private void showOrHideCancel(boolean visible) {

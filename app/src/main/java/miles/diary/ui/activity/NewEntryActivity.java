@@ -42,6 +42,7 @@ import miles.diary.util.AnimUtils;
 import miles.diary.util.GoogleUtils;
 import miles.diary.util.IntentUtils;
 import miles.diary.util.Logg;
+import miles.diary.util.TextUtils;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -270,6 +271,12 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     }
 
     private void getWeather() {
+        weatherText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
         if (temperature == null) {
             GoogleUtils.getLocation(this)
                     .flatMap(new Func1<Location, Observable<List<Address>>>() {
@@ -292,8 +299,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                         public void onNext(WeatherResponse weatherResponse) {
                             weather = weatherResponse;
 
-                            String[] array = weather.getTemperatureParts();
-                            temperature = array[0] + "\n" + array[1];
+                            temperature = weatherResponse.getTwoLineTemperatureString();
 
                             AnimUtils.textScale(weatherText, temperature, .2f, 1f).start();
                         }

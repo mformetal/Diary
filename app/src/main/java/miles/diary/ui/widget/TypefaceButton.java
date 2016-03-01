@@ -7,7 +7,6 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.AppCompatButton;
 import android.util.AttributeSet;
-import android.widget.Button;
 
 import me.grantland.widget.AutofitHelper;
 import miles.diary.R;
@@ -59,16 +58,18 @@ public class TypefaceButton extends AppCompatButton {
     }
 
     private void tintDrawables(final int color) {
-        new PreDrawer<Button>(this) {
+        PreDrawer.addPreDrawer(this, new PreDrawer.OnPreDrawListener<TypefaceButton>() {
             @Override
-            public void notifyPreDraw(Button view) {
+            public boolean onPreDraw(TypefaceButton view) {
                 Drawable[] drawables = getCompoundDrawables();
                 for (Drawable drawable: drawables) {
                     if (drawable != null) {
                         drawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
                     }
                 }
+
+                return true;
             }
-        };
+        });
     }
 }

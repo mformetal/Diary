@@ -10,14 +10,13 @@ import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
+import miles.diary.util.TextUtils;
 
 /**
  * Created by mbpeele on 1/18/16.
  */
 public class Entry extends RealmObject {
 
-    private final static SimpleDateFormat dateFormatter
-            = new SimpleDateFormat("EEE, MMM d, ''yy", Locale.getDefault());
     public final static String KEY = "body";
 
     @PrimaryKey private String body;
@@ -75,8 +74,11 @@ public class Entry extends RealmObject {
         this.date = date;
     }
 
-    public static String formatDateString(Entry entry) {
-        return dateFormatter.format(entry.getDate());
+    public static String formatDiaryPrefaceText(Entry entry) {
+        return "Dear Diary, " +
+                TextUtils.repeat(2, TextUtils.LINE_SEPERATOR) +
+                TextUtils.repeat(5, TextUtils.TAB) +
+                entry.getBody();
     }
 
     public static Entry construct(Realm realm, String body, Uri uri, String placeName,

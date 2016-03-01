@@ -61,8 +61,8 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        compositeSubscription.unsubscribe();
         realm.close();
+        compositeSubscription.unsubscribe();
         ButterKnife.unbind(this);
     }
 

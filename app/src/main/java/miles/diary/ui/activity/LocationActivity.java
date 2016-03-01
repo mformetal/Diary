@@ -2,6 +2,7 @@ package miles.diary.ui.activity;
 
 import android.Manifest;
 import android.app.ActivityOptions;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
@@ -17,6 +18,7 @@ import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.transition.Transition;
 import android.transition.TransitionSet;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 
@@ -237,9 +239,9 @@ public class LocationActivity extends BaseActivity
     }
 
     private void transitionSetup() {
-        new PreDrawer<View>(root) {
+        PreDrawer.addPreDrawer(root, new PreDrawer.OnPreDrawListener<ViewGroup>() {
             @Override
-            public void notifyPreDraw(View view) {
+            public boolean onPreDraw(ViewGroup view) {
                 float offset = root.getHeight() / 4;
                 for (int i = 0; i < root.getChildCount(); i++) {
                     View v = root.getChildAt(i);
@@ -253,21 +255,24 @@ public class LocationActivity extends BaseActivity
                             .setInterpolator(new FastOutSlowInInterpolator());
 
                     offset *= 1.8f;
+
+                    Context context = view.getContext();
+                    AnimUtils.colorfilter(locationImage,
+                            Color.WHITE, ContextCompat.getColor(context, R.color.accent)).start();
                 }
+                return true;
             }
-        };
+        });
 
         Transition returnTransition = getWindow().getSharedElementReturnTransition();
 
-        if (locationName != null && locationId != null) {
-            TransitionSet set = new TransitionSet();
-            set.addTransition(returnTransition);
-            ColorTransition colorTransition = new ColorTransition(
-                    ContextCompat.getColor(this, R.color.accent), Color.WHITE);
-            colorTransition.addTarget(locationImage);
-            set.addTransition(colorTransition);
+        TransitionSet set = new TransitionSet();
+        set.addTransition(returnTransition);
+        ColorTransition colorTransition = new ColorTransition(
+                ContextCompat.getColor(this, R.color.accent), Color.WHITE);
+        colorTransition.addTarget(locationImage);
+        set.addTransition(colorTransition);
 
-            getWindow().setSharedElementReturnTransition(set);
-        }
+        getWindow().setSharedElementReturnTransition(set);
     }
 }

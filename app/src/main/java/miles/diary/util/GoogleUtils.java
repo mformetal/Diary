@@ -38,7 +38,6 @@ public class GoogleUtils {
                                                              final GoogleApiClient apiClient) {
         return Observable.create(new PendingResultObservable<>(
                 Places.GeoDataApi.getPlacePhotos(apiClient, placeId)))
-                .retry()
                 .filter(new Func1<PlacePhotoMetadataResult, Boolean>() {
                     @Override
                     public Boolean call(PlacePhotoMetadataResult placePhotoMetadataResult) {

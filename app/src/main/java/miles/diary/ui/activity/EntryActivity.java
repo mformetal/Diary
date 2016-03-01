@@ -1,66 +1,58 @@
 package miles.diary.ui.activity;
 
-import android.animation.Animator;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
-import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.content.ContextCompat;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.support.v7.graphics.Palette;
-import android.text.Layout;
 import android.text.SpannableString;
 import android.text.Spanned;
-import android.text.style.AlignmentSpan;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.TypefaceSpan;
+import android.transition.ArcMotion;
 import android.transition.Transition;
 import android.view.View;
-import android.view.animation.Interpolator;
+import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.gson.Gson;
-
-import java.util.ArrayList;
 
 import butterknife.Bind;
 import miles.diary.R;
-import miles.diary.data.ActivitySubscriber;
 import miles.diary.data.model.Entry;
 import miles.diary.data.model.weather.WeatherResponse;
+import miles.diary.ui.TypefacerSpan;
+import miles.diary.ui.transition.CornerTransition;
 import miles.diary.ui.transition.SimpleTransitionListener;
 import miles.diary.ui.widget.CornerImageView;
-import miles.diary.ui.widget.NotebookTextView;
 import miles.diary.ui.widget.TypefaceIconTextView;
 import miles.diary.ui.widget.TypefaceTextView;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.ColorsUtils;
-import miles.diary.util.GoogleUtils;
 import miles.diary.util.IntentUtils;
 import miles.diary.util.Logg;
+import miles.diary.util.TextUtils;
 import miles.diary.util.ViewUtils;
 
 /**
  * Created by mbpeele on 2/8/16.
  */
-public class EntryActivity extends BaseActivity
-        implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks,
-        View.OnClickListener {
+public class EntryActivity extends TransitionActivity {
 
     public final static String DATA = "data";
     public static void newIntent(Context context, View view, Entry entry) {
@@ -72,10 +64,12 @@ public class EntryActivity extends BaseActivity
         context.startActivity(intent, options.toBundle());
     }
 
-    @Bind(R.id.activity_entry_root)
-    CoordinatorLayout layout;
+    @Bind(R.id.activity_entry_menu_show)
+    FloatingActionButton menuFab;
+    @Bind(R.id.activity_entry_back)
+    ImageButton backButton;
     @Bind(R.id.activity_entry_body)
-    NotebookTextView entryBody;
+    TypefaceTextView entryBody;
     @Bind(R.id.activity_entry_image)
     CornerImageView entryImage;
     @Bind(R.id.activity_entry_place)
@@ -86,45 +80,45 @@ public class EntryActivity extends BaseActivity
     TypefaceIconTextView entryWeather;
 
     private Entry entry;
-    private GoogleApiClient googleApiClient;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setupTransitions();
-        getWindow().getDecorView().setBackgroundColor(Color.WHITE);
         setContentView(R.layout.activity_entry);
+        setupTransitions();
 
         entry = realm.where(Entry.class)
                 .equalTo(Entry.KEY, getIntent().getStringExtra(DATA))
                 .findFirst();
 
-        googleApiClient = googleApiClientBuilder
-                .enableAutoManage(this, 0, this)
-                .addConnectionCallbacks(this)
-                .build();
-
-        findViewById(R.id.activity_entry_back).setOnClickListener(new View.OnClickListener() {
+        backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                finishAfterTransition();
             }
         });
 
-        int color = ContextCompat.getColor(this, R.color.accent);
-        ViewUtils.mutate(entryPlace.getCompoundDrawables(), color);
-        ViewUtils.mutate(entryDate.getCompoundDrawables(), color);
-        entryBody.setText(entry.getBody());
+        ViewUtils.mutate(entryPlace, entryPlace.getCurrentTextColor());
+        ViewUtils.mutate(entryDate, entryPlace.getCurrentTextColor());
+
+        SpannableString spannableString = new SpannableString(Entry.formatDiaryPrefaceText(entry));
+        spannableString.setSpan(new RelativeSizeSpan(1.4f), 0, 12, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        spannableString.setSpan(new TypefacerSpan(TextUtils.getFont(this, getString(R.string.light_italic))),
+                12, spannableString.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        entryBody.setText(spannableString, TextView.BufferType.SPANNABLE);
+
         entryPlace.setText(entry.getPlaceName());
-        entryDate.setText(Entry.formatDateString(entry));
+
+        entryDate.setText(TextUtils.formatDate(entry.getDate()) + TextUtils.LINE_SEPERATOR +
+                TextUtils.formatTime(entry.getDate()));
 
         WeatherResponse weatherResponse = new Gson().fromJson(entry.getWeather(), WeatherResponse.class);
-        String[] parts = weatherResponse.getTemperatureParts();
-        String temperature = parts[0] + "\n" + parts[1];
-        entryWeather.setText(temperature);
+        entryWeather.setText(weatherResponse.getOneLineTemperatureString());
 
         if (entry.getUri() != null) {
             postponeEnterTransition();
+
             Glide.with(EntryActivity.this)
                     .fromString()
                     .asBitmap()
@@ -140,6 +134,8 @@ public class EntryActivity extends BaseActivity
                         @Override
                         public boolean onResourceReady(final Bitmap resource, String model, Target<Bitmap> target,
                                                        boolean isFromMemoryCache, boolean isFirstResource) {
+                            startPostponedEnterTransition();
+
                             Palette.from(resource)
                                     .maximumColorCount(3)
                                     .clearFilters()
@@ -183,8 +179,6 @@ public class EntryActivity extends BaseActivity
                                             }
                                         }
                                     });
-
-                            startPostponedEnterTransition();
                             return false;
                         }
                     })
@@ -193,120 +187,105 @@ public class EntryActivity extends BaseActivity
     }
 
     @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        if (connectionResult.hasResolution()) {
-            try {
-                connectionResult.startResolutionForResult(this, IntentUtils.GOOGLE_API_CLIENT_FAILED_CODE);
-            } catch (IntentSender.SendIntentException e) {
-                e.printStackTrace();
-            }
-        } else {
-            Logg.log("CONNECTION FAILED WITH CODE: " + connectionResult.getErrorCode());
-        }
+    boolean shouldRunCustomExitAnimation() {
+        return false;
     }
 
     @Override
-    public void onConnected(Bundle bundle) {
-        if (hasConnection()) {
-            if (!realm.isClosed()) {
-                String placeId = entry.getPlaceId();
-                if (placeId != null) {
-//                GoogleUtils.getPlaceById(googleApiClient, placeId)
-//                        .subscribe(new ActivitySubscriber<PlaceBuffer>(this) {
-//                            @Override
-//                            public void onNext(PlaceBuffer places) {
-//                                super.onNext(places);
-//                                places.release();
-//                            }
-//                        });
-                }
+    void onEnter(ViewGroup root, Intent calledIntent, boolean hasSavedInstanceState) {
+        ArcMotion arcMotion = new ArcMotion();
+        arcMotion.setMinimumHorizontalAngle(50f);
+        arcMotion.setMinimumVerticalAngle(50f);
+
+        CornerTransition reveal = new CornerTransition(
+                Math.max(entryImage.getWidth(), entryImage.getHeight()) / 2f, 0);
+        reveal.addTarget(entryImage);
+        reveal.setPathMotion(arcMotion);
+
+        reveal.addListener(new SimpleTransitionListener() {
+            @Override
+            public void onTransitionStart(Transition transition) {
+                super.onTransitionStart(transition);
+                backButton.setVisibility(View.GONE);
+                menuFab.setVisibility(View.GONE);
             }
-        }
+
+            @Override
+            public void onTransitionEnd(Transition transition) {
+                super.onTransitionEnd(transition);
+                int duration = 150;
+
+                backButton.setVisibility(View.VISIBLE);
+                AnimUtils.pop(backButton, 0f, 1f)
+                        .setDuration(duration)
+                        .start();
+
+                menuFab.setVisibility(View.VISIBLE);
+                AnimUtils.pop(menuFab, 0f, 1f)
+                        .setDuration(duration)
+                        .start();
+            }
+        });
+
+        CornerTransition unreveal = new CornerTransition(
+                0, Math.min(entryImage.getWidth(), entryImage.getHeight()) / 2f);
+        unreveal.addTarget(entryImage);
+        unreveal.setPathMotion(arcMotion);
+
+        unreveal.addListener(new SimpleTransitionListener() {
+            @Override
+            public void onTransitionStart(Transition transition) {
+                super.onTransitionStart(transition);
+
+                int duration = 150;
+
+                AnimUtils.pop(backButton, 1f, 0f)
+                        .setDuration(duration)
+                        .start();
+
+                AnimUtils.pop(menuFab, 1f, 0f)
+                        .setDuration(duration)
+                        .start();
+            }
+        });
+
+        getWindow().setSharedElementEnterTransition(reveal);
+        getWindow().setSharedElementReturnTransition(unreveal);
     }
 
     @Override
-    public void onConnectionSuspended(int i) {
-
+    void onExit(ViewGroup root) {
     }
 
     private void setupTransitions() {
-        final Transition enterTransition = getWindow().getSharedElementEnterTransition();
-        final Transition returnTransition = getWindow().getSharedElementReturnTransition();
-
-        if (enterTransition != null && returnTransition != null) {
-            enterTransition.addListener(new SimpleTransitionListener() {
-                @Override
-                public void onTransitionStart(Transition transition) {
-                    super.onTransitionStart(transition);
-                    enterTransition.removeListener(this);
-
-                    returnTransition.addListener(new SimpleTransitionListener() {
-                        @Override
-                        public void onTransitionStart(Transition transition) {
-                            super.onTransitionEnd(transition);
-
-                            ObjectAnimator corner = ObjectAnimator.ofFloat(entryImage,
-                                    CornerImageView.CORNERS,
-                                    0, Math.min(entryImage.getWidth(), entryImage.getHeight()) / 2f);
-                            corner.setDuration(AnimUtils.longAnim(getApplicationContext()));
-                            corner.setInterpolator(new FastOutSlowInInterpolator());
-                            corner.start();
-                        }
-                    });
-
-                    ArrayList<Animator> animators = new ArrayList<Animator>();
-
-                    float offset = layout.getHeight() / 4;
-                    int duration = AnimUtils.mediumAnim(EntryActivity.this);
-                    int delay = 100, delayInc = 25;
-                    Interpolator interpolator = new FastOutSlowInInterpolator();
-                    for (int i = 0; i < layout.getChildCount(); i++) {
-                        View v = root.getChildAt(i);
-                        if (!(v instanceof AppBarLayout)) {
-                            v.setTranslationY(offset);
-                            v.setAlpha(0f);
-
-                            ObjectAnimator objectAnimator = ObjectAnimator.ofPropertyValuesHolder(v,
-                                    PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, 0f),
-                                    PropertyValuesHolder.ofFloat(View.ALPHA, 1f));
-                            objectAnimator.setDuration(duration);
-                            objectAnimator.setInterpolator(interpolator);
-                            objectAnimator.setStartDelay(delay);
-
-                            animators.add(objectAnimator);
-
-                            delay += delayInc;
-                            offset *= 1.8f;
-                        }
-                    }
-
-                    animators.add(AnimUtils.alpha(findViewById(R.id.activity_entry_back), 0f, 1f));
-
-                    ObjectAnimator corner = ObjectAnimator.ofFloat(entryImage,
-                            CornerImageView.CORNERS,
-                            Math.max(entryImage.getWidth(), entryImage.getHeight()) / 2f, 0);
-                    corner.setDuration(AnimUtils.longAnim(EntryActivity.this));
-                    corner.setInterpolator(interpolator);
-
-                    animators.add(corner);
-
-                    AnimatorSet animatorSet = new AnimatorSet();
-                    animatorSet.playTogether(animators);
-                    animatorSet.start();
-                }
-            });
-        }
+//        PreDrawer.addPreDrawer(entryImage, new PreDrawer.OnPreDrawListener<CornerImageView>() {
+//            @Override
+//            public boolean onPreDraw(CornerImageView view) {
+////                CornerTransition reveal = new CornerTransition(
+////                        Math.max(view.getWidth(), view.getHeight()) / 2f, 0);
+////                reveal.addTarget(view);
+////
+////                CornerTransition unreveal = new CornerTransition(
+////                        0, Math.min(view.getWidth(), view.getHeight()) / 2f);
+////                unreveal.addTarget(view);
+////
+////                getWindow().setSharedElementEnterTransition(reveal);
+////                getWindow().setSharedElementReturnTransition(unreveal);
+//
+//                return true;
+//            }
+//        });
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.activity_entry_fab_edit_entry:
-                break;
-            case R.id.activity_entry_fab_favorite_entry:
-                break;
-            case R.id.activity_entry_fab_delete_entry:
-                break;
-        }
-    }
+//    @Override
+//    public void onClick(View v) {
+//        switch (v.getId()) {
+//            case R.id.activity_entry_fab_edit_entry:
+//                break;
+//            case R.id.activity_entry_fab_favorite_entry:
+//                break;
+//            case R.id.activity_entry_fab_delete_entry:
+//                break;
+//        }
+//    }
 }

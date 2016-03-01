@@ -10,6 +10,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.view.animation.AnticipateOvershootInterpolator;
 import android.widget.ProgressBar;
@@ -63,7 +64,12 @@ public class HomeActivity extends TransitionActivity implements BackendAdapterLi
     }
 
     @Override
-    void onEnter(View root, Intent calledIntent, boolean hasSavedInstanceState) {
+    boolean shouldRunCustomExitAnimation() {
+        return false;
+    }
+
+    @Override
+    void onEnter(ViewGroup root, Intent calledIntent, boolean hasSavedInstanceState) {
         View view = toolbar.getChildAt(0);
         if (view != null && view instanceof TextView) {
             TextView textView = (TextView) view;
@@ -80,8 +86,7 @@ public class HomeActivity extends TransitionActivity implements BackendAdapterLi
     }
 
     @Override
-    void onExit(View root) {
-        finishWithDefaultTransition();
+    void onExit(ViewGroup root) {
     }
 
     @Override

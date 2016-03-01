@@ -45,14 +45,22 @@ public class WeatherResponse {
     @Expose
     private Integer cod;
 
-    public String[] getTemperatureParts() {
+    public String getOneLineTemperatureString() {
         Main main = getMain();
 
         Weather weather = getWeather().get(0);
-        return new String[] {
-                TextUtils.getWeatherIcon(weather.getIcon()),
-                main.formatTemperature()
-        };
+
+        return TextUtils.getWeatherIcon(weather.getIcon()) + " " + main.formatTemperature();
+    }
+
+    public String getTwoLineTemperatureString() {
+        Main main = getMain();
+
+        Weather weather = getWeather().get(0);
+
+        return TextUtils.getWeatherIcon(weather.getIcon())
+                + TextUtils.LINE_SEPERATOR
+                +  main.formatTemperature();
     }
 
     /**

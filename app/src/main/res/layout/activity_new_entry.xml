@@ -6,7 +6,9 @@
     android:id="@+id/activity_new_entry_root"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true" >
 
     <Toolbar
         android:id="@+id/fragment_entry_toolbar"
@@ -18,14 +20,15 @@
         android:id="@+id/activity_new_entry_body"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:textSize="@dimen/large_text_size"
+        android:textSize="@dimen/subtitle_text_size"
         android:layout_marginTop="@dimen/action_bar_margin"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
         android:layout_marginBottom="@dimen/action_bar_margin"
         android:gravity="start|top"
+        android:inputType="textCapSentences|textMultiLine|textAutoCorrect"
         android:hint="@string/activity_entry_body_hint"
-        tools:text="LONG STRING MOTHERFUCKER"/>
+        tools:text="LONG STRING MOTHERFUCKER" />
 
     <RelativeLayout
         android:id="@+id/activity_new_entry_fab_menu"

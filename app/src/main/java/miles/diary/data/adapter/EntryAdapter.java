@@ -24,6 +24,7 @@ import miles.diary.ui.activity.NewEntryActivity;
 import miles.diary.ui.widget.TypefaceIconTextView;
 import miles.diary.ui.widget.TypefaceTextView;
 import miles.diary.util.AnimUtils;
+import miles.diary.util.TextUtils;
 import rx.functions.Func1;
 
 /**
@@ -122,6 +123,7 @@ public class EntryAdapter extends BackendAdapter<Entry, RecyclerView.ViewHolder>
 
     @Override
     public void addData(Entry object) {
+        realm.refresh();
         loadData(realm);
     }
 
@@ -137,7 +139,6 @@ public class EntryAdapter extends BackendAdapter<Entry, RecyclerView.ViewHolder>
         String placeId = bundle.getString(NewEntryActivity.PLACE_ID);
         String weather = bundle.getString(NewEntryActivity.TEMPERATURE);
 
-//        WeatherResponse weatherResponse = new Gson().fromJson(weather, WeatherResponse.class);
 
         Entry entry = Entry.construct(realm, body, uri, placeName, placeId, weather);
         addData(entry);
@@ -164,14 +165,12 @@ public class EntryAdapter extends BackendAdapter<Entry, RecyclerView.ViewHolder>
                 }
             });
             body.setText(entry.getBody());
-            time.setText(Entry.formatDateString(entry));
+            time.setText(TextUtils.formatDate(entry.getDate()));
 
             String temperature = entry.getWeather();
             if (temperature != null) {
                 WeatherResponse weatherResponse = gson.fromJson(temperature, WeatherResponse.class);
-                String[] parts = weatherResponse.getTemperatureParts();
-                String text = parts[0] + " " + parts[1];
-                weather.setText(text);
+                weather.setText(weatherResponse.getOneLineTemperatureString());
             }
 
             String placeName = entry.getPlaceName();
@@ -201,15 +200,13 @@ public class EntryAdapter extends BackendAdapter<Entry, RecyclerView.ViewHolder>
                     EntryActivity.newIntent(host, image, entry);
                 }
             });
-            time.setText(Entry.formatDateString(entry));
+            time.setText(TextUtils.formatDate(entry.getDate()));
             body.setText(entry.getBody());
 
             String temperature = entry.getWeather();
             if (temperature != null) {
                 WeatherResponse weatherResponse = gson.fromJson(temperature, WeatherResponse.class);
-                String[] parts = weatherResponse.getTemperatureParts();
-                String text = parts[0] + " " + parts[1];
-                weather.setText(text);
+                weather.setText(weatherResponse.getOneLineTemperatureString());
             }
 
             String placeName = entry.getPlaceName();

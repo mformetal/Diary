@@ -3,6 +3,8 @@ package miles.diary.ui.widget;
 import android.content.Context;
 import android.util.AttributeSet;
 
+import miles.diary.util.Logg;
+
 /**
  * Created by mbpeele on 2/8/16.
  */

@@ -18,11 +18,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import miles.diary.util.AnimUtils;
+import miles.diary.util.Logg;
 
 public class ColorTransition extends Transition {
 
     private static final String PROPNAME_BACKGROUND = "miles:diary:ui:transition:colortransition:background";
     private static final String PROPNAME_COLOR = "miles:diary:ui:transition:colortransition:textColor";
+    private static final String[] PROPERTIES = new String[] {
+            PROPNAME_BACKGROUND,
+            PROPNAME_COLOR
+    };
 
     private int startColor, endColor;
 
@@ -33,6 +38,11 @@ public class ColorTransition extends Transition {
 
     public ColorTransition(Context context, AttributeSet attrs) {
         super(context, attrs);
+    }
+
+    @Override
+    public String[] getTransitionProperties() {
+        return PROPERTIES;
     }
 
     @Override
@@ -53,6 +63,7 @@ public class ColorTransition extends Transition {
         if (startValues == null || endValues == null) {
             return null;
         }
+
         final View view = endValues.view;
         Drawable startBackground = (Drawable) startValues.values.get(PROPNAME_BACKGROUND);
         Drawable endBackground = (Drawable) endValues.values.get(PROPNAME_BACKGROUND);

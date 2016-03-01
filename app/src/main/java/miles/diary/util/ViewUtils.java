@@ -14,6 +14,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import miles.diary.ui.PreDrawer;
+
 /**
  * Created by mbpeele on 1/14/16.
  */
@@ -49,6 +51,28 @@ public class ViewUtils {
             if (drawable != null) {
                 mutate(drawable, color);
             }
+        }
+    }
+
+    public static void mutate(TextView textView, final int color) {
+        Drawable[] drawables = textView.getCompoundDrawables();
+
+        boolean hasDrawable = false;
+        for (Drawable drawable: drawables) {
+            if (drawable != null) {
+                hasDrawable = true;
+                mutate(drawable, color);
+            }
+        }
+
+        if (!hasDrawable) {
+            PreDrawer.addPreDrawer(textView, new PreDrawer.OnPreDrawListener<TextView>() {
+                @Override
+                public boolean onPreDraw(TextView view) {
+                    mutate(view.getCompoundDrawables(), color);
+                    return true;
+                }
+            });
         }
     }
 

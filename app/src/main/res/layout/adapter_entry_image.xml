@@ -43,6 +43,7 @@
         android:layout_marginTop="@dimen/adapter_entry_margin"
         android:layout_marginBottom="@dimen/adapter_entry_margin"
         android:layout_gravity="center_horizontal"
+        android:transitionName="@string/transition_location_image"
         tools:text="MOUNTAIN BIKING" />
 
     <miles.diary.ui.widget.TypefaceTextView
@@ -50,6 +51,8 @@
         android:id="@+id/adapter_entry_image_body"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:maxLines="1"
+        android:ellipsize="end"
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:textSize="@dimen/adapter_title_text_size"

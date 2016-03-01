@@ -13,6 +13,8 @@
     <color name="half_opacity_gray">#80888888</color>
     <color name="scrim">#323232</color>
     <color name="scrim_with_alpha">#99323232</color>
+    <color name="dialog_background">#FFFFFF</color>
+    <color name="dialog_text">#000000</color>
     <color name="time">#00444C</color>
     <color name="toolbar">#ff333333</color>
     <color name="muted_red">#D32F2F</color>

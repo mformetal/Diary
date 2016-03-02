@@ -83,7 +83,7 @@ public final class TextUtils {
 
     public static String formatTime(Date date) {
         SimpleDateFormat dateFormat
-                = new SimpleDateFormat("HH:mm a", Locale.getDefault());
+                = new SimpleDateFormat("h:m a", Locale.getDefault());
         return dateFormat.format(date);
     }
 

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="default_font">Roboto-Medium.ttf</string>
-    <string name="light_italic">Roboto-Light.ttf</string>
+    <string name="default_font">Roboto-Light.ttf</string>
 </resources>

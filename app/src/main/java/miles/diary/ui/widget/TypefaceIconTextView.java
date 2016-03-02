@@ -28,6 +28,10 @@ public class TypefaceIconTextView extends IconTextView {
     }
 
     private void init() {
+        if (isInEditMode()) {
+            return;
+        }
+
         setTypeface(TextUtils.getDefaultFont(getContext()));
     }
 

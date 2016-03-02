@@ -1,26 +1,26 @@
 package miles.diary.ui.activity;
 
 import android.Manifest;
-import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.animation.FastOutSlowInInterpolator;
+import android.support.v7.graphics.Palette;
+import android.transition.ArcMotion;
 import android.transition.Transition;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,13 +29,18 @@ import butterknife.Bind;
 import butterknife.OnClick;
 import icepick.State;
 import miles.diary.R;
+import miles.diary.ui.PaletteWindows;
+import miles.diary.ui.PreDrawer;
+import miles.diary.ui.ResizeAnimation;
+import miles.diary.ui.transition.RoundedImageViewTransition;
 import miles.diary.ui.transition.SimpleTransitionListener;
-import miles.diary.ui.widget.CornerImageView;
+import miles.diary.ui.widget.RoundedImageView;
 import miles.diary.ui.widget.TypefaceButton;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.FileUtils;
 import miles.diary.util.IntentUtils;
 import miles.diary.util.Logg;
+import miles.diary.util.ViewUtils;
 
 /**
  * Created by mbpeele on 1/29/16.
@@ -47,7 +52,8 @@ public class UriActivity extends BaseActivity implements View.OnClickListener{
     private final static int REQUEST_VIDEO = 3;
     private final static int REQUESET_IMAGE_PERMISSION = 4;
 
-    @Bind(R.id.activity_uri_image_view) CornerImageView imageView;
+    @Bind(R.id.activity_uri_image_view)
+    RoundedImageView imageView;
     @Bind(R.id.activity_uri_video_view) VideoView videoView;
     @Bind(R.id.activity_uri_button_row) LinearLayout buttonRow;
     @Bind(R.id.activity_uri_gallery) TypefaceButton photo;
@@ -184,9 +190,29 @@ public class UriActivity extends BaseActivity implements View.OnClickListener{
 
             Glide.with(this)
                     .fromUri()
+                    .asBitmap()
                     .animate(AnimUtils.REVEAL)
                     .load(uri)
                     .centerCrop()
+                    .listener(new RequestListener<Uri, Bitmap>() {
+                        @Override
+                        public boolean onException(Exception e, Uri model,
+                                                   Target<Bitmap> target, boolean isFirstResource) {
+                            Logg.log(e);
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Bitmap resource, Uri model,
+                                                       Target<Bitmap> target,
+                                                       boolean isFromMemoryCache, boolean isFirstResource) {
+                            Palette.from(resource)
+                                    .maximumColorCount(3)
+                                    .clearFilters()
+                                    .generate(new PaletteWindows(UriActivity.this, resource));
+                            return false;
+                        }
+                    })
                     .into(imageView);
         }
     }
@@ -204,55 +230,52 @@ public class UriActivity extends BaseActivity implements View.OnClickListener{
     }
 
     private void setupTransitions() {
-        final Transition enterTransition = getWindow().getSharedElementEnterTransition();
-        final Transition returnTransition = getWindow().getSharedElementReturnTransition();
-
-        if (enterTransition != null && returnTransition != null) {
-            enterTransition.addListener(new SimpleTransitionListener() {
-                @Override
-                public void onTransitionStart(Transition transition) {
-                    super.onTransitionStart(transition);
-                    enterTransition.removeListener(this);
-
-                    returnTransition.addListener(new SimpleTransitionListener() {
-                        @Override
-                        public void onTransitionStart(Transition transition) {
-                            super.onTransitionEnd(transition);
-
-                            buttonRow.animate()
-                                    .translationY(root.getHeight())
-                                    .alpha(0f)
-                                    .setDuration(AnimUtils.mediumAnim(getApplicationContext()))
-                                    .setInterpolator(new FastOutSlowInInterpolator())
-                                    .start();
-
-                            ObjectAnimator corner = ObjectAnimator.ofFloat(imageView,
-                                    CornerImageView.CORNERS,
-                                    0, Math.min(imageView.getWidth(), imageView.getHeight()) / 2f);
-                            corner.setDuration(AnimUtils.longAnim(getApplicationContext()));
-                            corner.setInterpolator(new FastOutSlowInInterpolator());
-                            corner.start();
-                        }
-                    });
-
-                    buttonRow.setTranslationY(root.getHeight());
-                    buttonRow.setAlpha(0f);
-
-                    buttonRow.animate()
-                            .translationY(0f)
-                            .alpha(1f)
-                            .setDuration(AnimUtils.mediumAnim(getApplicationContext()))
-                            .setInterpolator(new FastOutSlowInInterpolator())
-                            .start();
-
-                    ObjectAnimator corner = ObjectAnimator.ofFloat(imageView,
-                            CornerImageView.CORNERS,
-                            Math.max(imageView.getWidth(), imageView.getHeight()) / 2f, 0);
-                    corner.setDuration(AnimUtils.longAnim(getApplicationContext()));
-                    corner.setInterpolator(new FastOutSlowInInterpolator());
-                    corner.start();
-                }
-            });
-        }
+//        PreDrawer.addPreDrawer(imageView, new PreDrawer.OnPreDrawListener<RoundedImageView>() {
+//            @Override
+//            public boolean onPreDraw(final RoundedImageView view) {
+//                if (view.getWidth() != 0 && view.getHeight() != 0) {
+//                    ArcMotion arcMotion = new ArcMotion();
+//                    arcMotion.setMinimumHorizontalAngle(50f);
+//                    arcMotion.setMinimumVerticalAngle(50f);
+//
+//                    RoundedImageViewTransition reveal = new RoundedImageViewTransition(
+//                            view.getWidth() / 2f, 0);
+//                    reveal.addTarget(view);
+//                    reveal.setPathMotion(arcMotion);
+//                    reveal.addListener(new SimpleTransitionListener() {
+//                        @Override
+//                        public void onTransitionStart(Transition transition) {
+//                            ViewUtils.gone(buttonRow);
+//                        }
+//
+//                        @Override
+//                        public void onTransitionEnd(Transition transition) {
+//                            for (int i = 0; i < buttonRow.getChildCount(); i++) {
+//                                AnimUtils.visible(buttonRow.getChildAt(i)).start();
+//                            }
+//                        }
+//                    });
+//
+//                    RoundedImageViewTransition unreveal = new RoundedImageViewTransition(
+//                            0, view.getHeight() / 2f);
+//                    unreveal.addTarget(view);
+//                    unreveal.setPathMotion(arcMotion);
+//                    unreveal.addListener(new SimpleTransitionListener() {
+//                        @Override
+//                        public void onTransitionStart(Transition transition) {
+//                            super.onTransitionStart(transition);
+//                            for (int i = 0; i < buttonRow.getChildCount(); i++) {
+//                                AnimUtils.gone(buttonRow.getChildAt(i)).start();
+//                            }
+//                        }
+//                    });
+//
+////                    getWindow().setSharedElementEnterTransition(reveal);
+////                    getWindow().setSharedElementReturnTransition(unreveal);
+//                }
+//
+//                return true;
+//            }
+//        });
     }
 }

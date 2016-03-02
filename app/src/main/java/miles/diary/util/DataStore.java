@@ -1,4 +1,4 @@
-package miles.diary.data;
+package miles.diary.util;
 
 import android.app.Application;
 import android.content.Context;

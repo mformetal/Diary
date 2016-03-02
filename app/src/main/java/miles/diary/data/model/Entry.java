@@ -2,9 +2,7 @@ package miles.diary.data.model;
 
 import android.net.Uri;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 import io.realm.Realm;
 import io.realm.RealmObject;
@@ -25,6 +23,23 @@ public class Entry extends RealmObject {
     private String placeName;
     private String placeId;
     private String weather;
+
+    public Entry() {
+        super();
+    }
+
+    public Entry(String body, Uri uri, String placeName,
+              String placeId, String temperature) {
+        super();
+        setBody(body);
+        setDate(new Date());
+        if (uri != null) {
+            setUri(uri.toString());
+        }
+        setPlaceName(placeName);
+        setPlaceId(placeId);
+        setWeather(temperature);
+    }
 
     public String getWeather() {
         return weather;
@@ -79,22 +94,5 @@ public class Entry extends RealmObject {
                 TextUtils.repeat(2, TextUtils.LINE_SEPERATOR) +
                 TextUtils.repeat(5, TextUtils.TAB) +
                 entry.getBody();
-    }
-
-    public static Entry construct(Realm realm, String body, Uri uri, String placeName,
-                                  String placeId, String temperature) {
-        realm.beginTransaction();
-        Entry entry = realm.createObject(Entry.class);
-        entry.setBody(body);
-        entry.setDate(new Date());
-        if (uri != null) {
-            entry.setUri(uri.toString());
-        }
-        entry.setPlaceName(placeName);
-        entry.setPlaceId(placeId);
-        entry.setWeather(temperature);
-        realm.commitTransaction();
-        realm.refresh();
-        return entry;
     }
 }

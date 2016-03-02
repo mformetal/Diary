@@ -12,12 +12,9 @@
     <miles.diary.ui.widget.TypefaceTextView
         android:id="@+id/adapter_entry_text_time"
         android:gravity="center"
-        android:drawableStart="@drawable/ic_access_time_24dp"
-        android:drawablePadding="@dimen/adapter_entry_margin"
-        android:includeFontPadding="false"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/adapter_time_text_size"
+        android:textSize="@dimen/small_text_size"
         android:maxLines="1"
         tools:text="MOUNTAIN BIKING" />
 
@@ -28,7 +25,7 @@
         android:layout_alignParentEnd="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/adapter_time_text_size"
+        android:textSize="@dimen/small_text_size"
         android:textColor="@color/secondary_text"
         android:maxLines="1"
         app:textViewAutoFit="true"
@@ -41,21 +38,20 @@
         android:ellipsize="end"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:layout_marginTop="@dimen/adapter_entry_margin"
+        android:layout_marginBottom="@dimen/adapter_entry_margin"
         android:gravity="center_vertical"
-        android:textSize="@dimen/adapter_title_text_size"
+        android:textSize="@dimen/medium_text_size"
         tools:text="MOUNTAIN BIKING" />
 
     <miles.diary.ui.widget.TypefaceTextView
         android:layout_below="@id/adapter_entry_text_body"
         android:id="@+id/adapter_entry_text_location"
-        android:includeFontPadding="false"
         android:gravity="center_vertical"
         android:drawableStart="@drawable/ic_place_24dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/adapter_time_text_size"
+        android:textSize="@dimen/small_text_size"
         android:textColor="@color/accent"
         android:maxLines="1"
         tools:text="MOUNTAIN BIKING" />

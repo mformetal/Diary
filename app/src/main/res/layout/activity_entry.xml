@@ -21,7 +21,7 @@
             android:background="@null"
             app:layout_scrollFlags="scroll|exitUntilCollapsed" >
 
-            <miles.diary.ui.widget.SquareCornerImageView
+            <miles.diary.ui.widget.SquareRoundedImageView
                 android:id="@+id/activity_entry_image"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -35,18 +35,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_arrow_back_24dp"
+                android:visibility="gone"
                 android:layout_margin="@dimen/fab_margin"
                 android:background="@null" />
-
-            <android.support.design.widget.FloatingActionButton
-                android:layout_margin="@dimen/fab_margin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/activity_entry_menu_show"
-                android:src="@drawable/ic_add_24dp"
-                android:tint="@android:color/white"
-                android:layout_gravity="top|end"
-                app:fabSize="normal" />
 
         </android.support.design.widget.CollapsingToolbarLayout>
 
@@ -54,7 +45,7 @@
 
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:paddingTop="10dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" >
 
@@ -70,24 +61,11 @@
                 android:textColor="@color/secondary_text"
                 android:textSize="@dimen/medium_text_size"
                 android:maxLines="1"
+                android:layout_marginBottom="@dimen/adapter_entry_margin"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 android:layout_gravity="end"
                 app:textViewAutoFit="true"
                 tools:text="Icon Weather" />
-
-            <miles.diary.ui.widget.TypefaceTextView
-                android:id="@+id/activity_entry_date"
-                android:drawableStart="@drawable/ic_access_time_24dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/medium_text_size"
-                android:textColor="@color/secondary_text"
-                android:maxLines="2"
-                android:layout_marginEnd="@dimen/activity_horizontal_margin"
-                android:gravity="end"
-                android:layout_gravity="end"
-                app:textViewAutoFit="true"
-                tools:text="10:59AM" />
 
             <miles.diary.ui.widget.TypefaceTextView
                 android:layout_width="wrap_content"
@@ -97,10 +75,26 @@
                 android:textSize="@dimen/medium_text_size"
                 android:textColor="@color/secondary_text"
                 android:layout_gravity="end"
+                android:layout_marginBottom="@dimen/adapter_entry_margin"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 android:maxLines="1"
                 app:textViewAutoFit="true"
                 tools:text="Swem Library" />
+
+            <miles.diary.ui.widget.TypefaceTextView
+                android:id="@+id/activity_entry_date"
+                android:drawableStart="@drawable/ic_access_time_24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/medium_text_size"
+                android:textColor="@color/secondary_text"
+                android:maxLines="2"
+                android:layout_marginBottom="@dimen/adapter_entry_margin"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:gravity="end"
+                android:layout_gravity="end"
+                app:textViewAutoFit="true"
+                tools:text="10:59AM" />
 
             <miles.diary.ui.widget.TypefaceTextView
                 android:id="@+id/activity_entry_body"

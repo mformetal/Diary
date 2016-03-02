@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle" >
 
-    <size android:height="@dimen/recycler_divider_height" />
+    <size android:height="@dimen/divider_height" />
 
     <gradient
         android:angle="0"

@@ -27,8 +27,7 @@
         android:layout_marginBottom="@dimen/action_bar_margin"
         android:gravity="start|top"
         android:inputType="textCapSentences|textMultiLine|textAutoCorrect"
-        android:hint="@string/activity_entry_body_hint"
-        tools:text="LONG STRING MOTHERFUCKER" />
+        android:hint="@string/activity_entry_body_hint" />
 
     <RelativeLayout
         android:id="@+id/activity_new_entry_fab_menu"
@@ -36,7 +35,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_anchor="@id/activity_new_entry_root"
-        app:layout_anchorGravity="bottom|end"
+        app:layout_anchorGravity="bottom|center_horizontal"
         app:layout_behavior="miles.diary.ui.SnackbarBehavior" >
 
         <de.hdodenhof.circleimageview.CircleImageView
@@ -45,7 +44,7 @@
             android:transitionName="@string/transition_location_image"
             android:layout_width="@dimen/fab_normal_dimens"
             android:layout_height="@dimen/fab_normal_dimens"
-            android:layout_margin="@dimen/activity_entry_fab_margin"
+            android:layout_margin="@dimen/small_fab_margin"
             android:layout_alignParentStart="true" />
 
         <miles.diary.ui.widget.TypefaceIconTextView
@@ -62,7 +61,7 @@
             android:transitionName="@string/transition_location_image"
             android:layout_width="@dimen/fab_normal_dimens"
             android:layout_height="@dimen/fab_normal_dimens"
-            android:layout_margin="@dimen/activity_entry_fab_margin"
+            android:layout_margin="@dimen/small_fab_margin"
             android:layout_alignParentEnd="true" />
 
     </RelativeLayout>

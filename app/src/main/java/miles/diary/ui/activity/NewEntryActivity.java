@@ -34,15 +34,14 @@ import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 import icepick.State;
 import miles.diary.R;
-import miles.diary.data.ActivitySubscriber;
+import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.ui.widget.TypefaceEditText;
 import miles.diary.ui.widget.TypefaceIconTextView;
 import miles.diary.util.AnimUtils;
-import miles.diary.util.GoogleUtils;
+import miles.diary.data.api.GoogleService;
 import miles.diary.util.IntentUtils;
 import miles.diary.util.Logg;
-import miles.diary.util.TextUtils;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -56,9 +55,9 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     @Bind(R.id.activity_new_entry_location) CircleImageView location;
     @Bind(R.id.activity_new_entry_temperature) TypefaceIconTextView weatherText;
 
-    public static final String BODY = "entryBody";
+    public static final String BODY = "body";
     public static final String URI = "uri";
-    public static final String PLACE_NAME = "entryPlace";
+    public static final String PLACE_NAME = "place";
     public static final String PLACE_ID = "placeId";
     public static final String TEMPERATURE = "temperature";
     public static final String ADDRESS = "address";
@@ -133,7 +132,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                     result.putExtra(NewEntryActivity.TEMPERATURE,
                             new Gson().toJson(weather, WeatherResponse.class));
                     setResult(Activity.RESULT_OK, result);
-                    finish();
+                    finishAfterTransition();
                 } else {
                     Snackbar.make(root, R.string.activity_entry_no_text_error,
                             Snackbar.LENGTH_SHORT).show();
@@ -162,13 +161,15 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                 }
                 break;
             case R.id.activity_new_entry_location:
-                Intent intent1 = new Intent(this, LocationActivity.class);
-                intent1.putExtra(NewEntryActivity.PLACE_NAME, placeName);
-                intent1.putExtra(NewEntryActivity.PLACE_ID, placeId);
-                ActivityOptions transitionActivityOptions =
-                        ActivityOptions.makeSceneTransitionAnimation(this, location,
-                                getString(R.string.transition_location_image));
-                startActivityForResult(intent1, REQUEST_LOCATION, transitionActivityOptions.toBundle());
+                if (placeName != null && placeId != null) {
+                    Intent intent1 = new Intent(this, LocationActivity.class);
+                    intent1.putExtra(NewEntryActivity.PLACE_NAME, placeName);
+                    intent1.putExtra(NewEntryActivity.PLACE_ID, placeId);
+                    ActivityOptions transitionActivityOptions =
+                            ActivityOptions.makeSceneTransitionAnimation(this, location,
+                                    getString(R.string.transition_location_image));
+                    startActivityForResult(intent1, REQUEST_LOCATION, transitionActivityOptions.toBundle());
+                }
                 break;
             case R.id.activity_new_entry_temperature:
                 if (temperature != null) {
@@ -204,11 +205,10 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                 Manifest.permission.ACCESS_FINE_LOCATION};
         if (hasPermissions(permissions)) {
             if (hasConnection()) {
-                GoogleUtils.getLocation(this)
+                GoogleService.getLocation(googleApiClient)
                         .subscribe(new ActivitySubscriber<Location>(this) {
                             @Override
                             public void onNext(Location location) {
-                                super.onNext(location);
                                 if (location != null) {
                                     getWeather();
 
@@ -244,23 +244,19 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
 
     private void getPlace() {
         if (placeName == null && placeId == null) {
-            GoogleUtils.getCurrentPlace(googleApiClient, null)
+            GoogleService.getCurrentPlace(googleApiClient, null)
                     .subscribe(new ActivitySubscriber<PlaceLikelihoodBuffer>(this) {
                         @Override
                         public void onNext(PlaceLikelihoodBuffer placeLikelihoods) {
-                            super.onNext(placeLikelihoods);
                             Place mostLikely = placeLikelihoods.get(0).getPlace();
 
                             placeId = mostLikely.getId();
                             placeName = mostLikely.getName().toString();
 
-                            Activity activity = getSubscribedActivity();
-                            if (activity != null) {
-                                AnimUtils.colorfilter(location,
-                                        ContextCompat.getColor(activity, R.color.accent),
-                                        Color.WHITE)
-                                        .start();
-                            }
+                            AnimUtils.colorfilter(location,
+                                    ContextCompat.getColor(NewEntryActivity.this, R.color.accent),
+                                    Color.WHITE)
+                                    .start();
 
                             placeLikelihoods.release();
                         }
@@ -271,18 +267,12 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     }
 
     private void getWeather() {
-        weatherText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
         if (temperature == null) {
-            GoogleUtils.getLocation(this)
+            GoogleService.getLocation(googleApiClient)
                     .flatMap(new Func1<Location, Observable<List<Address>>>() {
                         @Override
                         public Observable<List<Address>> call(Location location) {
-                            return GoogleUtils.getAddress(NewEntryActivity.this, location);
+                            return GoogleService.getAddress(NewEntryActivity.this, location);
                         }
                     })
                     .flatMap(new Func1<List<Address>, Observable<WeatherResponse>>() {

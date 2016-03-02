@@ -4,6 +4,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
@@ -17,17 +18,19 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
+import java.util.List;
+
 import butterknife.Bind;
-import jp.wasabeef.recyclerview.animators.FadeInAnimator;
 import miles.diary.R;
-import miles.diary.data.adapter.BackendAdapterListener;
+import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.data.adapter.EntryAdapter;
+import miles.diary.data.api.LoadingListener;
 import miles.diary.data.model.Entry;
-import miles.diary.ui.SpacingDecoration;
+import miles.diary.ui.RecylerDividerDecoration;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.Logg;
 
-public class HomeActivity extends TransitionActivity implements BackendAdapterListener {
+public class HomeActivity extends TransitionActivity implements LoadingListener {
 
     @Bind(R.id.activity_home_recycler) RecyclerView recyclerView;
     @Bind(R.id.activity_home_toolbar) Toolbar toolbar;
@@ -46,26 +49,32 @@ public class HomeActivity extends TransitionActivity implements BackendAdapterLi
 
         setActionBar(toolbar);
 
-        entryAdapter = new EntryAdapter(this, realm);
-        recyclerView.setItemAnimator(new FadeInAnimator());
+        dataManager.loadObjects(Entry.class)
+                .subscribe(new ActivitySubscriber<List<Entry>>(this, true) {
+                    @Override
+                    public void onNext(List<Entry> entries) {
+                        if (entries.isEmpty()) {
+                            onLoadEmpty();
+                        } else {
+                            entryAdapter.addData(entries);
+                            onLoadComplete();
+                        }
+                    }
+                });
+
+        entryAdapter = new EntryAdapter(this);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(entryAdapter);
-        recyclerView.addItemDecoration(new SpacingDecoration(
+        recyclerView.addItemDecoration(new RecylerDividerDecoration(
                 ContextCompat.getDrawable(this, R.drawable.recycler_divider)));
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), NewEntryActivity.class);
-                startActivityForResult(intent, RESULT_CODE_ENTRY);
+                startNewEntryActivity(v);
             }
         });
-    }
-
-    @Override
-    boolean shouldRunCustomExitAnimation() {
-        return false;
     }
 
     @Override
@@ -90,17 +99,30 @@ public class HomeActivity extends TransitionActivity implements BackendAdapterLi
     }
 
     @Override
+    boolean shouldRunCustomExitAnimation() {
+        return false;
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case RESULT_CODE_ENTRY:
                 if (resultCode == RESULT_OK) {
-                    Bundle extras = data.getExtras();
-                    if (extras != null) {
-                        entryAdapter.addEntry(extras);
+                    Bundle bundle = data.getExtras();
+                    String body = bundle.getString(NewEntryActivity.BODY);
+                    Uri uri = bundle.getParcelable(NewEntryActivity.URI);
+                    String placeName = bundle.getString(NewEntryActivity.PLACE_NAME);
+                    String placeId = bundle.getString(NewEntryActivity.PLACE_ID);
+                    String weather = bundle.getString(NewEntryActivity.TEMPERATURE);
 
-                        if (emptyView != null) {
-                            root.removeView(emptyView);
-                        }
+                    Entry entry = new Entry(body, uri, placeName, placeId, weather);
+
+                    dataManager.uploadObject(entry);
+
+                    entryAdapter.addData(entry);
+
+                    if (emptyView != null) {
+                        root.removeView(emptyView);
                     }
                 }
                 break;
@@ -108,7 +130,7 @@ public class HomeActivity extends TransitionActivity implements BackendAdapterLi
     }
 
     @Override
-    public void onLoadCompleted() {
+    public void onLoadComplete() {
         dismissLoading();
     }
 
@@ -122,13 +144,13 @@ public class HomeActivity extends TransitionActivity implements BackendAdapterLi
     public void onLoadEmpty() {
         if (emptyView == null) {
             dismissLoading();
+
             ViewStub viewStub = (ViewStub) findViewById(R.id.activity_home_no_entries);
             emptyView = viewStub.inflate();
             emptyView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(v.getContext(), NewEntryActivity.class);
-                    startActivityForResult(intent, RESULT_CODE_ENTRY);
+                    startNewEntryActivity(v);
                 }
             });
         }
@@ -137,6 +159,11 @@ public class HomeActivity extends TransitionActivity implements BackendAdapterLi
     @Override
     public void onLoadStart() {
         showLoading();
+    }
+
+    private void startNewEntryActivity(View v) {
+        Intent intent = new Intent(v.getContext(), NewEntryActivity.class);
+        startActivityForResult(intent, RESULT_CODE_ENTRY);
     }
 
     private void dismissLoading() {

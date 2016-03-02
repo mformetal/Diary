@@ -40,8 +40,4 @@ public class DiaryApplication extends Application {
     }
 
     public ApplicationComponent getComponent() { return component; }
-
-    public static boolean isMarshmallow() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
-    }
 }

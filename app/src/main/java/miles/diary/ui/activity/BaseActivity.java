@@ -10,19 +10,15 @@ import android.view.ViewGroup;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import icepick.Icepick;
-import io.realm.Realm;
 import miles.diary.DiaryApplication;
 import miles.diary.R;
-import miles.diary.data.DataStore;
-import miles.diary.data.WeatherService;
-import rx.Observable;
+import miles.diary.util.DataStore;
+import miles.diary.data.api.WeatherService;
+import miles.diary.data.api.DataManager;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
 
@@ -34,19 +30,19 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Inject WeatherService weatherService;
     @Inject DataStore datastore;
     @Inject GoogleApiClient.Builder googleApiClientBuilder;
+    @Inject DataManager dataManager;
 
     private CompositeSubscription compositeSubscription;
-    protected Realm realm;
-    public ViewGroup root;
+    protected ViewGroup root;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ((DiaryApplication) getApplication()).getComponent().inject(this);
 
-        compositeSubscription = new CompositeSubscription();
+        dataManager.init();
 
-        realm = Realm.getDefaultInstance();
+        compositeSubscription = new CompositeSubscription();
 
         Icepick.restoreInstanceState(this, savedInstanceState);
     }
@@ -61,7 +57,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        realm.close();
+        dataManager.close();
         compositeSubscription.unsubscribe();
         ButterKnife.unbind(this);
     }

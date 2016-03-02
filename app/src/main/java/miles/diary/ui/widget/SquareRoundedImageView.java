@@ -3,22 +3,20 @@ package miles.diary.ui.widget;
 import android.content.Context;
 import android.util.AttributeSet;
 
-import miles.diary.util.Logg;
-
 /**
  * Created by mbpeele on 2/8/16.
  */
-public class SquareCornerImageView extends CornerImageView {
+public class SquareRoundedImageView extends RoundedImageView {
 
-    public SquareCornerImageView(Context context) {
+    public SquareRoundedImageView(Context context) {
         super(context);
     }
 
-    public SquareCornerImageView(Context context, AttributeSet attrs) {
+    public SquareRoundedImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public SquareCornerImageView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public SquareRoundedImageView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 

@@ -38,6 +38,10 @@ public class NotebookEditText extends TypefaceEditText {
     }
 
     private void init() {
+        if (isInEditMode()) {
+            return;
+        }
+
         mRect = new Rect();
 
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);

@@ -1,9 +1,6 @@
 package miles.diary.data.adapter;
 
-import android.net.Uri;
-import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -12,43 +9,30 @@ import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 
 import butterknife.Bind;
-import io.realm.Realm;
-import io.realm.RealmResults;
 import miles.diary.R;
-import miles.diary.data.ActivitySubscriber;
 import miles.diary.data.model.Entry;
 import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.ui.activity.BaseActivity;
 import miles.diary.ui.activity.EntryActivity;
-import miles.diary.ui.activity.NewEntryActivity;
 import miles.diary.ui.widget.TypefaceIconTextView;
 import miles.diary.ui.widget.TypefaceTextView;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.TextUtils;
-import rx.functions.Func1;
 
 /**
  * Created by mbpeele on 1/14/16.
  */
-public class EntryAdapter extends BackendAdapter<Entry, RecyclerView.ViewHolder> {
+public class EntryAdapter extends BaseAdapter<RecyclerView.ViewHolder> {
 
     private static final int TYPE_IMAGE = 0;
     private static final int TYPE_TEXT = 1;
     private static final int TYPE_VIDEO = 2;
 
-    private BaseActivity host;
-    private LayoutInflater layoutInflater;
     private Gson gson;
 
-    public EntryAdapter(BaseActivity activity, Realm realm) {
-        super(realm);
-        setListener((BackendAdapterListener) activity);
-
+    public EntryAdapter(BaseActivity activity) {
+        super(activity);
         gson = new Gson();
-        host = activity;
-        layoutInflater = LayoutInflater.from(activity);
-
-        loadData(realm);
     }
 
     @Override
@@ -84,65 +68,8 @@ public class EntryAdapter extends BackendAdapter<Entry, RecyclerView.ViewHolder>
     }
 
     @Override
-    public void loadData(Realm realm) {
-        if (verifyDataSource(realm)) {
-            realm.where(Entry.class)
-                    .findAllAsync()
-                    .asObservable()
-                    .filter(new Func1<RealmResults<Entry>, Boolean>() {
-                        @Override
-                        public Boolean call(RealmResults<Entry> entries) {
-                            return entries.isLoaded();
-                        }
-                    })
-                    .subscribe(new ActivitySubscriber<RealmResults<Entry>>(host) {
-                        @Override
-                        public void onNext(RealmResults<Entry> entries) {
-                            super.onNext(entries);
-                            setData(entries);
-                            if (getData().isEmpty()) {
-                                propagateEmpty();
-                            } else {
-                                propagateCompletion();
-                            }
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            super.onError(e);
-                            propagateError(e);
-                        }
-
-                        @Override
-                        public void onStart() {
-                            propagateStart();
-                        }
-                    });
-        }
-    }
-
-    @Override
-    public void addData(Entry object) {
-        realm.refresh();
-        loadData(realm);
-    }
-
-    @Override
-    public boolean verifyDataSource(Realm realm) {
-        return !realm.isClosed();
-    }
-
-    public Entry addEntry(Bundle bundle) {
-        String body = bundle.getString(NewEntryActivity.BODY);
-        Uri uri = bundle.getParcelable(NewEntryActivity.URI);
-        String placeName = bundle.getString(NewEntryActivity.PLACE_NAME);
-        String placeId = bundle.getString(NewEntryActivity.PLACE_ID);
-        String weather = bundle.getString(NewEntryActivity.TEMPERATURE);
-
-
-        Entry entry = Entry.construct(realm, body, uri, placeName, placeId, weather);
-        addData(entry);
-        return entry;
+    public Entry getItem(int position) {
+        return (Entry) data.get(position);
     }
 
     class TextViewHolder extends BindingViewHolder<Entry> {

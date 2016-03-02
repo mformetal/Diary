@@ -44,7 +44,7 @@
             android:name=".ui.activity.UriActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustPan"
-            android:theme="@style/AppTheme.DialogActivity" >
+            android:theme="@style/AppTheme.UriActivity" >
         </activity>
 
         <activity

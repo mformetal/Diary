@@ -20,6 +20,7 @@ import android.transition.TransitionSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -30,21 +31,28 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.ui.PlacePicker;
+import com.jakewharton.rxbinding.widget.RxTextView;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
 import butterknife.OnClick;
 import icepick.State;
 import miles.diary.R;
-import miles.diary.data.ActivitySubscriber;
-import miles.diary.data.adapter.AutoCompleteAdapter;
+import miles.diary.data.rx.ActivitySubscriber;
+import miles.diary.data.model.AutoCompleteItem;
 import miles.diary.ui.PreDrawer;
 import miles.diary.ui.transition.ColorTransition;
 import miles.diary.ui.widget.TypefaceAutoCompleteTextView;
 import miles.diary.ui.widget.TypefaceButton;
 import miles.diary.util.AnimUtils;
-import miles.diary.util.GoogleUtils;
+import miles.diary.data.api.GoogleService;
 import miles.diary.util.IntentUtils;
 import miles.diary.util.Logg;
+import rx.Observable;
+import rx.functions.Action1;
+import rx.functions.Func1;
 
 /**
  * Created by mbpeele on 2/6/16.
@@ -61,6 +69,7 @@ public class LocationActivity extends BaseActivity
     @Bind(R.id.activity_location_image) ImageView locationImage;
 
     private GoogleApiClient googleApiClient;
+    private ArrayAdapter<AutoCompleteItem> autoCompleteAdapter;
     @State String locationName;
     @State String locationId;
 
@@ -88,16 +97,13 @@ public class LocationActivity extends BaseActivity
                 .addConnectionCallbacks(this)
                 .build();
 
-        final AutoCompleteAdapter autoCompleteAdapter =
-                new AutoCompleteAdapter(this, R.layout.autocomplete_adapter,
-                        googleApiClient, null);
+        autoCompleteAdapter = new ArrayAdapter<>(this, R.layout.autocomplete_adapter);
         autoCompleteTextView.setAdapter(autoCompleteAdapter);
 
         autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                final AutoCompleteAdapter.AutoCompleteAdapterItem item =
-                        autoCompleteAdapter.getItem(position);
+                final AutoCompleteItem item = autoCompleteAdapter.getItem(position);
                 locationId = String.valueOf(item.placeId);
                 locationName = String.valueOf(item.description);
             }
@@ -182,7 +188,7 @@ public class LocationActivity extends BaseActivity
 
     @Override
     public void onConnected(Bundle bundle) {
-        String[] permissions = new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
+        String[] permissions = new String[] {Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.ACCESS_FINE_LOCATION};
         if (hasPermissions(permissions)) {
             if (hasConnection()) {
@@ -194,6 +200,23 @@ public class LocationActivity extends BaseActivity
                 if (loc != null) {
                     getPlace();
                 }
+
+                RxTextView.textChanges(autoCompleteTextView)
+                        .debounce(300, TimeUnit.MILLISECONDS)
+                        .switchMap(new Func1<CharSequence, Observable<List<AutoCompleteItem>>>() {
+                            @Override
+                            public Observable<List<AutoCompleteItem>> call(CharSequence charSequence) {
+                                return GoogleService.autocomplete(googleApiClient,
+                                        charSequence, null, null);
+                            }
+                        })
+                        .subscribe(new Action1<List<AutoCompleteItem>>() {
+                            @Override
+                            public void call(List<AutoCompleteItem> autoCompleteItems) {
+                                autoCompleteAdapter.clear();
+                                autoCompleteAdapter.addAll(autoCompleteItems);
+                            }
+                        });
             } else {
                 noInternet();
             }
@@ -207,7 +230,7 @@ public class LocationActivity extends BaseActivity
 
     private void getPlace() {
         if (locationName == null && locationId == null) {
-            GoogleUtils.getCurrentPlace(googleApiClient, null)
+            GoogleService.getCurrentPlace(googleApiClient, null)
                     .subscribe(new ActivitySubscriber<PlaceLikelihoodBuffer>(this) {
                         @Override
                         public void onNext(PlaceLikelihoodBuffer placeLikelihoods) {

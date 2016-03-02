@@ -12,34 +12,38 @@ import miles.diary.util.AnimUtils;
 /**
  * Created by mbpeele on 2/5/16.
  */
-public class CornerImageView extends ImageView {
+public class RoundedImageView extends ImageView {
 
     private Path path;
     private RectF bounds;
 
     private float corner;
 
-    public CornerImageView(Context context) {
+    public RoundedImageView(Context context) {
         super(context);
         init();
     }
 
-    public CornerImageView(Context context, AttributeSet attrs) {
+    public RoundedImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
-    public CornerImageView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public RoundedImageView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
     }
 
-    public CornerImageView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public RoundedImageView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         init();
     }
 
     private void init() {
+        if (isInEditMode()) {
+            return;
+        }
+
         path = new Path();
         bounds = new RectF();
     }
@@ -69,15 +73,15 @@ public class CornerImageView extends ImageView {
         return corner;
     }
 
-    public final static AnimUtils.FloatProperty<CornerImageView> CORNERS =
-            new AnimUtils.FloatProperty<CornerImageView>("corners") {
+    public final static AnimUtils.FloatProperty<RoundedImageView> CORNERS =
+            new AnimUtils.FloatProperty<RoundedImageView>("corners") {
         @Override
-        public void setValue(CornerImageView object, float value) {
+        public void setValue(RoundedImageView object, float value) {
             object.setCornerRadius(value);
         }
 
         @Override
-        public Float get(CornerImageView object) {
+        public Float get(RoundedImageView object) {
             return object.getCornerRadius();
         }
     };

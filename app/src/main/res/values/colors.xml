@@ -8,16 +8,12 @@
     <color name="secondary_text">#0273b1</color>
     <color name="icons">#FFFFFF</color>
     <color name="divider">#B6B6B6</color>
-    <color name="super_dark">#11261c</color>
+    <color name="super_dark">#8011261c</color>
     <color name="hint_text">#80FFFFFF</color>
     <color name="half_opacity_gray">#80888888</color>
     <color name="scrim">#323232</color>
     <color name="scrim_with_alpha">#99323232</color>
     <color name="dialog_background">#FFFFFF</color>
     <color name="dialog_text">#000000</color>
-    <color name="time">#00444C</color>
     <color name="toolbar">#ff333333</color>
-    <color name="muted_red">#D32F2F</color>
-    <color name="muted_green">#4CAF50</color>
-    <color name="muted_gray">#80455A64</color>
 </resources>

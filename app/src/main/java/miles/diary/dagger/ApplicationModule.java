@@ -10,8 +10,9 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import miles.diary.data.DataStore;
-import miles.diary.data.WeatherService;
+import miles.diary.util.DataStore;
+import miles.diary.data.api.WeatherService;
+import miles.diary.data.api.DataManager;
 
 /**
  * Created by mbpeele on 1/16/16.
@@ -49,5 +50,11 @@ public class ApplicationModule {
                 .addApi(Places.GEO_DATA_API)
                 .addApi(Places.PLACE_DETECTION_API)
                 .addApi(LocationServices.API);
+    }
+
+    @Provides
+    @Singleton
+    public DataManager getDataManager() {
+        return new DataManager(mApplication);
     }
 }

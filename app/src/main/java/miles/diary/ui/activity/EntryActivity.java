@@ -1,58 +1,49 @@
 package miles.diary.ui.activity;
 
-import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.graphics.Bitmap;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.support.v7.graphics.Palette;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
-import android.text.style.TypefaceSpan;
 import android.transition.ArcMotion;
 import android.transition.Transition;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
 
 import butterknife.Bind;
 import miles.diary.R;
 import miles.diary.data.model.Entry;
 import miles.diary.data.model.weather.WeatherResponse;
+import miles.diary.ui.PaletteWindows;
 import miles.diary.ui.TypefacerSpan;
-import miles.diary.ui.transition.CornerTransition;
+import miles.diary.ui.transition.RoundedImageViewTransition;
 import miles.diary.ui.transition.SimpleTransitionListener;
-import miles.diary.ui.widget.CornerImageView;
+import miles.diary.ui.widget.RoundedImageView;
 import miles.diary.ui.widget.TypefaceIconTextView;
 import miles.diary.ui.widget.TypefaceTextView;
 import miles.diary.util.AnimUtils;
-import miles.diary.util.ColorsUtils;
-import miles.diary.util.IntentUtils;
-import miles.diary.util.Logg;
 import miles.diary.util.TextUtils;
 import miles.diary.util.ViewUtils;
 
 /**
  * Created by mbpeele on 2/8/16.
  */
-public class EntryActivity extends TransitionActivity {
+public class EntryActivity extends TransitionActivity implements View.OnClickListener {
 
     public final static String DATA = "data";
     public static void newIntent(Context context, View view, Entry entry) {
@@ -64,20 +55,18 @@ public class EntryActivity extends TransitionActivity {
         context.startActivity(intent, options.toBundle());
     }
 
-    @Bind(R.id.activity_entry_menu_show)
-    FloatingActionButton menuFab;
     @Bind(R.id.activity_entry_back)
     ImageButton backButton;
     @Bind(R.id.activity_entry_body)
-    TypefaceTextView entryBody;
+    TypefaceTextView body;
     @Bind(R.id.activity_entry_image)
-    CornerImageView entryImage;
+    RoundedImageView image;
     @Bind(R.id.activity_entry_place)
-    TypefaceTextView entryPlace;
+    TypefaceTextView place;
     @Bind(R.id.activity_entry_date)
-    TypefaceTextView entryDate;
+    TypefaceTextView date;
     @Bind(R.id.activity_entry_weather)
-    TypefaceIconTextView entryWeather;
+    TypefaceIconTextView weather;
 
     private Entry entry;
 
@@ -86,11 +75,8 @@ public class EntryActivity extends TransitionActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_entry);
-        setupTransitions();
 
-        entry = realm.where(Entry.class)
-                .equalTo(Entry.KEY, getIntent().getStringExtra(DATA))
-                .findFirst();
+        entry = dataManager.getObject(Entry.class, getIntent().getStringExtra(DATA));
 
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,22 +85,22 @@ public class EntryActivity extends TransitionActivity {
             }
         });
 
-        ViewUtils.mutate(entryPlace, entryPlace.getCurrentTextColor());
-        ViewUtils.mutate(entryDate, entryPlace.getCurrentTextColor());
+        ViewUtils.mutate(place, place.getCurrentTextColor());
+        ViewUtils.mutate(date, place.getCurrentTextColor());
 
         SpannableString spannableString = new SpannableString(Entry.formatDiaryPrefaceText(entry));
         spannableString.setSpan(new RelativeSizeSpan(1.4f), 0, 12, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-        spannableString.setSpan(new TypefacerSpan(TextUtils.getFont(this, getString(R.string.light_italic))),
+        spannableString.setSpan(new TypefacerSpan(TextUtils.getFont(this, getString(R.string.default_font))),
                 12, spannableString.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-        entryBody.setText(spannableString, TextView.BufferType.SPANNABLE);
+        body.setText(spannableString, TextView.BufferType.SPANNABLE);
 
-        entryPlace.setText(entry.getPlaceName());
+        place.setText(entry.getPlaceName());
 
-        entryDate.setText(TextUtils.formatDate(entry.getDate()) + TextUtils.LINE_SEPERATOR +
+        date.setText(TextUtils.formatDate(entry.getDate()) + TextUtils.LINE_SEPERATOR +
                 TextUtils.formatTime(entry.getDate()));
 
         WeatherResponse weatherResponse = new Gson().fromJson(entry.getWeather(), WeatherResponse.class);
-        entryWeather.setText(weatherResponse.getOneLineTemperatureString());
+        weather.setText(weatherResponse.getOneLineTemperatureString());
 
         if (entry.getUri() != null) {
             postponeEnterTransition();
@@ -139,50 +125,11 @@ public class EntryActivity extends TransitionActivity {
                             Palette.from(resource)
                                     .maximumColorCount(3)
                                     .clearFilters()
-                                    .generate(new Palette.PaletteAsyncListener() {
-                                        @Override
-                                        public void onGenerated(Palette palette) {
-                                            boolean isDark;
-                                            @ColorsUtils.Lightness int lightness = ColorsUtils.isDark(palette);
-                                            if (lightness == ColorsUtils.LIGHTNESS_UNKNOWN) {
-                                                isDark = ColorsUtils.isDark(resource,
-                                                        resource.getWidth() / 2, 0);
-                                            } else {
-                                                isDark = lightness == ColorsUtils.IS_DARK;
-                                            }
-
-                                            int statusBarColor = getWindow().getStatusBarColor();
-                                            Palette.Swatch topColor = ColorsUtils.getMostPopulousSwatch(palette);
-                                            if (topColor != null &&
-                                                    (isDark || Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)) {
-                                                statusBarColor = ColorsUtils.scrimify(topColor.getRgb(),
-                                                        isDark, .075f);
-
-                                                if (!isDark && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                                    ViewUtils.setLightStatusBar(entryImage);
-                                                }
-                                            }
-
-                                            if (statusBarColor != getWindow().getStatusBarColor()) {
-                                                ValueAnimator statusBarColorAnim = ValueAnimator.ofArgb(getWindow
-                                                        ().getStatusBarColor(), statusBarColor);
-                                                statusBarColorAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                                                    @Override
-                                                    public void onAnimationUpdate(ValueAnimator animation) {
-                                                        getWindow().setStatusBarColor(
-                                                                (int) animation.getAnimatedValue());
-                                                    }
-                                                });
-                                                statusBarColorAnim.setDuration(1000);
-                                                statusBarColorAnim.setInterpolator(new FastOutSlowInInterpolator());
-                                                statusBarColorAnim.start();
-                                            }
-                                        }
-                                    });
+                                    .generate(new PaletteWindows(EntryActivity.this, resource));
                             return false;
                         }
                     })
-                    .into(entryImage);
+                    .into(image);
         }
     }
 
@@ -192,44 +139,51 @@ public class EntryActivity extends TransitionActivity {
     }
 
     @Override
-    void onEnter(ViewGroup root, Intent calledIntent, boolean hasSavedInstanceState) {
+    void onEnter(final ViewGroup root, Intent calledIntent, boolean hasSavedInstanceState) {
         ArcMotion arcMotion = new ArcMotion();
         arcMotion.setMinimumHorizontalAngle(50f);
         arcMotion.setMinimumVerticalAngle(50f);
 
-        CornerTransition reveal = new CornerTransition(
-                Math.max(entryImage.getWidth(), entryImage.getHeight()) / 2f, 0);
-        reveal.addTarget(entryImage);
+        final int duration = AnimUtils.shortAnim(this);
+
+        RoundedImageViewTransition reveal = new RoundedImageViewTransition(
+                Math.max(image.getWidth(), image.getHeight()) / 2f, 0);
+        reveal.addTarget(image);
         reveal.setPathMotion(arcMotion);
 
         reveal.addListener(new SimpleTransitionListener() {
             @Override
             public void onTransitionStart(Transition transition) {
-                super.onTransitionStart(transition);
-                backButton.setVisibility(View.GONE);
-                menuFab.setVisibility(View.GONE);
+                LinearLayout linearLayout = (LinearLayout) ((ViewGroup) root.getChildAt(1)).getChildAt(0);
+                final float offset = root.getHeight() / 4f;
+                for (int i = 0; i < linearLayout.getChildCount(); i++) {
+                    View v = linearLayout.getChildAt(i);
+
+                    v.setTranslationY(offset);
+                    v.setAlpha(0f);
+
+                    v.animate()
+                            .translationY(0f)
+                            .alpha(1f)
+                            .setDuration(duration)
+                            .setInterpolator(new DecelerateInterpolator())
+                            .setStartDelay(50 + 50 * i)
+                            .start();
+                }
             }
 
             @Override
             public void onTransitionEnd(Transition transition) {
-                super.onTransitionEnd(transition);
-                int duration = 150;
-
                 backButton.setVisibility(View.VISIBLE);
                 AnimUtils.pop(backButton, 0f, 1f)
-                        .setDuration(duration)
-                        .start();
-
-                menuFab.setVisibility(View.VISIBLE);
-                AnimUtils.pop(menuFab, 0f, 1f)
                         .setDuration(duration)
                         .start();
             }
         });
 
-        CornerTransition unreveal = new CornerTransition(
-                0, Math.min(entryImage.getWidth(), entryImage.getHeight()) / 2f);
-        unreveal.addTarget(entryImage);
+        RoundedImageViewTransition unreveal = new RoundedImageViewTransition(
+                0, Math.min(image.getWidth(), image.getHeight()) / 2f);
+        unreveal.addTarget(image);
         unreveal.setPathMotion(arcMotion);
 
         unreveal.addListener(new SimpleTransitionListener() {
@@ -237,13 +191,7 @@ public class EntryActivity extends TransitionActivity {
             public void onTransitionStart(Transition transition) {
                 super.onTransitionStart(transition);
 
-                int duration = 150;
-
                 AnimUtils.pop(backButton, 1f, 0f)
-                        .setDuration(duration)
-                        .start();
-
-                AnimUtils.pop(menuFab, 1f, 0f)
                         .setDuration(duration)
                         .start();
             }
@@ -257,35 +205,7 @@ public class EntryActivity extends TransitionActivity {
     void onExit(ViewGroup root) {
     }
 
-    private void setupTransitions() {
-//        PreDrawer.addPreDrawer(entryImage, new PreDrawer.OnPreDrawListener<CornerImageView>() {
-//            @Override
-//            public boolean onPreDraw(CornerImageView view) {
-////                CornerTransition reveal = new CornerTransition(
-////                        Math.max(view.getWidth(), view.getHeight()) / 2f, 0);
-////                reveal.addTarget(view);
-////
-////                CornerTransition unreveal = new CornerTransition(
-////                        0, Math.min(view.getWidth(), view.getHeight()) / 2f);
-////                unreveal.addTarget(view);
-////
-////                getWindow().setSharedElementEnterTransition(reveal);
-////                getWindow().setSharedElementReturnTransition(unreveal);
-//
-//                return true;
-//            }
-//        });
+    @Override
+    public void onClick(View v) {
     }
-
-//    @Override
-//    public void onClick(View v) {
-//        switch (v.getId()) {
-//            case R.id.activity_entry_fab_edit_entry:
-//                break;
-//            case R.id.activity_entry_fab_favorite_entry:
-//                break;
-//            case R.id.activity_entry_fab_delete_entry:
-//                break;
-//        }
-//    }
 }

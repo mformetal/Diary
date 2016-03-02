@@ -1,4 +1,4 @@
-package miles.diary.data;
+package miles.diary.data.api;
 
 import android.app.Application;
 
@@ -25,13 +25,11 @@ import rx.schedulers.Schedulers;
 public class WeatherService {
 
     private OkHttpClient client;
-    private Gson gson;
     private String baseUrl, apiKey;
     private Observable<WeatherResponse> weatherResponseObservable;
 
     public WeatherService(Application application) {
         client = new OkHttpClient();
-        gson = new Gson();
         apiKey = application.getResources().getString(R.string.weather_api_key);
         baseUrl = application.getResources().getString(R.string.weather_base);
     }
@@ -47,7 +45,7 @@ public class WeatherService {
                                 .build()).execute();
 
                         Reader reader = response.body().charStream();
-                        subscriber.onNext(gson.fromJson(reader, WeatherResponse.class));
+                        subscriber.onNext(new Gson().fromJson(reader, WeatherResponse.class));
                         subscriber.onCompleted();
                         reader.close();
                     } catch (IOException e) {

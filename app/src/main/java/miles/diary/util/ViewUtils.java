@@ -11,6 +11,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -115,5 +116,17 @@ public class ViewUtils {
 
     public static float dpToPx(final float dp) {
         return dp * Resources.getSystem().getDisplayMetrics().density;
+    }
+
+    public static void gone(ViewGroup viewGroup) {
+        for (int i = 0; i < viewGroup.getChildCount(); i++) {
+            viewGroup.getChildAt(i).setVisibility(View.GONE);
+        }
+    }
+
+    public static void visible(ViewGroup viewGroup) {
+        for (int i = 0; i < viewGroup.getChildCount(); i++) {
+            viewGroup.getChildAt(i).setVisibility(View.VISIBLE);
+        }
     }
 }

@@ -26,18 +26,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@null"
-                android:transitionName="@string/transition_location_image"
+                android:transitionName="@string/transition_image"
                 app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"
-                app:layout_collapseMode="parallax" />
+                app:layout_collapseMode="parallax"
+                tools:visibility="invisible" />
 
             <ImageButton
                 android:id="@+id/activity_entry_back"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_arrow_back_24dp"
-                android:visibility="gone"
+                android:visibility="invisible"
                 android:layout_margin="@dimen/fab_margin"
-                android:background="@null" />
+                android:background="@null"
+                tools:visibility="visible" />
 
         </android.support.design.widget.CollapsingToolbarLayout>
 
@@ -46,10 +48,12 @@
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:id="@+id/activity_entry_scroller"
         android:paddingTop="10dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" >
 
-        <LinearLayout
+        <RelativeLayout
+            android:id="@+id/activity_entry_scroller_child"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical" >
@@ -61,6 +65,7 @@
                 android:textColor="@color/secondary_text"
                 android:textSize="@dimen/medium_text_size"
                 android:maxLines="1"
+                android:layout_alignParentEnd="true"
                 android:layout_marginBottom="@dimen/adapter_entry_margin"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 android:layout_gravity="end"
@@ -74,6 +79,8 @@
                 android:drawableStart="@drawable/ic_place_24dp"
                 android:textSize="@dimen/medium_text_size"
                 android:textColor="@color/secondary_text"
+                android:layout_alignParentEnd="true"
+                android:layout_below="@id/activity_entry_weather"
                 android:layout_gravity="end"
                 android:layout_marginBottom="@dimen/adapter_entry_margin"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
@@ -89,6 +96,8 @@
                 android:textSize="@dimen/medium_text_size"
                 android:textColor="@color/secondary_text"
                 android:maxLines="2"
+                android:layout_alignParentEnd="true"
+                android:layout_below="@id/activity_entry_place"
                 android:layout_marginBottom="@dimen/adapter_entry_margin"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 android:gravity="end"
@@ -96,8 +105,42 @@
                 app:textViewAutoFit="true"
                 tools:text="10:59AM" />
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@id/activity_entry_place"
+                android:orientation="horizontal" >
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/activity_entry_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/fab_margin"
+                    android:src="@drawable/ic_mode_edit_24dp"
+                    app:fabSize="mini" />
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/activity_entry_favorite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/fab_margin"
+                    android:src="@drawable/ic_star_outline_24dp"
+                    app:fabSize="mini" />
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/activity_entry_delete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/fab_margin"
+                    android:src="@drawable/ic_delete_24dp"
+                    app:fabSize="mini" />
+
+            </LinearLayout>
+
             <miles.diary.ui.widget.TypefaceTextView
                 android:id="@+id/activity_entry_body"
+                android:layout_below="@id/activity_entry_date"
                 android:textSize="@dimen/subtitle_text_size"
                 android:layout_marginStart="@dimen/activity_horizontal_margin"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
@@ -107,7 +150,7 @@
                 android:gravity="start|top"
                 tools:text="BODY" />
 
-        </LinearLayout>
+        </RelativeLayout>
 
     </android.support.v4.widget.NestedScrollView>
 

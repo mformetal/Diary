@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -9,64 +9,64 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
+    <miles.diary.ui.widget.TypefaceTextView
+        android:id="@+id/adapter_entry_image_time"
+        android:gravity="start"
+        android:layout_alignParentStart="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/small_text_size"
+        android:maxLines="1"
+        tools:text="MOUNTAIN BIKING" />
+
+    <miles.diary.ui.widget.TypefaceIconTextView
+        android:id="@+id/adapter_entry_image_temperature"
+        android:gravity="center"
+        android:layout_alignParentEnd="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/small_text_size"
+        android:textColor="@color/secondary_text"
+        android:maxLines="1"
+        app:textViewAutoFit="true"
+        tools:text="MOUNTAIN BIKING" />
+
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/adapter_entry_image_view"
         android:layout_width="@dimen/adapter_image_dimens"
         android:layout_height="@dimen/adapter_image_dimens"
+        android:layout_marginTop="@dimen/adapter_entry_margin"
+        android:layout_marginBottom="@dimen/adapter_entry_margin"
         android:layout_gravity="center_horizontal"
-        android:transitionName="@string/transition_location_image"
+        android:transitionName="@string/transition_image"
+        android:layout_below="@id/adapter_entry_image_time"
+        tools:text="MOUNTAIN BIKING" />
+
+    <miles.diary.ui.widget.TypefaceTextView
+        android:id="@+id/adapter_entry_image_location"
+        android:gravity="center"
+        android:drawableStart="@drawable/ic_place_24dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/small_text_size"
+        android:textColor="@color/accent"
+        android:maxLines="1"
+        android:layout_below="@id/adapter_entry_image_view"
         tools:text="MOUNTAIN BIKING" />
 
     <miles.diary.ui.widget.TypefaceTextView
         android:id="@+id/adapter_entry_image_body"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:maxLines="1"
         android:ellipsize="end"
-        android:layout_marginTop="@dimen/adapter_entry_margin"
-        android:layout_marginBottom="@dimen/adapter_entry_margin"
+        android:layout_marginStart="@dimen/adapter_entry_margin"
+        android:paddingTop="@dimen/adapter_entry_margin"
+        android:paddingBottom="@dimen/adapter_entry_margin"
         android:textSize="@dimen/medium_text_size"
+        android:gravity="center_vertical"
+        android:layout_toEndOf="@id/adapter_entry_image_view"
+        android:layout_below="@id/adapter_entry_image_time"
+        android:layout_above="@id/adapter_entry_image_location"
         tools:text="MOUNTAIN BIKING" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal" >
-
-        <miles.diary.ui.widget.TypefaceTextView
-            android:id="@+id/adapter_entry_image_time"
-            android:gravity="start"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/small_text_size"
-            android:maxLines="1"
-            tools:text="MOUNTAIN BIKING" />
-
-        <miles.diary.ui.widget.TypefaceIconTextView
-            android:id="@+id/adapter_entry_image_temperature"
-            android:gravity="center"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/small_text_size"
-            android:textColor="@color/secondary_text"
-            android:maxLines="1"
-            app:textViewAutoFit="true"
-            tools:text="MOUNTAIN BIKING" />
-
-        <miles.diary.ui.widget.TypefaceTextView
-            android:id="@+id/adapter_entry_image_location"
-            android:gravity="center"
-            android:drawableStart="@drawable/ic_place_24dp"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/small_text_size"
-            android:textColor="@color/accent"
-            android:maxLines="1"
-            tools:text="MOUNTAIN BIKING" />
-
-    </LinearLayout>
-
-</LinearLayout>
+</RelativeLayout>

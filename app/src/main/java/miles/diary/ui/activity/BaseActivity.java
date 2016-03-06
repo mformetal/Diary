@@ -13,12 +13,11 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
-import icepick.Icepick;
 import miles.diary.DiaryApplication;
 import miles.diary.R;
 import miles.diary.util.DataStore;
 import miles.diary.data.api.WeatherService;
-import miles.diary.data.api.DataManager;
+import miles.diary.data.api.db.DataManager;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
 
@@ -43,8 +42,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         dataManager.init();
 
         compositeSubscription = new CompositeSubscription();
-
-        Icepick.restoreInstanceState(this, savedInstanceState);
     }
 
     @Override
@@ -60,12 +57,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         dataManager.close();
         compositeSubscription.unsubscribe();
         ButterKnife.unbind(this);
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        Icepick.saveInstanceState(this, outState);
     }
 
     public void addSubscription(Subscription subscription) {

@@ -20,7 +20,7 @@ import miles.diary.ui.activity.BaseActivity;
 public abstract class BaseAdapter<VH extends RecyclerView.ViewHolder>
         extends RecyclerView.Adapter<VH> {
 
-    protected List<RealmObject> data;
+    protected final List<RealmObject> data;
     protected final BaseActivity host;
     protected final LayoutInflater layoutInflater;
 
@@ -32,15 +32,19 @@ public abstract class BaseAdapter<VH extends RecyclerView.ViewHolder>
 
     @Override
     public int getItemCount() {
-        return data != null ? data.size() : 0;
+        return data.size();
     }
 
     public abstract RealmObject getItem(int position);
 
+    public boolean isEmpty() {
+        return data.size() <= 0;
+    }
+
     public <T extends RealmObject> boolean addData(T object) {
         boolean addition = data.add(object);
         if (addition) {
-            notifyItemInserted(data.size());
+            notifyDataSetChanged();
         }
 
         return addition;
@@ -56,4 +60,25 @@ public abstract class BaseAdapter<VH extends RecyclerView.ViewHolder>
     }
 
     public List<RealmObject> getData() { return data; }
+
+    public void removeData(int position) {
+        data.remove(position);
+    }
+
+    public boolean removeData(RealmObject realmObject) {
+        boolean removal =  data.remove(realmObject);
+        if (removal) {
+            notifyDataSetChanged();
+        }
+
+        return removal;
+    }
+
+    public boolean validateData(RealmObject realmObject) {
+        return realmObject.isValid();
+    }
+
+    public void clear() {
+        data.clear();
+    }
 }

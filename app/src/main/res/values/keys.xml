@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="twitter_key">BPDFCX6EhkhnpvNoypu1H9oRz</string>
-    <string name="twitter_secret">n4NeidmOFJG6gOQG0rA9LLgKMcEyNxXxOkyk5IZAHY8Mw2vlfz</string>
     <string name="google_api_key">AIzaSyAzjwPsLDflM1T11lTbcywrcRe8jPPV-GI</string>
+    <string name="google_web_api_key">AIzaSyBTf81soR_ONXCXCuqYu8syWU8XY1xy7xM</string>
     <string name="weather_api_key">563fe128bf5473f8f078e9dd1196d6bb</string>
 </resources>

@@ -15,10 +15,11 @@ import miles.diary.util.TextUtils;
  */
 public class Entry extends RealmObject {
 
-    public final static String KEY = "body";
+    public final static String KEY = "dateMillis";
 
-    @PrimaryKey private String body;
     @Required private Date date;
+    @PrimaryKey private long dateMillis;
+    @Required private String body;
     private String uri;
     private String placeName;
     private String placeId;
@@ -32,7 +33,9 @@ public class Entry extends RealmObject {
               String placeId, String temperature) {
         super();
         setBody(body);
-        setDate(new Date());
+        Date date = new Date();
+        setDate(date);
+        setDateMillis(date.getTime());
         if (uri != null) {
             setUri(uri.toString());
         }
@@ -89,10 +92,30 @@ public class Entry extends RealmObject {
         this.date = date;
     }
 
+    public long getDateMillis() {
+        return dateMillis;
+    }
+
+    public void setDateMillis(long dateMillis) {
+        this.dateMillis = dateMillis;
+    }
+
     public static String formatDiaryPrefaceText(Entry entry) {
         return "Dear Diary, " +
                 TextUtils.repeat(2, TextUtils.LINE_SEPERATOR) +
                 TextUtils.repeat(5, TextUtils.TAB) +
                 entry.getBody();
+    }
+
+    public static Entry update(Entry entry, String body, Uri uri, String placeName,
+                               String placeId, String temperature) {
+        entry.setBody(body);
+        entry.setPlaceId(placeId);
+        entry.setPlaceName(placeName);
+        entry.setWeather(temperature);
+        if (uri != null) {
+            entry.setUri(uri.toString());
+        }
+        return entry;
     }
 }

@@ -6,6 +6,8 @@ import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.util.Property;
 import android.view.View;
@@ -15,6 +17,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.request.animation.ViewPropertyAnimation;
+
+import java.lang.ref.SoftReference;
 
 import miles.diary.ui.PreDrawer;
 
@@ -56,7 +60,6 @@ public class AnimUtils {
 
     public static ObjectAnimator gone(final View view) {
         ObjectAnimator alpha = ObjectAnimator.ofFloat(view, View.ALPHA, 1f, 0f);
-        alpha.setDuration(shortAnim(view.getContext()));
         alpha.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
@@ -68,7 +71,6 @@ public class AnimUtils {
 
     public static ObjectAnimator visible(final View view) {
         ObjectAnimator alpha = ObjectAnimator.ofFloat(view, View.ALPHA, 0f, 1f);
-        alpha.setDuration(shortAnim(view.getContext()));
         alpha.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
@@ -80,7 +82,6 @@ public class AnimUtils {
 
     public static ObjectAnimator invisible(final View view) {
         ObjectAnimator alpha = ObjectAnimator.ofFloat(view, View.ALPHA, 1f, 0f);
-        alpha.setDuration(shortAnim(view.getContext()));
         alpha.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
@@ -92,7 +93,6 @@ public class AnimUtils {
 
     public static ObjectAnimator alpha(final View view, float... alphas) {
         ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(view, View.ALPHA, alphas);
-        objectAnimator.setDuration(mediumAnim(view.getContext()));
         objectAnimator.setInterpolator(new DecelerateInterpolator());
         return objectAnimator;
     }
@@ -130,32 +130,56 @@ public class AnimUtils {
         ObjectAnimator scale = ObjectAnimator.ofPropertyValuesHolder(view,
                 PropertyValuesHolder.ofFloat(View.SCALE_X, scales),
                 PropertyValuesHolder.ofFloat(View.SCALE_Y, scales));
-        scale.setDuration(mediumAnim(view.getContext()));
         scale.setInterpolator(new FastOutSlowInInterpolator());
         return scale;
     }
 
-    public static ValueAnimator colorfilter(final ImageView imageView, int... colors) {
+    public static ValueAnimator colorFilter(final ImageView imageView, int... colors) {
+        final SoftReference<ImageView> softReference = new SoftReference<ImageView>(imageView);
         ValueAnimator color = ValueAnimator.ofArgb(colors);
-        color.setDuration(AnimUtils.mediumAnim(imageView.getContext()));
         color.setInterpolator(new DecelerateInterpolator());
         color.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                imageView.setColorFilter((int) animation.getAnimatedValue());
+                ImageView imageView1 = softReference.get();
+                if (imageView1 != null) {
+                    imageView1.setColorFilter((int) animation.getAnimatedValue());
+                }
+            }
+        });
+        return color;
+    }
+
+    public static ValueAnimator colorFilter(final Drawable drawable, int... colors) {
+        final SoftReference<Drawable> softReference = new SoftReference<Drawable>(drawable);
+        drawable.mutate();
+        ValueAnimator color = ValueAnimator.ofArgb(colors);
+        color.setDuration(400);
+        color.setInterpolator(new DecelerateInterpolator());
+        color.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                Drawable drawable1 = softReference.get();
+                if (drawable1 != null) {
+                    drawable1.setColorFilter((int) animation.getAnimatedValue(), PorterDuff.Mode.SRC_IN);
+                }
             }
         });
         return color;
     }
 
     public static ValueAnimator background(final View view, int... colors) {
+        final SoftReference<View> softReference = new SoftReference<View>(view);
         ValueAnimator color = ValueAnimator.ofArgb(colors);
         color.setDuration(AnimUtils.mediumAnim(view.getContext()));
         color.setInterpolator(new DecelerateInterpolator());
         color.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                view.setBackgroundColor((int) animation.getAnimatedValue());
+                View view = softReference.get();
+                if (view != null) {
+                    view.setBackgroundColor((int) animation.getAnimatedValue());
+                }
             }
         });
         return color;

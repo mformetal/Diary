@@ -35,7 +35,7 @@
         app:layout_anchorGravity="center" />
 
     <ViewStub
-        android:id="@+id/activity_home_no_entries"
+        android:id="@+id/activity_home_stub"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="?android:attr/actionBarSize"

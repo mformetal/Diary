@@ -1,9 +1,9 @@
-package miles.diary.data.api;
+package miles.diary.data.api.db;
 
 /**
  * Created by mbpeele on 3/2/16.
  */
-public interface LoadingListener {
+public interface DataLoadingListener {
 
     void onLoadEmpty();
 

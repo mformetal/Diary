@@ -11,8 +11,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.graphics.Palette;
-import android.transition.ArcMotion;
-import android.transition.Transition;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
@@ -27,20 +25,14 @@ import java.io.IOException;
 
 import butterknife.Bind;
 import butterknife.OnClick;
-import icepick.State;
 import miles.diary.R;
 import miles.diary.ui.PaletteWindows;
-import miles.diary.ui.PreDrawer;
-import miles.diary.ui.ResizeAnimation;
-import miles.diary.ui.transition.RoundedImageViewTransition;
-import miles.diary.ui.transition.SimpleTransitionListener;
 import miles.diary.ui.widget.RoundedImageView;
 import miles.diary.ui.widget.TypefaceButton;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.FileUtils;
 import miles.diary.util.IntentUtils;
 import miles.diary.util.Logg;
-import miles.diary.util.ViewUtils;
 
 /**
  * Created by mbpeele on 1/29/16.
@@ -62,8 +54,6 @@ public class UriActivity extends BaseActivity implements View.OnClickListener{
 
     private File mFile;
     private Uri uri;
-
-    @State
     boolean uriChanged;
 
     @Override
@@ -79,6 +69,7 @@ public class UriActivity extends BaseActivity implements View.OnClickListener{
                 ActivityCompat.requestPermissions(this, camera, REQUESET_IMAGE_PERMISSION);
             }
         } else {
+            buttonRow.setEnabled(false);
             Snackbar.make(root, R.string.activity_entry_no_camera_error,
                     Snackbar.LENGTH_INDEFINITE).setAction(android.R.string.ok, new View.OnClickListener() {
                 @Override
@@ -209,7 +200,7 @@ public class UriActivity extends BaseActivity implements View.OnClickListener{
                             Palette.from(resource)
                                     .maximumColorCount(3)
                                     .clearFilters()
-                                    .generate(new PaletteWindows(UriActivity.this, resource));
+                                    .generate(new PaletteWindows(UriActivity.this, resource, null));
                             return false;
                         }
                     })

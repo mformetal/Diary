@@ -41,7 +41,7 @@
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/activity_new_entry_photo"
             android:src="@drawable/ic_photo_24dp"
-            android:transitionName="@string/transition_location_image"
+            android:transitionName="@string/transition_image"
             android:layout_width="@dimen/fab_normal_dimens"
             android:layout_height="@dimen/fab_normal_dimens"
             android:layout_margin="@dimen/small_fab_margin"
@@ -51,14 +51,15 @@
             android:id="@+id/activity_new_entry_temperature"
             android:layout_width="@dimen/fab_normal_dimens"
             android:layout_height="@dimen/fab_normal_dimens"
+            android:textColor="@color/accent"
             android:gravity="center"
             android:background="@drawable/fab_normal_background"
             android:layout_centerInParent="true" />
 
-        <de.hdodenhof.circleimageview.CircleImageView
+        <ImageView
             android:id="@+id/activity_new_entry_location"
             android:src="@drawable/ic_place_24dp"
-            android:transitionName="@string/transition_location_image"
+            android:transitionName="@string/transition_image"
             android:layout_width="@dimen/fab_normal_dimens"
             android:layout_height="@dimen/fab_normal_dimens"
             android:layout_margin="@dimen/small_fab_margin"

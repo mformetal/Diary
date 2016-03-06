@@ -4,22 +4,22 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import miles.diary.data.api.LoadingListener;
+import miles.diary.data.api.db.DataLoadingListener;
 import rx.Subscriber;
 
 /**
  * Created by mbpeele on 3/2/16.
  */
-public abstract class LoadingSubscriber<T> extends Subscriber<T> implements LoadingListener {
+public abstract class LoadingSubscriber<T> extends Subscriber<T> implements DataLoadingListener {
 
-    private List<LoadingListener> loadingListeners;
+    private List<DataLoadingListener> loadingListeners;
 
-    public LoadingSubscriber(LoadingListener listener) {
+    public LoadingSubscriber(DataLoadingListener listener) {
         loadingListeners = new ArrayList<>();
         loadingListeners.add(listener);
     }
 
-    public LoadingSubscriber(LoadingListener... listeners) {
+    public LoadingSubscriber(DataLoadingListener... listeners) {
         loadingListeners = new ArrayList<>();
         Collections.addAll(loadingListeners, listeners);
     }
@@ -46,21 +46,21 @@ public abstract class LoadingSubscriber<T> extends Subscriber<T> implements Load
 
     @Override
     public void onLoadComplete() {
-        for (LoadingListener listener: loadingListeners) {
+        for (DataLoadingListener listener: loadingListeners) {
             listener.onLoadComplete();
         }
     }
 
     @Override
     public void onLoadStart() {
-        for (LoadingListener listener: loadingListeners) {
+        for (DataLoadingListener listener: loadingListeners) {
             listener.onLoadStart();
         }
     }
 
     @Override
     public void onLoadError(Throwable throwable) {
-        for (LoadingListener listener: loadingListeners) {
+        for (DataLoadingListener listener: loadingListeners) {
             listener.onLoadError(throwable);
         }
     }

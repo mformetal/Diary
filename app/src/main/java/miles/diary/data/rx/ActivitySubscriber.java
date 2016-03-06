@@ -2,7 +2,7 @@ package miles.diary.data.rx;
 
 import java.lang.ref.SoftReference;
 
-import miles.diary.data.api.LoadingListener;
+import miles.diary.data.api.db.DataLoadingListener;
 import miles.diary.ui.activity.BaseActivity;
 import miles.diary.util.Logg;
 import rx.Subscriber;
@@ -45,7 +45,7 @@ public abstract class ActivitySubscriber<T> extends Subscriber<T> {
 
         BaseActivity activity = softReference.get();
         if (isListening && activity != null) {
-            ((LoadingListener) activity).onLoadComplete();
+            ((DataLoadingListener) activity).onLoadComplete();
         }
     }
 
@@ -55,10 +55,10 @@ public abstract class ActivitySubscriber<T> extends Subscriber<T> {
 
         BaseActivity activity = softReference.get();
         if (isListening && activity != null) {
-            ((LoadingListener) activity).onLoadError(e);
+            ((DataLoadingListener) activity).onLoadError(e);
         } else if (activity != null) {
             e.printStackTrace();
-            Logg.log("ERROR FROM:", activity.getClass().getName());
+            Logg.log(e, "ERROR FROM:", activity.getClass().getName());
         }
     }
 
@@ -66,7 +66,7 @@ public abstract class ActivitySubscriber<T> extends Subscriber<T> {
     public void onStart() {
         BaseActivity activity = softReference.get();
         if (isListening && activity != null) {
-            ((LoadingListener) activity).onLoadStart();
+            ((DataLoadingListener) activity).onLoadStart();
         }
     }
 
@@ -75,5 +75,9 @@ public abstract class ActivitySubscriber<T> extends Subscriber<T> {
         if (activity != null) {
             activity.removeSubscription(this);
         }
+    }
+
+    public BaseActivity getSubscribedActivity() {
+        return softReference.get();
     }
 }

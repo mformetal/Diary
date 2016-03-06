@@ -35,12 +35,6 @@
         </activity>
 
         <activity
-            android:name=".ui.activity.WeatherActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.DialogActivity" >
-        </activity>
-
-        <activity
             android:name=".ui.activity.UriActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustPan"

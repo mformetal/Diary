@@ -1,5 +1,7 @@
 package miles.diary.data.adapter;
 
+import android.app.ActivityOptions;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +16,7 @@ import miles.diary.data.model.Entry;
 import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.ui.activity.BaseActivity;
 import miles.diary.ui.activity.EntryActivity;
+import miles.diary.ui.activity.HomeActivity;
 import miles.diary.ui.widget.TypefaceIconTextView;
 import miles.diary.ui.widget.TypefaceTextView;
 import miles.diary.util.AnimUtils;
@@ -60,10 +63,12 @@ public class EntryAdapter extends BaseAdapter<RecyclerView.ViewHolder> {
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
         final Entry entry = getItem(position);
 
-        if (holder instanceof TextViewHolder) {
-            ((TextViewHolder) holder).bind(entry);
-        } else if (holder instanceof ImageViewHolder) {
-            ((ImageViewHolder) holder).bind(entry);
+        if (entry != null) {
+            if (holder instanceof TextViewHolder) {
+                ((TextViewHolder) holder).bind(entry);
+            } else if (holder instanceof ImageViewHolder) {
+                ((ImageViewHolder) holder).bind(entry);
+            }
         }
     }
 
@@ -84,13 +89,15 @@ public class EntryAdapter extends BaseAdapter<RecyclerView.ViewHolder> {
         }
 
         @Override
-        public void bind(Entry entry) {
-            body.setOnClickListener(new View.OnClickListener() {
+        public void bind(final Entry entry) {
+            ((View) body.getParent()).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    Intent intent = EntryActivity.newIntent(host, entry);
+                    host.startActivityForResult(intent, HomeActivity.RESULT_CODE_ENTRY);
                 }
             });
+
             body.setText(entry.getBody());
             time.setText(TextUtils.formatDate(entry.getDate()));
 
@@ -103,6 +110,8 @@ public class EntryAdapter extends BaseAdapter<RecyclerView.ViewHolder> {
             String placeName = entry.getPlaceName();
             if (placeName != null) {
                 location.setText(entry.getPlaceName());
+            } else {
+                location.setVisibility(View.GONE);
             }
         }
     }
@@ -124,7 +133,11 @@ public class EntryAdapter extends BaseAdapter<RecyclerView.ViewHolder> {
             image.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    EntryActivity.newIntent(host, image, entry);
+                    Intent intent = EntryActivity.newIntent(host, entry);
+                    ActivityOptions options =
+                            ActivityOptions.makeSceneTransitionAnimation(host, image,
+                                    host.getString(R.string.transition_image));
+                    host.startActivityForResult(intent, HomeActivity.RESULT_CODE_ENTRY, options.toBundle());
                 }
             });
             time.setText(TextUtils.formatDate(entry.getDate()));
@@ -139,6 +152,8 @@ public class EntryAdapter extends BaseAdapter<RecyclerView.ViewHolder> {
             String placeName = entry.getPlaceName();
             if (placeName != null) {
                 location.setText(placeName);
+            } else {
+                location.setVisibility(View.GONE);
             }
 
             Glide.with(host)

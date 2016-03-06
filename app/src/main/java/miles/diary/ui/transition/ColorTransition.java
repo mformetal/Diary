@@ -83,14 +83,7 @@ public class ColorTransition extends Transition {
             int start = (Integer) startValues.values.get(PROPNAME_COLOR);
             int end = (Integer) endValues.values.get(PROPNAME_COLOR);
             if (start != end) {
-                ValueAnimator colorFilter = ValueAnimator.ofArgb(start, end);
-                colorFilter.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animation) {
-                        imageView.setColorFilter((int) animation.getAnimatedValue());
-                    }
-                });
-                return colorFilter;
+                return AnimUtils.colorFilter(imageView, start, end);
             }
         } else {
             int start = (Integer) startValues.values.get(PROPNAME_COLOR);

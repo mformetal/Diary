@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="weather_base">http://api.openweathermap.org/</string>
+    <string name="maps_url">https://maps.googleapis.com/</string>
+
+</resources>

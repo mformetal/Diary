@@ -1,9 +1,6 @@
-package miles.diary.data.api;
+package miles.diary.data.api.db;
 
 import android.app.Application;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
 
 import com.google.common.collect.Lists;
 
@@ -12,8 +9,10 @@ import java.util.List;
 import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
+import miles.diary.data.error.NoInternetException;
 import miles.diary.data.model.Entry;
-import miles.diary.ui.activity.NewEntryActivity;
+import miles.diary.data.rx.DataObservable;
+import miles.diary.data.rx.DataTransaction;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -60,24 +59,37 @@ public class DataManager implements DataManagerInterface {
     }
 
     @Override
-    public <T extends RealmObject> T getObject(Class<T> tClass, String key) {
+    public <T extends RealmObject> Observable<T> getObject(Class<T> tClass, long key) {
         return realm.where(tClass)
                 .equalTo(Entry.KEY, key)
-                .findFirst();
+                .findFirst()
+                .asObservable();
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <T extends RealmObject> T uploadObject(RealmObject realmObject) {
+    public <T extends RealmObject> Observable<T> uploadObject(T object) {
         if (hasConnection()) {
-            realm.beginTransaction();
-            realm.copyToRealm(realmObject);
-            realm.commitTransaction();
-            realm.refresh();
-
-            return (T) realmObject;
+            return DataObservable.upload(object, realm);
         } else {
-            return null;
+            return Observable.error(new NoInternetException());
+        }
+    }
+
+    @Override
+    public <T extends RealmObject> Observable<T> deleteObject(T object) {
+        if (hasConnection()) {
+            return DataObservable.delete(object, realm);
+        } else {
+            return Observable.error(new NoInternetException());
+        }
+    }
+
+    @Override
+    public <T extends RealmObject> Observable<T> updateObject(DataTransaction<T> transaction) {
+        if (hasConnection()) {
+            return DataObservable.update(transaction, realm);
+        } else {
+            return Observable.error(new NoInternetException());
         }
     }
 

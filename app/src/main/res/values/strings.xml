@@ -8,6 +8,7 @@
 
     <string name="activity_location_text_hint">Type place or click above</string>
     <string name="activity_location_no_input">Choose a place first!</string>
+    <string name="activity_location_not_enabled">Enable Location!</string>
 
     <string name="activity_entry_no_text_error">Your Entry must not be empty</string>
     <string name="activity_entry_title_hint">Entry Title</string>
@@ -20,9 +21,5 @@
     <string name="menu_entry_done">Add Entry</string>
 
     <string name="menu_home_new_entry">New Entry</string>
-
-    <string name="transition_location_image">image</string>
-
-    <string name="weather_base">http://api.openweathermap.org/</string>
 
 </resources>

@@ -4,9 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.graphics.Color;
-import android.location.Address;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,13 +16,11 @@ import android.support.v4.content.ContextCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.gson.Gson;
 
 import java.util.List;
@@ -32,27 +28,29 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
-import icepick.State;
 import miles.diary.R;
+import miles.diary.data.api.LocationService;
+import miles.diary.data.model.Entry;
+import miles.diary.data.model.google.LikelyPlace;
+import miles.diary.data.model.google.apiresponse.PlaceResponse;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.ui.widget.TypefaceEditText;
 import miles.diary.ui.widget.TypefaceIconTextView;
 import miles.diary.util.AnimUtils;
-import miles.diary.data.api.GoogleService;
-import miles.diary.util.IntentUtils;
+import miles.diary.data.api.google.GoogleService;
 import miles.diary.util.Logg;
+import miles.diary.util.ViewUtils;
 import rx.Observable;
 import rx.functions.Func1;
 
-public class NewEntryActivity extends BaseActivity implements View.OnClickListener,
-        GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
+public class NewEntryActivity extends BaseActivity implements View.OnClickListener {
 
     @Bind(R.id.activity_new_entry_root) CoordinatorLayout root;
     @Bind(R.id.fragment_entry_toolbar) Toolbar toolbar;
     @Bind(R.id.activity_new_entry_body) TypefaceEditText bodyInput;
     @Bind(R.id.activity_new_entry_photo) CircleImageView photo;
-    @Bind(R.id.activity_new_entry_location) CircleImageView location;
+    @Bind(R.id.activity_new_entry_location) ImageView location;
     @Bind(R.id.activity_new_entry_temperature) TypefaceIconTextView weatherText;
 
     public static final String BODY = "body";
@@ -60,18 +58,16 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     public static final String PLACE_NAME = "place";
     public static final String PLACE_ID = "placeId";
     public static final String TEMPERATURE = "temperature";
-    public static final String ADDRESS = "address";
     private final static int REQUEST_LOCATION = 1;
     private final static int REQUEST_IMAGE = 2;
     private final static int REQUEST_LOCATION_PERMISSION = 3;
 
-    @State String placeName;
-    @State String placeId;
-    @State String temperature;
-    @State Uri imageUri;
-    @State String address;
+    String placeName;
+    String placeId;
+    String temperature;
+    Uri imageUri;
     private WeatherResponse weather;
-    private GoogleApiClient googleApiClient;
+    private GoogleService googleService;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -80,14 +76,27 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
 
         setActionBar(toolbar);
 
-        googleApiClient = googleApiClientBuilder
-                .enableAutoManage(this, 0, this)
-                .addConnectionCallbacks(this)
-                .build();
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
+        if (bundle != null) {
+            dataManager.getObject(Entry.class, bundle.getLong(EntryActivity.INTENT_KEY))
+                    .subscribe(new ActivitySubscriber<Entry>(this) {
+                        @Override
+                        public void onNext(Entry entry) {
+                            updateViews(entry);
+                        }
+                    });
+        }
 
-        int color = ContextCompat.getColor(this, R.color.accent);
-        photo.setColorFilter(color);
-        location.setColorFilter(color);
+        ViewUtils.mutate(location, ContextCompat.getColor(this, R.color.accent));
+
+        googleService = new GoogleService(this, googleApiClientBuilder,
+                new GoogleService.GoogleServiceCallback() {
+                    @Override
+                    public void onConnected(Bundle bundle, GoogleApiClient client, Activity activity) {
+                        getLocationData();
+                    }
+                });
     }
 
     @Override
@@ -104,7 +113,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                 if (resultCode == RESULT_OK) {
                     imageUri = data.getData();
 
-                    loadThumbnailFromUri();
+                    loadThumbnailFromUri(imageUri);
                 }
                 break;
             default:
@@ -129,9 +138,11 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                     result.putExtra(NewEntryActivity.URI, imageUri);
                     result.putExtra(NewEntryActivity.PLACE_NAME, placeName);
                     result.putExtra(NewEntryActivity.PLACE_ID, placeId);
-                    result.putExtra(NewEntryActivity.TEMPERATURE,
-                            new Gson().toJson(weather, WeatherResponse.class));
-                    setResult(Activity.RESULT_OK, result);
+                    if (weather != null) {
+                        result.putExtra(NewEntryActivity.TEMPERATURE,
+                                new Gson().toJson(weather, WeatherResponse.class));
+                    }
+                    setResult(RESULT_OK, result);
                     finishAfterTransition();
                 } else {
                     Snackbar.make(root, R.string.activity_entry_no_text_error,
@@ -143,8 +154,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     }
 
     @Override
-    @OnClick({R.id.activity_new_entry_photo, R.id.activity_new_entry_location,
-                R.id.activity_new_entry_temperature})
+    @OnClick({R.id.activity_new_entry_photo, R.id.activity_new_entry_location})
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.activity_new_entry_photo:
@@ -156,7 +166,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                 } else {
                     ActivityOptions transitionActivityOptions =
                             ActivityOptions.makeSceneTransitionAnimation(this, photo,
-                                    getString(R.string.transition_location_image));
+                                    getString(R.string.transition_image));
                     startActivityForResult(intent, REQUEST_IMAGE, transitionActivityOptions.toBundle());
                 }
                 break;
@@ -167,16 +177,8 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                     intent1.putExtra(NewEntryActivity.PLACE_ID, placeId);
                     ActivityOptions transitionActivityOptions =
                             ActivityOptions.makeSceneTransitionAnimation(this, location,
-                                    getString(R.string.transition_location_image));
+                                    getString(R.string.transition_image));
                     startActivityForResult(intent1, REQUEST_LOCATION, transitionActivityOptions.toBundle());
-                }
-                break;
-            case R.id.activity_new_entry_temperature:
-                if (temperature != null) {
-                    Intent intent2 = new Intent(this, WeatherActivity.class);
-                    intent2.putExtra(NewEntryActivity.TEMPERATURE, temperature);
-                    intent2.putExtra(NewEntryActivity.ADDRESS, address);
-                    startActivity(intent2);
                 }
                 break;
         }
@@ -187,9 +189,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
         switch (requestCode) {
             case REQUEST_LOCATION_PERMISSION:
                 if (permissionsGranted(grantResults)) {
-                    getWeather();
-
-                    getPlace();
+                    getLocationData();
                 } else {
                     finish();
                 }
@@ -199,91 +199,69 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
         }
     }
 
-    @Override
-    public void onConnected(Bundle bundle) {
-        String[] permissions = new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACCESS_FINE_LOCATION};
-        if (hasPermissions(permissions)) {
-            if (hasConnection()) {
-                GoogleService.getLocation(googleApiClient)
-                        .subscribe(new ActivitySubscriber<Location>(this) {
-                            @Override
-                            public void onNext(Location location) {
-                                if (location != null) {
-                                    getWeather();
-
-                                    getPlace();
-                                }
-                            }
-                        });
-            } else {
-                noInternet();
+    private void updateViews(Entry entry) {
+        if (entry != null) {
+            String stringUri = entry.getUri();
+            if (stringUri != null) {
+                loadThumbnailFromUri(stringUri);
+                imageUri = Uri.parse(stringUri);
             }
-        } else {
-            ActivityCompat.requestPermissions(this, permissions, REQUEST_LOCATION_PERMISSION);
+
+            bodyInput.setText(entry.getBody());
+
+            String string = entry.getUri();
+            if (string != null) {
+                loadThumbnailFromUri(string);
+            }
+
+            String entryWeather = entry.getWeather();
+            if (entryWeather != null) {
+                weather = new Gson().fromJson(entryWeather, WeatherResponse.class);
+                temperature = weather.getTwoLineTemperatureString();
+                AnimUtils.textScale(weatherText,
+                        weather.getTwoLineTemperatureString(), .2f, 1f).start();
+            }
+
+            placeName = entry.getPlaceName();
+            placeId = entry.getPlaceId();
+            if (entry.getPlaceName() != null) {
+                location.setColorFilter(Color.WHITE);
+            }
         }
     }
 
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        if (connectionResult.hasResolution()) {
-            try {
-                connectionResult.startResolutionForResult(this, IntentUtils.GOOGLE_API_CLIENT_FAILED_CODE);
-            } catch (IntentSender.SendIntentException e) {
-                e.printStackTrace();
-            }
-        } else {
-            Logg.log("CONNECTION FAILED WITH CODE: " + connectionResult.getErrorCode());
-        }
-    }
-
-    private void getPlace() {
+    private void getPlace(Location location1) {
         if (placeName == null && placeId == null) {
-            GoogleService.getCurrentPlace(googleApiClient, null)
-                    .subscribe(new ActivitySubscriber<PlaceLikelihoodBuffer>(this) {
+            googleService.searchNearby(location1, 10)
+                    .subscribe(new ActivitySubscriber<PlaceResponse>(this) {
                         @Override
-                        public void onNext(PlaceLikelihoodBuffer placeLikelihoods) {
-                            Place mostLikely = placeLikelihoods.get(0).getPlace();
+                        public void onNext(PlaceResponse placeResponse) {
+                            PlaceResponse.Result result = placeResponse.getResults().get(0);
 
-                            placeId = mostLikely.getId();
-                            placeName = mostLikely.getName().toString();
+                            placeName = result.getName();
+                            placeId = result.getId();
 
-                            AnimUtils.colorfilter(location,
-                                    ContextCompat.getColor(NewEntryActivity.this, R.color.accent),
-                                    Color.WHITE)
-                                    .start();
-
-                            placeLikelihoods.release();
+                            Activity activity = getSubscribedActivity();
+                            if (activity != null) {
+                                AnimUtils.colorFilter(location,
+                                        ContextCompat.getColor(activity, R.color.accent),
+                                        Color.WHITE)
+                                        .start();
+                            }
                         }
                     });
         } else {
-            location.setColorFilter(Color.WHITE);
+            AnimUtils.colorFilter(location,
+                    ContextCompat.getColor(NewEntryActivity.this, R.color.accent),
+                    Color.WHITE)
+                    .start();
         }
     }
 
-    private void getWeather() {
+    private void getWeather(Location location) {
         if (temperature == null) {
-            GoogleService.getLocation(googleApiClient)
-                    .flatMap(new Func1<Location, Observable<List<Address>>>() {
-                        @Override
-                        public Observable<List<Address>> call(Location location) {
-                            return GoogleService.getAddress(NewEntryActivity.this, location);
-                        }
-                    })
-                    .flatMap(new Func1<List<Address>, Observable<WeatherResponse>>() {
-                        @Override
-                        public Observable<WeatherResponse> call(List<Address> addresses) {
-                            Address address1 = addresses.get(0);
-                            address = address1.getLocality();
-                            return weatherService.getWeather(address1.getLatitude(),
-                                    address1.getLongitude());
-                        }
-                    })
+            weatherService.getWeather(location.getLatitude(),
+                    location.getLongitude())
                     .subscribe(new ActivitySubscriber<WeatherResponse>(this) {
                         @Override
                         public void onNext(WeatherResponse weatherResponse) {
@@ -294,20 +272,64 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                             AnimUtils.textScale(weatherText, temperature, .2f, 1f).start();
                         }
                     });
-        } else {
-            weatherText.setText(temperature);
         }
     }
 
-    private void loadThumbnailFromUri() {
-        if (imageUri != null) {
+    private void loadThumbnailFromUri(Uri uri) {
+        if (uri != null) {
             photo.clearColorFilter();
             Glide.with(this)
                     .fromUri()
                     .animate(R.anim.glide_pop)
-                    .load(imageUri)
+                    .load(uri)
                     .centerCrop()
                     .into(photo);
+        }
+    }
+
+    private void loadThumbnailFromUri(String uri) {
+        if (uri != null) {
+            photo.clearColorFilter();
+            Glide.with(this)
+                    .fromString()
+                    .animate(R.anim.glide_pop)
+                    .load(uri)
+                    .centerCrop()
+                    .into(photo);
+        }
+    }
+
+    private void getLocationData() {
+        String[] permissions = new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION};
+        if (hasPermissions(permissions)) {
+            if (hasConnection()) {
+                if (LocationService.isLocationEnabled(this)) {
+                    googleService.getLocation()
+                            .subscribe(new ActivitySubscriber<Location>(this) {
+                                @Override
+                                public void onNext(Location location) {
+                                    getWeather(location);
+                                    getPlace(location);
+                                }
+                            });
+                } else {
+                    Snackbar.make(root,
+                            R.string.activity_location_not_enabled,
+                            Snackbar.LENGTH_LONG)
+                            .setAction(android.R.string.ok, new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                                }
+                            })
+                            .show();
+                }
+            } else {
+                noInternet();
+            }
+        } else {
+            ActivityCompat.requestPermissions(this, permissions, REQUEST_LOCATION_PERMISSION);
         }
     }
 }

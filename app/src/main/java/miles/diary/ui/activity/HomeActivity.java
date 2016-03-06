@@ -2,7 +2,6 @@ package miles.diary.ui.activity;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.animation.PropertyValuesHolder;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,20 +23,21 @@ import butterknife.Bind;
 import miles.diary.R;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.data.adapter.EntryAdapter;
-import miles.diary.data.api.LoadingListener;
+import miles.diary.data.api.db.DataLoadingListener;
 import miles.diary.data.model.Entry;
 import miles.diary.ui.RecylerDividerDecoration;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.Logg;
 
-public class HomeActivity extends TransitionActivity implements LoadingListener {
+public class HomeActivity extends TransitionActivity implements DataLoadingListener {
 
     @Bind(R.id.activity_home_recycler) RecyclerView recyclerView;
     @Bind(R.id.activity_home_toolbar) Toolbar toolbar;
     @Bind(R.id.activity_home_loading) ProgressBar progressBar;
     @Bind(R.id.activity_home_fab) FloatingActionButton fab;
 
-    private final static int RESULT_CODE_ENTRY = 1;
+    private final static int RESULT_CODE_NEW_ENTRY = 1;
+    public final static int RESULT_CODE_ENTRY = 2;
 
     private EntryAdapter entryAdapter;
     private View emptyView;
@@ -53,11 +53,9 @@ public class HomeActivity extends TransitionActivity implements LoadingListener 
                 .subscribe(new ActivitySubscriber<List<Entry>>(this, true) {
                     @Override
                     public void onNext(List<Entry> entries) {
+                        entryAdapter.addData(entries);
                         if (entries.isEmpty()) {
                             onLoadEmpty();
-                        } else {
-                            entryAdapter.addData(entries);
-                            onLoadComplete();
                         }
                     }
                 });
@@ -72,7 +70,7 @@ public class HomeActivity extends TransitionActivity implements LoadingListener 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startNewEntryActivity(v);
+                startNewEntryActivity();
             }
         });
     }
@@ -106,26 +104,52 @@ public class HomeActivity extends TransitionActivity implements LoadingListener 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
-            case RESULT_CODE_ENTRY:
+            case RESULT_CODE_NEW_ENTRY:
                 if (resultCode == RESULT_OK) {
                     Bundle bundle = data.getExtras();
-                    String body = bundle.getString(NewEntryActivity.BODY);
-                    Uri uri = bundle.getParcelable(NewEntryActivity.URI);
-                    String placeName = bundle.getString(NewEntryActivity.PLACE_NAME);
-                    String placeId = bundle.getString(NewEntryActivity.PLACE_ID);
-                    String weather = bundle.getString(NewEntryActivity.TEMPERATURE);
+                    final String body = bundle.getString(NewEntryActivity.BODY);
+                    final Uri uri = bundle.getParcelable(NewEntryActivity.URI);
+                    final String placeName = bundle.getString(NewEntryActivity.PLACE_NAME);
+                    final String placeId = bundle.getString(NewEntryActivity.PLACE_ID);
+                    final String weather = bundle.getString(NewEntryActivity.TEMPERATURE);
 
-                    Entry entry = new Entry(body, uri, placeName, placeId, weather);
-
-                    dataManager.uploadObject(entry);
-
-                    entryAdapter.addData(entry);
+                    dataManager.uploadObject(new Entry(body, uri, placeName, placeId, weather))
+                            .subscribe(new ActivitySubscriber<Entry>(this) {
+                                @Override
+                                public void onNext(Entry entry) {
+                                    entryAdapter.addData(entry);
+                                }
+                            });
 
                     if (emptyView != null) {
-                        root.removeView(emptyView);
+                        emptyView.setVisibility(View.GONE);
                     }
                 }
                 break;
+            case RESULT_CODE_ENTRY:
+                if (data != null) {
+                    Bundle bundle = data.getExtras();
+                    EntryActivity.Action action = (EntryActivity.Action)
+                            bundle.getSerializable(EntryActivity.INTENT_KEY);
+                    if (action != null) {
+                        switch (action) {
+                            case EDIT:
+                                Logg.log("EDIT");
+                                break;
+                            case DELETE:
+                                Logg.log("DELETE");
+                                break;
+                            case FAVORITE:
+                                Logg.log("FAVORITE");
+                                break;
+                            default:
+                                Logg.log("DEFAULT");
+                        }
+                    }
+                }
+                break;
+            default:
+                super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
@@ -142,18 +166,20 @@ public class HomeActivity extends TransitionActivity implements LoadingListener 
 
     @Override
     public void onLoadEmpty() {
-        if (emptyView == null) {
-            dismissLoading();
+        dismissLoading();
 
-            ViewStub viewStub = (ViewStub) findViewById(R.id.activity_home_no_entries);
-            emptyView = viewStub.inflate();
-            emptyView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    startNewEntryActivity(v);
-                }
-            });
+        if (emptyView == null) {
+            emptyView = ((ViewStub) findViewById(R.id.activity_home_stub)).inflate();
+        } else {
+            emptyView.setVisibility(View.VISIBLE);
         }
+
+        emptyView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startNewEntryActivity();
+            }
+        });
     }
 
     @Override
@@ -161,36 +187,36 @@ public class HomeActivity extends TransitionActivity implements LoadingListener 
         showLoading();
     }
 
-    private void startNewEntryActivity(View v) {
-        Intent intent = new Intent(v.getContext(), NewEntryActivity.class);
-        startActivityForResult(intent, RESULT_CODE_ENTRY);
+    private void startNewEntryActivity() {
+        Intent intent = new Intent(this, NewEntryActivity.class);
+        startActivityForResult(intent, RESULT_CODE_NEW_ENTRY);
     }
 
     private void dismissLoading() {
-        ObjectAnimator scale = ObjectAnimator.ofPropertyValuesHolder(progressBar,
-                PropertyValuesHolder.ofFloat(View.SCALE_X, 0f),
-                PropertyValuesHolder.ofFloat(View.SCALE_Y, 0f));
-        scale.setDuration(AnimUtils.longAnim(this));
-        scale.setInterpolator(new AnticipateOvershootInterpolator());
+        if (progressBar.getVisibility() != View.GONE) {
+            ObjectAnimator scale = AnimUtils.pop(fab, 0f);
+            scale.setDuration(AnimUtils.longAnim(this));
+            scale.setInterpolator(new AnticipateOvershootInterpolator());
 
-        ObjectAnimator gone = AnimUtils.gone(progressBar).setDuration(AnimUtils.longAnim(this));
+            ObjectAnimator gone = AnimUtils.gone(progressBar).setDuration(AnimUtils.longAnim(this));
 
-        AnimatorSet animatorSet = new AnimatorSet();
-        animatorSet.playTogether(scale, gone);
-        animatorSet.start();
+            AnimatorSet animatorSet = new AnimatorSet();
+            animatorSet.playTogether(scale, gone);
+            animatorSet.start();
+        }
     }
 
     private void showLoading() {
-        ObjectAnimator scale = ObjectAnimator.ofPropertyValuesHolder(progressBar,
-                PropertyValuesHolder.ofFloat(View.SCALE_X, 1f),
-                PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f));
-        scale.setDuration(AnimUtils.longAnim(this));
-        scale.setInterpolator(new AnticipateOvershootInterpolator());
+        if (progressBar.getVisibility() != View.VISIBLE) {
+            ObjectAnimator scale = AnimUtils.pop(fab, 1f);
+            scale.setDuration(AnimUtils.longAnim(this));
+            scale.setInterpolator(new AnticipateOvershootInterpolator());
 
-        ObjectAnimator gone = AnimUtils.visible(progressBar).setDuration(AnimUtils.longAnim(this));
+            ObjectAnimator gone = AnimUtils.visible(progressBar).setDuration(AnimUtils.longAnim(this));
 
-        AnimatorSet animatorSet = new AnimatorSet();
-        animatorSet.playTogether(scale, gone);
-        animatorSet.start();
+            AnimatorSet animatorSet = new AnimatorSet();
+            animatorSet.playTogether(scale, gone);
+            animatorSet.start();
+        }
     }
 }

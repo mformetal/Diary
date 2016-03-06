@@ -8,6 +8,6 @@
         android:height="@dimen/fab_normal_dimens" />
 
     <solid
-        android:color="@color/accent" />
+        android:color="@color/icons" />
 
 </shape>

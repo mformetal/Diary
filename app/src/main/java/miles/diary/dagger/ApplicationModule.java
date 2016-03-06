@@ -12,7 +12,7 @@ import dagger.Module;
 import dagger.Provides;
 import miles.diary.util.DataStore;
 import miles.diary.data.api.WeatherService;
-import miles.diary.data.api.DataManager;
+import miles.diary.data.api.db.DataManager;
 
 /**
  * Created by mbpeele on 1/16/16.

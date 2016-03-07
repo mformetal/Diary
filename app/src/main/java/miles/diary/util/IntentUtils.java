@@ -7,4 +7,5 @@ public class IntentUtils {
 
     public final static String IMAGE = "image/*";
     public final static int GOOGLE_API_CLIENT_FAILED_CODE = 5;
+
 }

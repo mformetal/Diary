@@ -3,19 +3,26 @@ package miles.diary.ui;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.support.v7.graphics.Palette;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
+import android.widget.Toolbar;
 
 import java.lang.ref.SoftReference;
 
 import miles.diary.R;
 import miles.diary.util.ColorsUtils;
+import miles.diary.util.Logg;
 import miles.diary.util.ViewUtils;
 
 /**
@@ -25,12 +32,10 @@ public class PaletteWindows implements Palette.PaletteAsyncListener {
 
     private final SoftReference<Activity> softReference;
     private final Bitmap resource;
-    private View[] overlappingViews;
 
-    public PaletteWindows(Activity activity, Bitmap bitmap, View... overlap) {
+    public PaletteWindows(Activity activity, Bitmap bitmap) {
         softReference = new SoftReference<Activity>(activity);
         resource = bitmap;
-        overlappingViews = overlap;
     }
 
     @Override
@@ -41,26 +46,9 @@ public class PaletteWindows implements Palette.PaletteAsyncListener {
             boolean isDark;
             @ColorsUtils.Lightness int lightness = ColorsUtils.isDark(palette);
             if (lightness == ColorsUtils.LIGHTNESS_UNKNOWN) {
-                isDark = ColorsUtils.isDark(resource,
-                        resource.getWidth() / 2, 0);
+                isDark = ColorsUtils.isDark(resource, resource.getWidth() / 2, 0);
             } else {
                 isDark = lightness == ColorsUtils.IS_DARK;
-            }
-
-            if (!isDark) { // make back icon dark on light images
-                if (overlappingViews != null) {
-                    int dark = ContextCompat.getColor(
-                            activity, R.color.dark_icons);
-                    for (View view: overlappingViews) {
-                        if (view instanceof ImageView) {
-                            ((ImageView) view).setColorFilter(dark);
-                        } else if (view.getBackground() instanceof ColorDrawable) {
-                            ((ColorDrawable) view.getBackground()).setColor(dark);
-                        } else {
-                            view.setBackgroundColor(dark);
-                        }
-                    }
-                }
             }
 
             int statusBarColor = window.getStatusBarColor();

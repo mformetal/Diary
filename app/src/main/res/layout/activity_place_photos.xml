@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activity_place_photos_root"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/activity_place_photos_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <miles.diary.ui.widget.TypefaceTextView
+        android:id="@+id/activity_place_name_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="@dimen/logo_text_size"
+        android:layout_margin="@dimen/activity_vertical_margin"
+        android:maxLines="1"
+        app:layout_anchor="@id/activity_place_photos_root"
+        app:layout_anchorGravity="bottom"
+        app:textViewAutoFit="true"
+        app:layout_behavior="miles.diary.ui.SnackbarBehavior"
+        tools:text="PLACE NAME" />
+
+</android.support.design.widget.CoordinatorLayout>

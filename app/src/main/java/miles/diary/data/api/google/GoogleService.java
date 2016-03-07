@@ -2,8 +2,6 @@ package miles.diary.data.api.google;
 
 import android.app.Activity;
 import android.content.IntentSender;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -12,18 +10,26 @@ import android.support.annotation.NonNull;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.PlaceFilter;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
+import com.google.android.gms.location.places.PlacePhotoMetadata;
+import com.google.android.gms.location.places.PlacePhotoMetadataBuffer;
+import com.google.android.gms.location.places.PlacePhotoMetadataResult;
+import com.google.android.gms.location.places.PlacePhotoResult;
 import com.google.android.gms.location.places.Places;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import miles.diary.R;
 import miles.diary.data.api.LocationService;
 import miles.diary.data.model.google.LikelyPlace;
+import miles.diary.data.model.google.PlaceInfo;
 import miles.diary.data.model.google.PlaceResponse;
 import miles.diary.data.rx.GoogleResultObservable;
+import miles.diary.ui.activity.BaseActivity;
 import miles.diary.util.IntentUtils;
 import miles.diary.util.Logg;
 import miles.diary.util.SimpleLocationListener;
@@ -43,11 +49,11 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
     GoogleApiClient.OnConnectionFailedListener {
 
     private final GoogleApiClient client;
-    private final Activity activity;
+    private final BaseActivity activity;
     private GoogleServiceCallback callback;
     private MapsAPI mapsService;
 
-    public GoogleService(final Activity activity1, GoogleApiClient.Builder builder,
+    public GoogleService(final BaseActivity activity1, GoogleApiClient.Builder builder,
                          GoogleServiceCallback googleServiceCallback) {
         activity = activity1;
 
@@ -60,17 +66,16 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
         callback = googleServiceCallback;
     }
 
+    public void cleanup() {
+        client.disconnect();
+    }
+
     public Observable<PlaceResponse> searchNearby(Location location, float radius) {
         if (mapsService == null) {
-//            HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-//            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-//            OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
-
             Retrofit builder = new Retrofit.Builder()
                     .baseUrl(activity.getString(R.string.maps_url))
                     .addConverterFactory(GsonConverterFactory.create())
                     .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-//                    .client(client)
                     .build();
 
             mapsService = builder.create(MapsAPI.class);
@@ -126,14 +131,39 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
         });
     }
 
-    public Observable<List<Address>> getAddressFromLocation(Location location) {
-        try {
-            return Observable.just(new Geocoder(activity).getFromLocation(location.getLatitude(), location.getLongitude(), 1))
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
-        } catch (IOException e) {
-            return Observable.empty();
-        }
+    public Observable<PlacePhotoMetadataResult> getPlacePhotos(final String placeId) {
+        final String test = "ChIJrTLr-GyuEmsRBfy61i59si0";
+        return Observable.create(new GoogleResultObservable<>(
+                Places.GeoDataApi.getPlacePhotos(client, placeId)))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Observable<PlacePhotoResult> getPlacePhoto(PlacePhotoMetadata metadata) {
+        return Observable.create(new GoogleResultObservable<PlacePhotoResult>(metadata.getPhoto(client)))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Observable<PlacePhotoResult> getScaledPhoto(PlacePhotoMetadata metadata, int w, int h) {
+        return Observable.create(new GoogleResultObservable<PlacePhotoResult>(metadata.getScaledPhoto(client, w, h)))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Observable<PlaceInfo> getPlaceById(final String placeId) {
+        return Observable.create(new GoogleResultObservable<>(Places.GeoDataApi.getPlaceById(client, placeId)))
+                .map(new Func1<PlaceBuffer, PlaceInfo>() {
+                    @Override
+                    public PlaceInfo call(PlaceBuffer places) {
+                        Place place = places.get(0);
+                        PlaceInfo info = new PlaceInfo(place);
+                        places.release();
+                        return info;
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     private boolean checkActivity() {
@@ -171,6 +201,6 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
 
     public interface GoogleServiceCallback {
 
-        void onConnected(Bundle bundle, GoogleApiClient client, Activity activity);
+        void onConnected(Bundle bundle, GoogleApiClient client, BaseActivity activity);
     }
 }

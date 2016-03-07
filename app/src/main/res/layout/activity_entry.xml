@@ -19,6 +19,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:contentScrim="?attr/colorPrimary"
+            android:clipChildren="false"
+            android:clipToPadding="false"
             app:layout_scrollFlags="scroll|exitUntilCollapsed" >
 
             <miles.diary.ui.widget.SquareRoundedImageView
@@ -35,7 +37,8 @@
                 android:id="@+id/activity_entry_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?android:attr/actionBarSize"
-                app:layout_scrollFlags="scroll|enterAlways" />
+                app:layout_scrollFlags="scroll|enterAlways"
+                style="@style/AppTheme.EntryActivity.Toolbar" />
 
         </android.support.design.widget.CollapsingToolbarLayout>
 
@@ -44,15 +47,21 @@
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="@dimen/activity_vertical_margin"
         android:id="@+id/activity_entry_scroller"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" >
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/activity_entry_scroller_child"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical" >
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/activity_entry_place_photos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_place_24dp"
+                android:layout_margin="@dimen/fab_margin" />
 
             <miles.diary.ui.widget.TypefaceIconTextView
                 android:id="@+id/activity_entry_weather"
@@ -63,7 +72,7 @@
                 android:maxLines="1"
                 android:layout_marginBottom="@dimen/adapter_entry_margin"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
-                android:layout_gravity="end"
+                android:layout_alignParentEnd="true"
                 app:textViewAutoFit="true"
                 tools:text="Icon Weather" />
 
@@ -74,9 +83,10 @@
                 android:drawableStart="@drawable/ic_place_24dp"
                 android:textSize="@dimen/medium_text_size"
                 android:textColor="@color/secondary_text"
-                android:layout_gravity="end"
                 android:layout_marginBottom="@dimen/adapter_entry_margin"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_alignParentEnd="true"
+                android:layout_below="@id/activity_entry_weather"
                 android:maxLines="1"
                 app:textViewAutoFit="true"
                 tools:text="Swem Library" />
@@ -91,8 +101,8 @@
                 android:maxLines="2"
                 android:layout_marginBottom="@dimen/adapter_entry_margin"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
-                android:gravity="end"
-                android:layout_gravity="end"
+                android:layout_alignParentEnd="true"
+                android:layout_below="@id/activity_entry_place"
                 app:textViewAutoFit="true"
                 tools:text="10:59AM" />
 
@@ -105,9 +115,10 @@
                 android:layout_height="match_parent"
                 android:textColor="@color/dialog_text"
                 android:gravity="start|top"
+                android:layout_below="@id/activity_entry_date"
                 tools:text="BODY" />
 
-        </LinearLayout>
+        </RelativeLayout>
 
     </android.support.v4.widget.NestedScrollView>
 

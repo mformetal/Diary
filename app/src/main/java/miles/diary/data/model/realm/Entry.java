@@ -1,10 +1,9 @@
-package miles.diary.data.model;
+package miles.diary.data.model.realm;
 
 import android.net.Uri;
 
 import java.util.Date;
 
-import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;

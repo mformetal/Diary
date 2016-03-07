@@ -22,7 +22,7 @@ import miles.diary.util.AnimUtils;
 /**
  * Created by mbpeele on 3/6/16.
  */
-public class DialogToFabTransition extends ChangeBounds {
+public class ContainerFabTransition extends ChangeBounds {
 
     private static final String PROPERTY_COLOR = "plaid:rectMorph:color";
     private static final String PROPERTY_CORNER_RADIUS = "plaid:rectMorph:cornerRadius";
@@ -33,12 +33,12 @@ public class DialogToFabTransition extends ChangeBounds {
 
     private @ColorInt int endColor = Color.TRANSPARENT;
 
-    public DialogToFabTransition(@ColorInt int endColor) {
+    public ContainerFabTransition(@ColorInt int endColor) {
         super();
         setEndColor(endColor);
     }
 
-    public DialogToFabTransition(Context context, AttributeSet attrs) {
+    public ContainerFabTransition(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
@@ -104,15 +104,7 @@ public class DialogToFabTransition extends ChangeBounds {
         if (endValues.view instanceof ViewGroup) {
             ViewGroup vg = (ViewGroup) endValues.view;
             for (int i = 0; i < vg.getChildCount(); i++) {
-                View v = vg.getChildAt(i);
-                v.animate()
-                        .alpha(0f)
-                        .translationY(v.getHeight() / 3)
-                        .setStartDelay(0L)
-                        .setDuration(50L)
-                        .setInterpolator(AnimationUtils.loadInterpolator(vg.getContext(),
-                                android.R.interpolator.fast_out_linear_in))
-                        .start();
+                AnimUtils.gone(vg.getChildAt(i)).start();
             }
         }
 

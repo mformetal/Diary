@@ -6,6 +6,8 @@
 
     <string name="no_internet">No internet connection found.</string>
 
+    <string name="activity_place_photos_empty">No Photos Found :(</string>
+
     <string name="activity_location_text_hint">Type place or click above</string>
     <string name="activity_location_no_input">Choose a place first!</string>
     <string name="activity_location_not_enabled">Enable Location!</string>

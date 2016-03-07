@@ -6,7 +6,11 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.transition.Transition;
+import android.util.Pair;
+import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 
@@ -100,5 +104,23 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
 
         return true;
+    }
+
+    public Pair<View, String> getNavigationBarSharedElement() {
+        return new Pair<>(getNavigationBarView(), Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME);
+    }
+
+    public Pair<View, String> getStatusBarSharedElement() {
+        return new Pair<>(getStatusBarView(), Window.STATUS_BAR_BACKGROUND_TRANSITION_NAME);
+    }
+
+    public View getNavigationBarView() {
+        View decor = getWindow().getDecorView();
+        return decor.findViewById(android.R.id.navigationBarBackground);
+    }
+
+    public View getStatusBarView() {
+        View decor = getWindow().getDecorView();
+        return decor.findViewById(android.R.id.statusBarBackground);
     }
 }

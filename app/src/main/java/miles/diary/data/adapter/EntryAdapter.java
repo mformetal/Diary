@@ -3,6 +3,7 @@ package miles.diary.data.adapter;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -12,7 +13,7 @@ import com.google.gson.Gson;
 
 import butterknife.Bind;
 import miles.diary.R;
-import miles.diary.data.model.Entry;
+import miles.diary.data.model.realm.Entry;
 import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.ui.activity.BaseActivity;
 import miles.diary.ui.activity.EntryActivity;
@@ -25,7 +26,7 @@ import miles.diary.util.TextUtils;
 /**
  * Created by mbpeele on 1/14/16.
  */
-public class EntryAdapter extends BaseAdapter<RecyclerView.ViewHolder> {
+public class EntryAdapter extends BaseRealmAdapter<RecyclerView.ViewHolder> {
 
     private static final int TYPE_IMAGE = 0;
     private static final int TYPE_TEXT = 1;
@@ -135,8 +136,10 @@ public class EntryAdapter extends BaseAdapter<RecyclerView.ViewHolder> {
                 public void onClick(View v) {
                     Intent intent = EntryActivity.newIntent(host, entry);
                     ActivityOptions options =
-                            ActivityOptions.makeSceneTransitionAnimation(host, image,
-                                    host.getString(R.string.transition_location_image));
+                            ActivityOptions.makeSceneTransitionAnimation(host,
+                                    host.getNavigationBarSharedElement(),
+                                    host.getStatusBarSharedElement(),
+                                    Pair.create((View) image, host.getString(R.string.transition_entry_image)));
                     host.startActivityForResult(intent, HomeActivity.RESULT_CODE_ENTRY, options.toBundle());
                 }
             });

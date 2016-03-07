@@ -5,26 +5,22 @@ import android.view.LayoutInflater;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 
-import io.realm.Realm;
 import io.realm.RealmObject;
-import io.realm.RealmResults;
-import miles.diary.data.model.Entry;
 import miles.diary.ui.activity.BaseActivity;
 
 /**
  * Created by mbpeele on 2/3/16.
  */
-public abstract class BaseAdapter<VH extends RecyclerView.ViewHolder>
+public abstract class BaseRealmAdapter<VH extends RecyclerView.ViewHolder>
         extends RecyclerView.Adapter<VH> {
 
     protected final List<RealmObject> data;
     protected final BaseActivity host;
     protected final LayoutInflater layoutInflater;
 
-    public BaseAdapter(BaseActivity activity) {
+    public BaseRealmAdapter(BaseActivity activity) {
         host = activity;
         layoutInflater = LayoutInflater.from(activity);
         data = new ArrayList<>();

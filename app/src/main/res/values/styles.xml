@@ -15,6 +15,7 @@
         <item name="icon">@color/icons</item>
         <item name="android:windowActivityTransitions">true</item>
         <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
 
     <style name="AppTheme.Home" parent="AppTheme" >
@@ -53,6 +54,10 @@
         <item name="android:background">@color/toolbar</item>
         <item name="android:theme">@android:style/ThemeOverlay.Material.Dark</item>
         <item name="android:elevation">6dp</item>
+    </style>
+
+    <style name="AppTheme.EntryActivity.Toolbar" parent="AppTheme.Widget.Toolbar">
+        <item name="android:background">@color/scrim_with_alpha</item>
     </style>
 
     <style name="AppTheme.ColoredButton" parent="AppTheme.Widget">

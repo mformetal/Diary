@@ -82,7 +82,7 @@ public class LocationActivity extends BaseActivity implements View.OnClickListen
 
                 googleService = new GoogleService(this, googleApiClientBuilder, new GoogleService.GoogleServiceCallback() {
                     @Override
-                    public void onConnected(Bundle bundle, GoogleApiClient client, Activity activity) {
+                    public void onConnected(Bundle bundle, GoogleApiClient client, BaseActivity activity) {
                         autoCompleteAdapter = new AutoCompleteAdapter(activity,
                                 R.layout.autocomplete_adapter, client, null, null);
                         autoCompleteTextView.setAdapter(autoCompleteAdapter);
@@ -106,6 +106,8 @@ public class LocationActivity extends BaseActivity implements View.OnClickListen
             ActivityCompat.requestPermissions(this, permissions, REQUEST_LOCATION_PERMISSION);
         }
     }
+
+
 
     @Override
     public void onBackPressed() {

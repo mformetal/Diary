@@ -9,7 +9,6 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -28,7 +27,7 @@ import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 import miles.diary.R;
 import miles.diary.data.api.LocationService;
-import miles.diary.data.model.Entry;
+import miles.diary.data.model.realm.Entry;
 import miles.diary.data.model.google.PlaceResponse;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.data.model.weather.WeatherResponse;
@@ -37,6 +36,7 @@ import miles.diary.ui.widget.TypefaceEditText;
 import miles.diary.ui.widget.TypefaceIconTextView;
 import miles.diary.util.AnimUtils;
 import miles.diary.data.api.google.GoogleService;
+import miles.diary.util.Logg;
 import miles.diary.util.ViewUtils;
 
 public class NewEntryActivity extends BaseActivity implements View.OnClickListener {
@@ -91,10 +91,16 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
         googleService = new GoogleService(this, googleApiClientBuilder,
                 new GoogleService.GoogleServiceCallback() {
                     @Override
-                    public void onConnected(Bundle bundle, GoogleApiClient client, Activity activity) {
+                    public void onConnected(Bundle bundle, GoogleApiClient client, BaseActivity activity) {
                         getLocationData();
                     }
                 });
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        googleService.cleanup();
     }
 
     @Override
@@ -230,14 +236,17 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
 
     private void getPlace(Location location1) {
         if (placeName == null && placeId == null) {
-            googleService.searchNearby(location1, 10)
+            googleService.searchNearby(location1, 5)
                     .subscribe(new ActivitySubscriber<PlaceResponse>(this) {
                         @Override
                         public void onNext(PlaceResponse placeResponse) {
                             PlaceResponse.Result result = placeResponse.getResults().get(0);
-
                             placeName = result.getName();
                             placeId = result.getId();
+
+                            Logg.log("END NEARBY SEARCH", placeName);
+
+                            Logg.log(placeName);
 
                             Activity activity = getSubscribedActivity();
                             if (activity != null) {
@@ -246,6 +255,12 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                                         Color.WHITE)
                                         .start();
                             }
+                        }
+
+                        @Override
+                        public void onStart() {
+                            super.onStart();
+                            Logg.log("START NEARBY SEARCH");
                         }
                     });
         } else {

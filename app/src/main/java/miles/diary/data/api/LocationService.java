@@ -23,8 +23,7 @@ public class LocationService {
 
     @SuppressWarnings({"ResourceType"})
     public static Location getLocation(Context context) {
-        LocationManager locationManager =
-                (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        LocationManager locationManager = getLocationManager(context);
 
         String gpsProvider = LocationManager.GPS_PROVIDER;
         String networkProvider = LocationManager.NETWORK_PROVIDER;
@@ -42,8 +41,7 @@ public class LocationService {
 
     @SuppressWarnings({"ResourceType"})
     public static void getLocationUpdates(Context context, LocationListener locationListener) {
-        LocationManager locationManager =
-                (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        LocationManager locationManager = getLocationManager(context);
 
         String gpsProvider = LocationManager.GPS_PROVIDER;
         String networkProvider = LocationManager.NETWORK_PROVIDER;

@@ -7,12 +7,14 @@ import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.ColorInt;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.transition.ChangeBounds;
 import android.transition.TransitionValues;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
+import android.view.animation.Interpolator;
 
 import miles.diary.R;
 import miles.diary.ui.drawable.MorphDrawable;
@@ -21,7 +23,7 @@ import miles.diary.util.AnimUtils;
 /**
  * Created by mbpeele on 3/6/16.
  */
-public class FabToDialogTransition extends ChangeBounds {
+public class FabContainerTransition extends ChangeBounds {
 
     private static final String PROPERTY_COLOR = "plaid:circleMorph:color";
     private static final String PROPERTY_CORNER_RADIUS = "plaid:circleMorph:cornerRadius";
@@ -34,13 +36,13 @@ public class FabToDialogTransition extends ChangeBounds {
     int startColor = Color.TRANSPARENT;
     private int endCornerRadius;
 
-    public FabToDialogTransition(@ColorInt int startColor, int endCornerRadius) {
+    public FabContainerTransition(@ColorInt int startColor, int endCornerRadius) {
         super();
         setStartColor(startColor);
         setEndCornerRadius(endCornerRadius);
     }
 
-    public FabToDialogTransition(Context context, AttributeSet attrs) {
+    public FabContainerTransition(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
@@ -109,19 +111,17 @@ public class FabToDialogTransition extends ChangeBounds {
         // ease in the dialog's child views (slide up & fade in)
         if (endValues.view instanceof ViewGroup) {
             ViewGroup vg = (ViewGroup) endValues.view;
-            float offset = vg.getHeight() / 3;
+            int duration = AnimUtils.mediumAnim(sceneRoot.getContext());
+            Interpolator interpolator = new FastOutSlowInInterpolator();
             for (int i = 0; i < vg.getChildCount(); i++) {
                 View v = vg.getChildAt(i);
-                v.setTranslationY(offset);
                 v.setAlpha(0f);
+
                 v.animate()
                         .alpha(1f)
-                        .translationY(0f)
-                        .setDuration(150)
-                        .setStartDelay(150)
-                        .setInterpolator(AnimationUtils.loadInterpolator(vg.getContext(),
-                                android.R.interpolator.fast_out_slow_in));
-                offset *= 1.8f;
+                        .setDuration(duration)
+                        .setStartDelay(50 + 50 * i)
+                        .setInterpolator(interpolator);
             }
         }
 

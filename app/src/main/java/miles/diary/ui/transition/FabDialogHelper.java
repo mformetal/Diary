@@ -21,10 +21,10 @@ public class FabDialogHelper {
         int color = activity.getIntent().getIntExtra(START_COLOR, Color.TRANSPARENT);
         Interpolator easeInOut =
                 AnimationUtils.loadInterpolator(activity, android.R.interpolator.fast_out_slow_in);
-        FabToDialogTransition sharedEnter = new FabToDialogTransition(color, radius);
+        FabContainerTransition sharedEnter = new FabContainerTransition(color, radius);
         sharedEnter.setPathMotion(arcMotion);
         sharedEnter.setInterpolator(easeInOut);
-        DialogToFabTransition sharedReturn = new DialogToFabTransition(color);
+        ContainerFabTransition sharedReturn = new ContainerFabTransition(color);
         sharedReturn.setPathMotion(arcMotion);
         sharedReturn.setInterpolator(easeInOut);
         sharedEnter.addTarget(target);

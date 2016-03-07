@@ -200,7 +200,7 @@ public class UriActivity extends BaseActivity implements View.OnClickListener{
                             Palette.from(resource)
                                     .maximumColorCount(3)
                                     .clearFilters()
-                                    .generate(new PaletteWindows(UriActivity.this, resource, null));
+                                    .generate(new PaletteWindows(UriActivity.this, resource));
                             return false;
                         }
                     })

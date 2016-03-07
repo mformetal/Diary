@@ -42,6 +42,13 @@
         </activity>
 
         <activity
+            android:name=".ui.activity.PlacePhotosActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan"
+            android:theme="@style/AppTheme.UriActivity" >
+        </activity>
+
+        <activity
             android:name=".ui.activity.LocationActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustPan"

@@ -10,7 +10,7 @@ import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
 import miles.diary.data.error.NoInternetException;
-import miles.diary.data.model.Entry;
+import miles.diary.data.model.realm.Entry;
 import miles.diary.data.rx.DataObservable;
 import miles.diary.data.rx.DataTransaction;
 import rx.Observable;

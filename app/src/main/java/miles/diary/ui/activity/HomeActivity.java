@@ -1,7 +1,6 @@
 package miles.diary.ui.activity;
 
 import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.net.Uri;
@@ -13,7 +12,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
-import android.view.animation.AnticipateOvershootInterpolator;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toolbar;
@@ -25,14 +23,11 @@ import miles.diary.R;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.data.adapter.EntryAdapter;
 import miles.diary.data.api.db.DataLoadingListener;
-import miles.diary.data.model.Entry;
+import miles.diary.data.model.realm.Entry;
 import miles.diary.ui.RecylerDividerDecoration;
 import miles.diary.ui.transition.FabDialogHelper;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.Logg;
-import rx.Observable;
-import rx.functions.Action1;
-import rx.functions.Func1;
 
 public class HomeActivity extends TransitionActivity implements DataLoadingListener {
 
@@ -196,29 +191,13 @@ public class HomeActivity extends TransitionActivity implements DataLoadingListe
 
     private void dismissLoading() {
         if (progressBar.getVisibility() != View.GONE) {
-            ObjectAnimator scale = AnimUtils.pop(fab, 0f);
-            scale.setDuration(AnimUtils.longAnim(this));
-            scale.setInterpolator(new AnticipateOvershootInterpolator());
-
-            ObjectAnimator gone = AnimUtils.gone(progressBar).setDuration(AnimUtils.longAnim(this));
-
-            AnimatorSet animatorSet = new AnimatorSet();
-            animatorSet.playTogether(scale, gone);
-            animatorSet.start();
+            AnimUtils.gone(progressBar).setDuration(AnimUtils.longAnim(this)).start();
         }
     }
 
     private void showLoading() {
         if (progressBar.getVisibility() != View.VISIBLE) {
-            ObjectAnimator scale = AnimUtils.pop(fab, 1f);
-            scale.setDuration(AnimUtils.longAnim(this));
-            scale.setInterpolator(new AnticipateOvershootInterpolator());
-
-            ObjectAnimator gone = AnimUtils.visible(progressBar).setDuration(AnimUtils.longAnim(this));
-
-            AnimatorSet animatorSet = new AnimatorSet();
-            animatorSet.playTogether(scale, gone);
-            animatorSet.start();
+            AnimUtils.visible(progressBar).setDuration(AnimUtils.longAnim(this)).start();
         }
     }
 

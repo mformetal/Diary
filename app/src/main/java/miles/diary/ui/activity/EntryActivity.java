@@ -7,13 +7,10 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.graphics.Palette;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -25,7 +22,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
@@ -37,7 +33,7 @@ import com.google.gson.Gson;
 import butterknife.Bind;
 import butterknife.OnClick;
 import miles.diary.R;
-import miles.diary.data.model.Entry;
+import miles.diary.data.model.realm.Entry;
 import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.data.rx.DataTransaction;
@@ -49,7 +45,6 @@ import miles.diary.ui.widget.RoundedImageView;
 import miles.diary.ui.widget.TypefaceIconTextView;
 import miles.diary.ui.widget.TypefaceTextView;
 import miles.diary.util.AnimUtils;
-import miles.diary.util.Logg;
 import miles.diary.util.TextUtils;
 import miles.diary.util.ViewUtils;
 
@@ -74,6 +69,8 @@ public class EntryActivity extends TransitionActivity {
         return intent;
     }
 
+    @Bind(R.id.activity_entry_place_photos)
+    FloatingActionButton photosFab;
     @Bind(R.id.activity_entry_toolbar)
     Toolbar toolbar;
     @Bind(R.id.activity_entry_body)
@@ -110,6 +107,15 @@ public class EntryActivity extends TransitionActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        if (dataChanged) {
+            setResultAction(Action.EDIT);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_entry, menu);
         for (int i = 0; i < menu.size(); i++) {
@@ -137,64 +143,6 @@ public class EntryActivity extends TransitionActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @SuppressLint("SetTextI18n")
-    private void updateView(Entry entry) {
-        ViewUtils.mutate(place, place.getCurrentTextColor());
-        ViewUtils.mutate(date, place.getCurrentTextColor());
-
-        SpannableString spannableString = new SpannableString(Entry.formatDiaryPrefaceText(entry));
-        spannableString.setSpan(new RelativeSizeSpan(1.4f), 0, 12, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-        spannableString.setSpan(new TypefacerSpan(TextUtils.getFont(this, getString(R.string.default_font))),
-                12, spannableString.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-        body.setText(spannableString, TextView.BufferType.SPANNABLE);
-
-        String placeName = entry.getPlaceName();
-        if (placeName != null) {
-            place.setText(placeName);
-        } else {
-            place.setVisibility(View.GONE);
-        }
-
-        date.setText(TextUtils.formatDate(entry.getDate()) + TextUtils.LINE_SEPERATOR +
-                TextUtils.formatTime(entry.getDate()));
-
-        String string = entry.getWeather();
-        if (string != null) {
-            WeatherResponse weatherResponse = new Gson().fromJson(string, WeatherResponse.class);
-            weather.setText(weatherResponse.getOneLineTemperatureString());
-        } else {
-            weather.setVisibility(View.GONE);
-        }
-
-        if (entry.getUri() != null) {
-            Glide.with(this)
-                    .fromString()
-                    .asBitmap()
-                    .load(entry.getUri())
-                    .dontAnimate()
-                    .centerCrop()
-                    .listener(new RequestListener<String, Bitmap>() {
-                        @Override
-                        public boolean onException(Exception e, String model, Target<Bitmap> target, boolean isFirstResource) {
-                            return false;
-                        }
-
-                        @Override
-                        public boolean onResourceReady(final Bitmap resource, String model, Target<Bitmap> target,
-                                                       boolean isFromMemoryCache, boolean isFirstResource) {
-                            Palette.from(resource)
-                                    .maximumColorCount(3)
-                                    .clearFilters()
-                                    .generate(new PaletteWindows(EntryActivity.this, resource));
-                            return false;
-                        }
-                    })
-                    .into(image);
-        } else {
-            image.setVisibility(View.GONE);
-        }
     }
 
     @Override
@@ -237,12 +185,10 @@ public class EntryActivity extends TransitionActivity {
 
     @Override
     void onEnter(final ViewGroup root, Intent calledIntent, boolean hasSavedInstanceState) {
-        @SuppressWarnings("ConstantConditions")
-        Drawable navigationIcon = toolbar.getNavigationIcon().mutate();
-
         if (entry.getUri() == null) {
-            navigationIcon.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
-            toolbar.setTitleTextColor(Color.BLACK);
+            int color = ContextCompat.getColor(this, R.color.dark_icons);
+            toolbar.getNavigationIcon().mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+            toolbar.setTitleTextColor(color);
 
             Animator animator = AnimUtils.background(root,
                     Color.TRANSPARENT,
@@ -253,13 +199,9 @@ public class EntryActivity extends TransitionActivity {
 
             slideUpView(root, AnimUtils.shortAnim(this));
         } else {
-            navigationIcon.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
-
             ArcMotion arcMotion = new ArcMotion();
             arcMotion.setMinimumHorizontalAngle(50f);
             arcMotion.setMinimumVerticalAngle(50f);
-
-            final int duration = AnimUtils.shortAnim(this);
 
             RoundedImageViewTransition reveal = new RoundedImageViewTransition(
                     Math.max(image.getWidth(), image.getHeight()) / 2f, 0);
@@ -269,7 +211,13 @@ public class EntryActivity extends TransitionActivity {
             reveal.addListener(new SimpleTransitionListener() {
                 @Override
                 public void onTransitionStart(Transition transition) {
-                    slideUpView(root, duration);
+                    toolbar.setVisibility(View.GONE);
+                    slideUpView(root, AnimUtils.shortAnim(EntryActivity.this));
+                }
+
+                @Override
+                public void onTransitionEnd(Transition transition) {
+                    AnimUtils.visible(toolbar).start();
                 }
             });
 
@@ -277,9 +225,82 @@ public class EntryActivity extends TransitionActivity {
                     0, Math.min(image.getWidth(), image.getHeight()) / 2f);
             unreveal.addTarget(image);
             unreveal.setPathMotion(arcMotion);
+            unreveal.addListener(new SimpleTransitionListener() {
+                @Override
+                public void onTransitionStart(Transition transition) {
+                    toolbar.setVisibility(View.GONE);
+                }
+            });
 
             getWindow().setSharedElementEnterTransition(reveal);
             getWindow().setSharedElementReturnTransition(unreveal);
+        }
+    }
+
+    @Override
+    void onExit(ViewGroup root) {
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void updateView(Entry entry) {
+        ViewUtils.mutate(place, place.getCurrentTextColor());
+        ViewUtils.mutate(date, place.getCurrentTextColor());
+
+        SpannableString spannableString = new SpannableString(Entry.formatDiaryPrefaceText(entry));
+        spannableString.setSpan(new RelativeSizeSpan(1.4f), 0, 12, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        spannableString.setSpan(new TypefacerSpan(TextUtils.getFont(this, getString(R.string.default_font))),
+                12, spannableString.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        body.setText(spannableString, TextView.BufferType.SPANNABLE);
+
+        String placeName = entry.getPlaceName();
+        if (placeName != null) {
+            place.setText(placeName);
+        } else {
+            place.setVisibility(View.GONE);
+        }
+
+        date.setText(TextUtils.formatDate(entry.getDate()) + TextUtils.LINE_SEPERATOR +
+                TextUtils.formatTime(entry.getDate()));
+
+        String string = entry.getWeather();
+        if (string != null) {
+            WeatherResponse weatherResponse = new Gson().fromJson(string, WeatherResponse.class);
+            weather.setText(weatherResponse.getOneLineTemperatureString());
+        } else {
+            weather.setVisibility(View.GONE);
+        }
+
+        if (entry.getUri() != null) {
+            postponeEnterTransition();
+
+            Glide.with(this)
+                    .fromString()
+                    .asBitmap()
+                    .load(entry.getUri())
+                    .dontAnimate()
+                    .centerCrop()
+                    .listener(new RequestListener<String, Bitmap>() {
+                        @Override
+                        public boolean onException(Exception e, String model, Target<Bitmap> target, boolean isFirstResource) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(final Bitmap resource, String model, Target<Bitmap> target,
+                                                       boolean isFromMemoryCache, boolean isFirstResource) {
+                            Palette.from(resource)
+                                    .maximumColorCount(3)
+                                    .clearFilters()
+                                    .generate(new PaletteWindows(EntryActivity.this, resource));
+
+                            startPostponedEnterTransition();
+                            image.setVisibility(View.VISIBLE);
+                            return false;
+                        }
+                    })
+                    .into(image);
+        } else {
+            image.setVisibility(View.GONE);
         }
     }
 
@@ -302,24 +323,25 @@ public class EntryActivity extends TransitionActivity {
         }
     }
 
-    @Override
-    void onExit(ViewGroup root) {
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (dataChanged) {
-            setResultAction(Action.EDIT);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
     private void setResultAction(Action action) {
         Intent intent = new Intent();
         intent.putExtra(INTENT_KEY, action);
         intent.putExtra(INTENT_ACTION, entry.getDateMillis());
         setResult(RESULT_OK, intent);
         finish();
+    }
+
+    @OnClick(R.id.activity_entry_place_photos)
+    protected void fabClick() {
+        // start place photos activity
+        String id = entry.getPlaceId();
+        if (id != null) {
+            Intent intent = new Intent(this, PlacePhotosActivity.class);
+            intent.putExtra(PlacePhotosActivity.ID, entry.getPlaceId());
+            intent.putExtra(PlacePhotosActivity.NAME, entry.getPlaceName());
+            startActivity(intent);
+        } else {
+            // show snackbar or something
+        }
     }
 }

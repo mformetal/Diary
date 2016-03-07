@@ -32,6 +32,7 @@ import miles.diary.data.model.Entry;
 import miles.diary.data.model.google.PlaceResponse;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.data.model.weather.WeatherResponse;
+import miles.diary.ui.transition.FabDialogHelper;
 import miles.diary.ui.widget.TypefaceEditText;
 import miles.diary.ui.widget.TypefaceIconTextView;
 import miles.diary.util.AnimUtils;
@@ -40,7 +41,6 @@ import miles.diary.util.ViewUtils;
 
 public class NewEntryActivity extends BaseActivity implements View.OnClickListener {
 
-    @Bind(R.id.activity_new_entry_root) CoordinatorLayout root;
     @Bind(R.id.fragment_entry_toolbar) Toolbar toolbar;
     @Bind(R.id.activity_new_entry_body) TypefaceEditText bodyInput;
     @Bind(R.id.activity_new_entry_photo) CircleImageView photo;
@@ -56,10 +56,10 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     private final static int REQUEST_IMAGE = 2;
     private final static int REQUEST_LOCATION_PERMISSION = 3;
 
-    String placeName;
-    String placeId;
-    String temperature;
-    Uri imageUri;
+    private String placeName;
+    private String placeId;
+    private String temperature;
+    private Uri imageUri;
     private WeatherResponse weather;
     private GoogleService googleService;
 
@@ -67,19 +67,23 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_entry);
+        FabDialogHelper.makeFabDialogTransition(this, root, 20);
 
         setActionBar(toolbar);
 
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
-            dataManager.getObject(Entry.class, bundle.getLong(EntryActivity.INTENT_KEY))
-                    .subscribe(new ActivitySubscriber<Entry>(this) {
-                        @Override
-                        public void onNext(Entry entry) {
-                            updateViews(entry);
-                        }
-                    });
+            long id =  bundle.getLong(EntryActivity.INTENT_KEY, -1L);
+            if (id != -1L) {
+                dataManager.getObject(Entry.class, id)
+                        .subscribe(new ActivitySubscriber<Entry>(this) {
+                            @Override
+                            public void onNext(Entry entry) {
+                                updateViews(entry);
+                            }
+                        });
+            }
         }
 
         ViewUtils.mutate(location, ContextCompat.getColor(this, R.color.accent));
@@ -160,7 +164,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                 } else {
                     ActivityOptions transitionActivityOptions =
                             ActivityOptions.makeSceneTransitionAnimation(this, photo,
-                                    getString(R.string.transition_image));
+                                    getString(R.string.transition_location_image));
                     startActivityForResult(intent, REQUEST_IMAGE, transitionActivityOptions.toBundle());
                 }
                 break;
@@ -171,7 +175,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                     intent1.putExtra(NewEntryActivity.PLACE_ID, placeId);
                     ActivityOptions transitionActivityOptions =
                             ActivityOptions.makeSceneTransitionAnimation(this, location,
-                                    getString(R.string.transition_image));
+                                    getString(R.string.transition_location_image));
                     startActivityForResult(intent1, REQUEST_LOCATION, transitionActivityOptions.toBundle());
                 }
                 break;

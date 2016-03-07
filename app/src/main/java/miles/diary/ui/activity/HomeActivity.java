@@ -2,6 +2,7 @@ package miles.diary.ui.activity;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -26,6 +27,7 @@ import miles.diary.data.adapter.EntryAdapter;
 import miles.diary.data.api.db.DataLoadingListener;
 import miles.diary.data.model.Entry;
 import miles.diary.ui.RecylerDividerDecoration;
+import miles.diary.ui.transition.FabDialogHelper;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.Logg;
 import rx.Observable;
@@ -186,7 +188,10 @@ public class HomeActivity extends TransitionActivity implements DataLoadingListe
 
     private void startNewEntryActivity() {
         Intent intent = new Intent(this, NewEntryActivity.class);
-        startActivityForResult(intent, RESULT_CODE_NEW_ENTRY);
+        intent.putExtra(FabDialogHelper.START_COLOR, ContextCompat.getColor(this, R.color.accent));
+        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this, fab,
+                getString(R.string.transition_fab_dialog_new_entry));
+        startActivityForResult(intent, RESULT_CODE_NEW_ENTRY, options.toBundle());
     }
 
     private void dismissLoading() {

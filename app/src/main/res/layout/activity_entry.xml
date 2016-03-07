@@ -25,7 +25,7 @@
                 android:id="@+id/activity_entry_image"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:transitionName="@string/transition_image"
+                android:transitionName="@string/transition_entry_image"
                 android:minHeight="?android:attr/actionBarSize"
                 app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"
                 app:layout_collapseMode="parallax"

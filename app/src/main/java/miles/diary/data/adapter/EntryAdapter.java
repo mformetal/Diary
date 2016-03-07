@@ -136,7 +136,7 @@ public class EntryAdapter extends BaseAdapter<RecyclerView.ViewHolder> {
                     Intent intent = EntryActivity.newIntent(host, entry);
                     ActivityOptions options =
                             ActivityOptions.makeSceneTransitionAnimation(host, image,
-                                    host.getString(R.string.transition_image));
+                                    host.getString(R.string.transition_location_image));
                     host.startActivityForResult(intent, HomeActivity.RESULT_CODE_ENTRY, options.toBundle());
                 }
             });

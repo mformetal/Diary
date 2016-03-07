@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="transition_image">image</string>
+    <string name="transition_location_image">location</string>
+    <string name="transition_entry_image">entry</string>
+    <string name="transition_fab_dialog_new_entry">new_entry</string>
 </resources>

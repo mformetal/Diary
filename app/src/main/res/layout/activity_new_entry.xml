@@ -7,6 +7,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:transitionName="@string/transition_fab_dialog_new_entry"
     android:descendantFocusability="beforeDescendants"
     android:focusableInTouchMode="true" >
 
@@ -41,7 +42,7 @@
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/activity_new_entry_photo"
             android:src="@drawable/ic_photo_24dp"
-            android:transitionName="@string/transition_image"
+            android:transitionName="@string/transition_location_image"
             android:layout_width="@dimen/fab_normal_dimens"
             android:layout_height="@dimen/fab_normal_dimens"
             android:layout_margin="@dimen/small_fab_margin"
@@ -59,7 +60,7 @@
         <ImageView
             android:id="@+id/activity_new_entry_location"
             android:src="@drawable/ic_place_24dp"
-            android:transitionName="@string/transition_image"
+            android:transitionName="@string/transition_location_image"
             android:layout_width="@dimen/fab_normal_dimens"
             android:layout_height="@dimen/fab_normal_dimens"
             android:layout_margin="@dimen/small_fab_margin"

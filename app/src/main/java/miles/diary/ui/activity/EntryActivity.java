@@ -139,7 +139,6 @@ public class EntryActivity extends TransitionActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
     @SuppressLint("SetTextI18n")
     private void updateView(Entry entry) {
         ViewUtils.mutate(place, place.getCurrentTextColor());

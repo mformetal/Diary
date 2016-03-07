@@ -38,7 +38,7 @@
         android:layout_marginTop="@dimen/adapter_entry_margin"
         android:layout_marginBottom="@dimen/adapter_entry_margin"
         android:layout_gravity="center_horizontal"
-        android:transitionName="@string/transition_image"
+        android:transitionName="@string/transition_entry_image"
         android:layout_below="@id/adapter_entry_image_time"
         tools:text="MOUNTAIN BIKING" />
 

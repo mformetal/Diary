@@ -80,5 +80,6 @@ public abstract class BaseAdapter<VH extends RecyclerView.ViewHolder>
 
     public void clear() {
         data.clear();
+        notifyDataSetChanged();
     }
 }

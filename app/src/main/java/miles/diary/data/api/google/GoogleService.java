@@ -22,7 +22,7 @@ import java.util.List;
 import miles.diary.R;
 import miles.diary.data.api.LocationService;
 import miles.diary.data.model.google.LikelyPlace;
-import miles.diary.data.model.google.apiresponse.PlaceResponse;
+import miles.diary.data.model.google.PlaceResponse;
 import miles.diary.data.rx.GoogleResultObservable;
 import miles.diary.util.IntentUtils;
 import miles.diary.util.Logg;

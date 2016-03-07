@@ -145,7 +145,7 @@ public class LinearFabMenu extends LinearLayout {
                     continue;
                 }
 
-                ObjectAnimator gone = AnimUtils.gone(view);
+                ObjectAnimator gone = AnimUtils.invisible(view);
                 gone.setStartDelay(delay);
 
                 delay += DELAY_INCREMENT;

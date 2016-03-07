@@ -28,6 +28,9 @@ import miles.diary.data.model.Entry;
 import miles.diary.ui.RecylerDividerDecoration;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.Logg;
+import rx.Observable;
+import rx.functions.Action1;
+import rx.functions.Func1;
 
 public class HomeActivity extends TransitionActivity implements DataLoadingListener {
 
@@ -49,16 +52,7 @@ public class HomeActivity extends TransitionActivity implements DataLoadingListe
 
         setActionBar(toolbar);
 
-        dataManager.loadObjects(Entry.class)
-                .subscribe(new ActivitySubscriber<List<Entry>>(this, true) {
-                    @Override
-                    public void onNext(List<Entry> entries) {
-                        entryAdapter.addData(entries);
-                        if (entries.isEmpty()) {
-                            onLoadEmpty();
-                        }
-                    }
-                });
+        fetchData();
 
         entryAdapter = new EntryAdapter(this);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -102,7 +96,7 @@ public class HomeActivity extends TransitionActivity implements DataLoadingListe
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
         switch (requestCode) {
             case RESULT_CODE_NEW_ENTRY:
                 if (resultCode == RESULT_OK) {
@@ -129,22 +123,12 @@ public class HomeActivity extends TransitionActivity implements DataLoadingListe
             case RESULT_CODE_ENTRY:
                 if (data != null) {
                     Bundle bundle = data.getExtras();
-                    EntryActivity.Action action = (EntryActivity.Action)
+                    final EntryActivity.Action action = (EntryActivity.Action)
                             bundle.getSerializable(EntryActivity.INTENT_KEY);
                     if (action != null) {
-                        switch (action) {
-                            case EDIT:
-                                Logg.log("EDIT");
-                                break;
-                            case DELETE:
-                                Logg.log("DELETE");
-                                break;
-                            case FAVORITE:
-                                Logg.log("FAVORITE");
-                                break;
-                            default:
-                                Logg.log("DEFAULT");
-                        }
+                        long id = bundle.getLong(EntryActivity.INTENT_ACTION);
+                        Entry entry = dataManager.get(Entry.class, id);
+                        executeAction(action, entry);
                     }
                 }
                 break;
@@ -187,6 +171,19 @@ public class HomeActivity extends TransitionActivity implements DataLoadingListe
         showLoading();
     }
 
+    private void fetchData() {
+        dataManager.loadObjects(Entry.class)
+                .subscribe(new ActivitySubscriber<List<Entry>>(this, true) {
+                    @Override
+                    public void onNext(List<Entry> entries) {
+                        entryAdapter.addData(entries);
+                        if (entries.isEmpty()) {
+                            onLoadEmpty();
+                        }
+                    }
+                });
+    }
+
     private void startNewEntryActivity() {
         Intent intent = new Intent(this, NewEntryActivity.class);
         startActivityForResult(intent, RESULT_CODE_NEW_ENTRY);
@@ -217,6 +214,24 @@ public class HomeActivity extends TransitionActivity implements DataLoadingListe
             AnimatorSet animatorSet = new AnimatorSet();
             animatorSet.playTogether(scale, gone);
             animatorSet.start();
+        }
+    }
+
+    private void executeAction(EntryActivity.Action action, final Entry entry) {
+        switch (action) {
+            case DELETE:
+                entryAdapter.removeData(entry);
+                if (entryAdapter.isEmpty()) {
+                    onLoadEmpty();
+                }
+                addSubscription(dataManager.deleteObject(entry).subscribe());
+                break;
+            case EDIT:
+                entryAdapter.clear();
+                fetchData();
+                break;
+            case FAVORITE:
+                break;
         }
     }
 }

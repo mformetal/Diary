@@ -18,8 +18,11 @@
     <string name="activity_entry_image_chooser_camera">Camera</string>
     <string name="activity_entry_image_chooser_video">Video</string>
 
-    <string name="menu_entry_done">Add Entry</string>
-
+    <string name="menu_new_entry_done">Add Entry</string>
     <string name="menu_home_new_entry">New Entry</string>
+
+    <string name="menu_entry_edit">Edit</string>
+    <string name="menu_entry_favorite">Favorite</string>
+    <string name="menu_entry_delete">Delete</string>
 
 </resources>

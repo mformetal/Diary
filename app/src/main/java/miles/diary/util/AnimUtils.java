@@ -29,7 +29,6 @@ public class AnimUtils {
 
     private static int SHORT_ANIM = -1, MEDIUM_ANIM = -1, LONG_ANIM = -1;
     public final static String COLOR = "color";
-    public final static String TEXT_SCALE_X = "textScaleX";
 
     public static int shortAnim(Context context) {
         if (SHORT_ANIM < 0) {
@@ -106,7 +105,6 @@ public class AnimUtils {
 
             @Override
             public Float get(TextView object) {
-                Logg.log("GET: ", object.getTextScaleX());
                 return object.getTextScaleX();
             }
         };

@@ -23,26 +23,20 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
 
-import java.util.List;
-
 import butterknife.Bind;
 import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 import miles.diary.R;
 import miles.diary.data.api.LocationService;
 import miles.diary.data.model.Entry;
-import miles.diary.data.model.google.LikelyPlace;
-import miles.diary.data.model.google.apiresponse.PlaceResponse;
+import miles.diary.data.model.google.PlaceResponse;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.ui.widget.TypefaceEditText;
 import miles.diary.ui.widget.TypefaceIconTextView;
 import miles.diary.util.AnimUtils;
 import miles.diary.data.api.google.GoogleService;
-import miles.diary.util.Logg;
 import miles.diary.util.ViewUtils;
-import rx.Observable;
-import rx.functions.Func1;
 
 public class NewEntryActivity extends BaseActivity implements View.OnClickListener {
 
@@ -123,14 +117,14 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_entry, menu);
+        getMenuInflater().inflate(R.menu.menu_new_entry, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_entry_done:
+            case R.id.menu_new_entry_done:
                 String body = bodyInput.getTextAsString();
                 if (!body.isEmpty()) {
                     Intent result = new Intent();

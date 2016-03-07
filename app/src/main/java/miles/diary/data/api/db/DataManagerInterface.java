@@ -20,6 +20,8 @@ public interface DataManagerInterface {
 
     <T extends RealmObject> Observable<T> getObject(Class<T> tClass, long key);
 
+    <T extends RealmObject> T get(Class<T> tClass, long key);
+
     <T extends RealmObject> Observable<T> uploadObject(T object);
 
     <T extends RealmObject> Observable<T> deleteObject(T object);

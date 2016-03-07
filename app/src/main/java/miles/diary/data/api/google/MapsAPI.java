@@ -1,9 +1,7 @@
 package miles.diary.data.api.google;
 
-import miles.diary.data.model.google.apiresponse.PlaceResponse;
-import retrofit2.Call;
+import miles.diary.data.model.google.PlaceResponse;
 import retrofit2.http.GET;
-import retrofit2.http.Path;
 import retrofit2.http.Query;
 import rx.Observable;
 

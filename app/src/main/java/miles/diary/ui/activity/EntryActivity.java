@@ -1,24 +1,33 @@
 package miles.diary.ui.activity;
 
+import android.animation.Animator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.graphics.Palette;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
 import android.transition.ArcMotion;
 import android.transition.Transition;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestListener;
@@ -40,15 +49,17 @@ import miles.diary.ui.widget.RoundedImageView;
 import miles.diary.ui.widget.TypefaceIconTextView;
 import miles.diary.ui.widget.TypefaceTextView;
 import miles.diary.util.AnimUtils;
+import miles.diary.util.Logg;
 import miles.diary.util.TextUtils;
 import miles.diary.util.ViewUtils;
 
 /**
  * Created by mbpeele on 2/8/16.
  */
-public class EntryActivity extends TransitionActivity implements View.OnClickListener {
+public class EntryActivity extends TransitionActivity {
 
     public final static String INTENT_KEY = "data";
+    public final static String INTENT_ACTION = "action";
     public final static int REQUEST_EDIT_ENTRY = 1;
 
     public enum Action {
@@ -63,10 +74,8 @@ public class EntryActivity extends TransitionActivity implements View.OnClickLis
         return intent;
     }
 
-    @Bind(R.id.activity_entry_edit)
-    FloatingActionButton editButton;
-    @Bind(R.id.activity_entry_back)
-    ImageButton backButton;
+    @Bind(R.id.activity_entry_toolbar)
+    Toolbar toolbar;
     @Bind(R.id.activity_entry_body)
     TypefaceTextView body;
     @Bind(R.id.activity_entry_image)
@@ -79,12 +88,16 @@ public class EntryActivity extends TransitionActivity implements View.OnClickLis
     TypefaceIconTextView weather;
 
     private Entry entry;
+    private boolean dataChanged;
 
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_entry);
+
+        setActionBar(toolbar);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
 
         dataManager.getObject(Entry.class, getIntent().getLongExtra(INTENT_KEY, -1))
                 .subscribe(new ActivitySubscriber<Entry>(this) {
@@ -95,6 +108,37 @@ public class EntryActivity extends TransitionActivity implements View.OnClickLis
                     }
                 });
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_entry, menu);
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            if (entry.getUri() == null) {
+                item.getIcon().mutate().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
+            }
+        }
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_entry_edit:
+                Intent intent = new Intent(this, NewEntryActivity.class);
+                intent.putExtra(EntryActivity.INTENT_KEY, entry.getDateMillis());
+                startActivityForResult(intent, REQUEST_EDIT_ENTRY);
+                break;
+            case R.id.menu_entry_favorite:
+                setResultAction(Action.FAVORITE);
+                break;
+            case R.id.menu_entry_delete:
+                setResultAction(Action.DELETE);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 
     @SuppressLint("SetTextI18n")
     private void updateView(Entry entry) {
@@ -110,6 +154,8 @@ public class EntryActivity extends TransitionActivity implements View.OnClickLis
         String placeName = entry.getPlaceName();
         if (placeName != null) {
             place.setText(placeName);
+        } else {
+            place.setVisibility(View.GONE);
         }
 
         date.setText(TextUtils.formatDate(entry.getDate()) + TextUtils.LINE_SEPERATOR +
@@ -119,6 +165,8 @@ public class EntryActivity extends TransitionActivity implements View.OnClickLis
         if (string != null) {
             WeatherResponse weatherResponse = new Gson().fromJson(string, WeatherResponse.class);
             weather.setText(weatherResponse.getOneLineTemperatureString());
+        } else {
+            weather.setVisibility(View.GONE);
         }
 
         if (entry.getUri() != null) {
@@ -140,8 +188,7 @@ public class EntryActivity extends TransitionActivity implements View.OnClickLis
                             Palette.from(resource)
                                     .maximumColorCount(3)
                                     .clearFilters()
-                                    .generate(new PaletteWindows(EntryActivity.this, resource,
-                                            backButton));
+                                    .generate(new PaletteWindows(EntryActivity.this, resource));
                             return false;
                         }
                     })
@@ -172,6 +219,7 @@ public class EntryActivity extends TransitionActivity implements View.OnClickLis
                     }).subscribe(new ActivitySubscriber<Entry>(this) {
                         @Override
                         public void onNext(Entry entry1) {
+                            dataChanged = true;
                             entry = entry1;
                             updateView(entry);
                         }
@@ -190,23 +238,24 @@ public class EntryActivity extends TransitionActivity implements View.OnClickLis
 
     @Override
     void onEnter(final ViewGroup root, Intent calledIntent, boolean hasSavedInstanceState) {
+        @SuppressWarnings("ConstantConditions")
+        Drawable navigationIcon = toolbar.getNavigationIcon().mutate();
+
         if (entry.getUri() == null) {
-            backButton.setVisibility(View.VISIBLE);
-            backButton.setColorFilter(Color.BLACK);
+            navigationIcon.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
+            toolbar.setTitleTextColor(Color.BLACK);
 
-            AnimUtils.pop(backButton, 0f, 1f)
-                    .setDuration(200)
-                    .start();
-
-            AnimUtils.background(root,
+            Animator animator = AnimUtils.background(root,
                     Color.TRANSPARENT,
-//                    ContextCompat.getColor(this, R.color.window_background),
                     Color.WHITE)
-                    .setDuration(AnimUtils.longAnim(this))
-                    .start();
+                    .setDuration(AnimUtils.longAnim(this));
+            animator.setInterpolator(new DecelerateInterpolator());
+            animator.start();
 
             slideUpView(root, AnimUtils.shortAnim(this));
         } else {
+            navigationIcon.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
+
             ArcMotion arcMotion = new ArcMotion();
             arcMotion.setMinimumHorizontalAngle(50f);
             arcMotion.setMinimumVerticalAngle(50f);
@@ -223,30 +272,12 @@ public class EntryActivity extends TransitionActivity implements View.OnClickLis
                 public void onTransitionStart(Transition transition) {
                     slideUpView(root, duration);
                 }
-
-                @Override
-                public void onTransitionEnd(Transition transition) {
-                    backButton.setVisibility(View.VISIBLE);
-                    AnimUtils.pop(backButton, 0f, 1f)
-                            .setDuration(duration)
-                            .start();
-                }
             });
 
             RoundedImageViewTransition unreveal = new RoundedImageViewTransition(
                     0, Math.min(image.getWidth(), image.getHeight()) / 2f);
             unreveal.addTarget(image);
             unreveal.setPathMotion(arcMotion);
-
-            unreveal.addListener(new SimpleTransitionListener() {
-                @Override
-                public void onTransitionStart(Transition transition) {
-                    super.onTransitionStart(transition);
-                    AnimUtils.pop(backButton, 1f, 0f)
-                            .setDuration(duration)
-                            .start();
-                }
-            });
 
             getWindow().setSharedElementEnterTransition(reveal);
             getWindow().setSharedElementReturnTransition(unreveal);
@@ -277,26 +308,19 @@ public class EntryActivity extends TransitionActivity implements View.OnClickLis
     }
 
     @Override
-    @OnClick({R.id.activity_entry_back, R.id.activity_entry_delete, R.id.activity_entry_favorite,
-        R.id.activity_entry_edit})
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.activity_entry_back:
-                finishAfterTransition();
-                break;
-            case R.id.activity_entry_favorite:
-                break;
-            case R.id.activity_entry_delete:
-                break;
-            case R.id.activity_entry_edit:
-                Intent intent = new Intent(this, NewEntryActivity.class);
-                intent.putExtra(EntryActivity.INTENT_KEY, entry.getDateMillis());
-                startActivityForResult(intent, REQUEST_EDIT_ENTRY);
-                break;
+    public void onBackPressed() {
+        if (dataChanged) {
+            setResultAction(Action.EDIT);
+        } else {
+            super.onBackPressed();
         }
     }
 
-    private void setResultAction() {
-
+    private void setResultAction(Action action) {
+        Intent intent = new Intent();
+        intent.putExtra(INTENT_KEY, action);
+        intent.putExtra(INTENT_ACTION, entry.getDateMillis());
+        setResult(RESULT_OK, intent);
+        finish();
     }
 }

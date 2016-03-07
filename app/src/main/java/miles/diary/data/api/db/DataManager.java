@@ -67,6 +67,13 @@ public class DataManager implements DataManagerInterface {
     }
 
     @Override
+    public <T extends RealmObject> T get(Class<T> tClass, long key) {
+        return realm.where(tClass)
+                .equalTo(Entry.KEY, key)
+                .findFirst();
+    }
+
+    @Override
     public <T extends RealmObject> Observable<T> uploadObject(T object) {
         if (hasConnection()) {
             return DataObservable.upload(object, realm);

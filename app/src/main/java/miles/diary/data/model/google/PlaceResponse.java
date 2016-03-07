@@ -1,4 +1,4 @@
-package miles.diary.data.model.google.apiresponse;
+package miles.diary.data.model.google;
 
 /**
  * Created by mbpeele on 3/6/16.

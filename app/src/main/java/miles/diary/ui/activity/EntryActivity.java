@@ -256,6 +256,7 @@ public class EntryActivity extends TransitionActivity {
         if (placeName != null) {
             place.setText(placeName);
         } else {
+            photosFab.setVisibility(View.GONE);
             place.setVisibility(View.GONE);
         }
 
@@ -333,15 +334,9 @@ public class EntryActivity extends TransitionActivity {
 
     @OnClick(R.id.activity_entry_place_photos)
     protected void fabClick() {
-        // start place photos activity
-        String id = entry.getPlaceId();
-        if (id != null) {
-            Intent intent = new Intent(this, PlacePhotosActivity.class);
-            intent.putExtra(PlacePhotosActivity.ID, entry.getPlaceId());
-            intent.putExtra(PlacePhotosActivity.NAME, entry.getPlaceName());
-            startActivity(intent);
-        } else {
-            // show snackbar or something
-        }
+        Intent intent = new Intent(this, PlacePhotosActivity.class);
+        intent.putExtra(PlacePhotosActivity.ID, entry.getPlaceId());
+        intent.putExtra(PlacePhotosActivity.NAME, entry.getPlaceName());
+        startActivity(intent);
     }
 }

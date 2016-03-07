@@ -3,6 +3,8 @@ package miles.diary.ui.activity;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityOptions;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
@@ -27,16 +29,15 @@ import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 import miles.diary.R;
 import miles.diary.data.api.LocationService;
-import miles.diary.data.model.realm.Entry;
+import miles.diary.data.api.google.GoogleService;
 import miles.diary.data.model.google.PlaceResponse;
-import miles.diary.data.rx.ActivitySubscriber;
+import miles.diary.data.model.realm.Entry;
 import miles.diary.data.model.weather.WeatherResponse;
+import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.ui.transition.FabDialogHelper;
 import miles.diary.ui.widget.TypefaceEditText;
 import miles.diary.ui.widget.TypefaceIconTextView;
 import miles.diary.util.AnimUtils;
-import miles.diary.data.api.google.GoogleService;
-import miles.diary.util.Logg;
 import miles.diary.util.ViewUtils;
 
 public class NewEntryActivity extends BaseActivity implements View.OnClickListener {
@@ -162,7 +163,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.activity_new_entry_photo:
-                Intent intent = new Intent(this, UriActivity.class);
+                Intent intent = new Intent(this, GalleryActivity.class);
                 intent.setData(imageUri);
 
                 if (imageUri == null) {
@@ -244,10 +245,6 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                             placeName = result.getName();
                             placeId = result.getId();
 
-                            Logg.log("END NEARBY SEARCH", placeName);
-
-                            Logg.log(placeName);
-
                             Activity activity = getSubscribedActivity();
                             if (activity != null) {
                                 AnimUtils.colorFilter(location,
@@ -255,12 +252,6 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                                         Color.WHITE)
                                         .start();
                             }
-                        }
-
-                        @Override
-                        public void onStart() {
-                            super.onStart();
-                            Logg.log("START NEARBY SEARCH");
                         }
                     });
         } else {
@@ -327,6 +318,13 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                                 }
                             });
                 } else {
+                    LocationService.getLocationAvailabilityUpdate(this, new LocationService.AvailabilityCallback() {
+                        @Override
+                        public void onLocationEnabled(Context context, BroadcastReceiver receiver, Intent intent) {
+                            getLocationData();
+                        }
+                    });
+
                     Snackbar.make(root,
                             R.string.activity_location_not_enabled,
                             Snackbar.LENGTH_LONG)

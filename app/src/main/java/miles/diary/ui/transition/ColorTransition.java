@@ -1,24 +1,21 @@
 package miles.diary.ui.transition;
 
-import android.animation.ValueAnimator;
-import android.support.annotation.ColorInt;
-import android.transition.Transition;
-
 import android.animation.Animator;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.ColorInt;
+import android.transition.Transition;
 import android.transition.TransitionValues;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import miles.diary.util.AnimUtils;
-import miles.diary.util.Logg;
 
 public class ColorTransition extends Transition {
 

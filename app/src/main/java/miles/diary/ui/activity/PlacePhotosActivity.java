@@ -1,29 +1,21 @@
 package miles.diary.ui.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
 import android.view.View;
-import android.widget.Toolbar;
 
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.places.PlacePhotoMetadata;
+import com.google.android.gms.location.places.PlacePhotoMetadataBuffer;
 import com.google.android.gms.location.places.PlacePhotoMetadataResult;
-
-import java.util.List;
 
 import butterknife.Bind;
 import miles.diary.R;
 import miles.diary.data.adapter.PlacePhotosAdapter;
 import miles.diary.data.api.google.GoogleService;
-import miles.diary.data.model.google.PlaceInfo;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.ui.widget.TypefaceTextView;
-import miles.diary.util.Logg;
-import rx.Observable;
-import rx.functions.Func1;
 
 /**
  * Created by mbpeele on 3/6/16.
@@ -64,7 +56,8 @@ public class PlacePhotosActivity extends BaseActivity implements GoogleService.G
                 .subscribe(new ActivitySubscriber<PlacePhotoMetadataResult>(this) {
                     @Override
                     public void onNext(PlacePhotoMetadataResult result) {
-                        if (result.getPhotoMetadata().getCount() > 0) {
+                        PlacePhotoMetadataBuffer buffer = result.getPhotoMetadata();
+                        if (buffer != null && buffer.getCount() > 0) {
                             placePhotosAdapter = new PlacePhotosAdapter(googleService, activity, result);
                             pager.setOffscreenPageLimit(2);
                             pager.setAdapter(placePhotosAdapter);

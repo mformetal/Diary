@@ -12,12 +12,7 @@ import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import miles.diary.R;
 import miles.diary.util.AnimUtils;
-import miles.diary.util.Logg;
-import miles.diary.util.ViewUtils;
 
 /**
  * Created by mbpeele on 3/1/16.

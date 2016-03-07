@@ -9,7 +9,6 @@ import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 
 import miles.diary.R;
-import miles.diary.util.Logg;
 
 /**
  * Created by mbpeele on 1/28/16.

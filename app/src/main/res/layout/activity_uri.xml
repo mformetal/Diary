@@ -1,69 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:gravity="center"
-    android:id="@+id/activity_uri_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <miles.diary.ui.widget.RoundedImageView
-        android:id="@+id/activity_uri_image_view"
+    <ImageView
+        android:id="@+id/activity_uri_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="fitXY"
-        android:transitionName="@string/transition_location_image"
-        android:visibility="gone" />
+        android:transitionName="@string/transition_gallery_to_uri" />
 
-    <VideoView
-        android:id="@+id/activity_uri_video_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="?android:attr/actionBarSize"
-        android:visibility="gone" />
-
-    <LinearLayout
-        android:id="@+id/activity_uri_button_row"
-        android:orientation="horizontal"
-        android:layout_gravity="bottom"
-        android:layout_width="match_parent"
-        android:layout_height="?android:attr/actionBarSize" >
-
-        <miles.diary.ui.widget.TypefaceButton
-            android:id="@+id/activity_uri_gallery"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/activity_entry_image_chooser_gallery"
-            android:drawableStart="@drawable/ic_photo_24dp"
-            android:lines="1"
-            android:theme="@style/AppTheme.ColoredButton"
-            app:buttonAutofit="true" />
-
-        <miles.diary.ui.widget.TypefaceButton
-            android:id="@+id/activity_uri_camera"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/activity_entry_image_chooser_camera"
-            android:drawableStart="@drawable/ic_camera_alt_24dp"
-            android:lines="1"
-            android:maxLines="1"
-            android:theme="@style/AppTheme.ColoredButton"
-            app:buttonAutofit="true" />
-
-        <miles.diary.ui.widget.TypefaceButton
-            android:id="@+id/activity_uri_video"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/activity_entry_image_chooser_video"
-            android:drawableStart="@drawable/ic_voice_chat_24dp"
-            android:lines="1"
-            android:theme="@style/AppTheme.ColoredButton"
-            app:buttonAutofit="true" />
-
-    </LinearLayout>
+    <!-- image controls -->
 
 </FrameLayout>

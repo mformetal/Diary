@@ -13,7 +13,6 @@ import android.transition.TransitionValues;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
 
 import miles.diary.R;
 import miles.diary.ui.drawable.MorphDrawable;

@@ -35,17 +35,21 @@
         </activity>
 
         <activity
-            android:name=".ui.activity.UriActivity"
+            android:name=".ui.activity.GalleryActivity"
+            android:label="@string/activity_uri_name"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden|adjustPan"
-            android:theme="@style/AppTheme.UriActivity" >
+            android:windowSoftInputMode="stateHidden|adjustPan" >
         </activity>
 
         <activity
             android:name=".ui.activity.PlacePhotosActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden|adjustPan"
             android:theme="@style/AppTheme.UriActivity" >
+        </activity>
+
+        <activity
+            android:name=".ui.activity.UriActivity"
+            android:screenOrientation="portrait" >
         </activity>
 
         <activity
@@ -58,7 +62,6 @@
         <activity
             android:name=".ui.activity.EntryActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden|adjustPan"
             android:theme="@style/AppTheme.EntryActivity" >
         </activity>
 

@@ -8,11 +8,11 @@ import android.view.View;
 /**
  * Created by mbpeele on 1/28/16.
  */
-public class RecylerDividerDecoration extends RecyclerView.ItemDecoration {
+public class DividerDecoration extends RecyclerView.ItemDecoration {
 
     private Drawable mDrawable;
 
-    public RecylerDividerDecoration(Drawable drawable) {
+    public DividerDecoration(Drawable drawable) {
         mDrawable = drawable;
     }
 

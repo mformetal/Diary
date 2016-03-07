@@ -1,7 +1,6 @@
 package miles.diary.ui.activity;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -31,16 +30,16 @@ import butterknife.Bind;
 import butterknife.OnClick;
 import miles.diary.R;
 import miles.diary.data.adapter.AutoCompleteAdapter;
+import miles.diary.data.api.google.GoogleService;
+import miles.diary.data.model.google.AutoCompleteItem;
 import miles.diary.data.model.google.LikelyPlace;
 import miles.diary.data.model.google.PlaceInfo;
 import miles.diary.data.rx.ActivitySubscriber;
-import miles.diary.data.model.google.AutoCompleteItem;
 import miles.diary.ui.PreDrawer;
 import miles.diary.ui.transition.ColorTransition;
 import miles.diary.ui.widget.TypefaceAutoCompleteTextView;
 import miles.diary.ui.widget.TypefaceButton;
 import miles.diary.util.AnimUtils;
-import miles.diary.data.api.google.GoogleService;
 import miles.diary.util.Logg;
 
 /**

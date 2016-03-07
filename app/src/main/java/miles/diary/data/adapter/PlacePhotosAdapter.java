@@ -1,6 +1,5 @@
 package miles.diary.data.adapter;
 
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.support.v4.view.PagerAdapter;
 import android.view.LayoutInflater;
@@ -10,22 +9,17 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
-import com.bumptech.glide.Glide;
 import com.google.android.gms.location.places.PlacePhotoMetadata;
 import com.google.android.gms.location.places.PlacePhotoMetadataBuffer;
 import com.google.android.gms.location.places.PlacePhotoMetadataResult;
 import com.google.android.gms.location.places.PlacePhotoResult;
-
-import java.util.List;
 
 import miles.diary.R;
 import miles.diary.data.api.google.GoogleService;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.ui.PreDrawer;
 import miles.diary.ui.activity.BaseActivity;
-import miles.diary.ui.widget.TypefaceTextView;
 import miles.diary.util.AnimUtils;
-import miles.diary.util.Logg;
 
 /**
  * Created by mbpeele on 3/6/16.

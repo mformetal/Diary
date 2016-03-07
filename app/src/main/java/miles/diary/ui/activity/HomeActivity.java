@@ -20,11 +20,11 @@ import java.util.List;
 
 import butterknife.Bind;
 import miles.diary.R;
-import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.data.adapter.EntryAdapter;
 import miles.diary.data.api.db.DataLoadingListener;
 import miles.diary.data.model.realm.Entry;
-import miles.diary.ui.RecylerDividerDecoration;
+import miles.diary.data.rx.ActivitySubscriber;
+import miles.diary.ui.DividerDecoration;
 import miles.diary.ui.transition.FabDialogHelper;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.Logg;
@@ -55,7 +55,7 @@ public class HomeActivity extends TransitionActivity implements DataLoadingListe
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(entryAdapter);
-        recyclerView.addItemDecoration(new RecylerDividerDecoration(
+        recyclerView.addItemDecoration(new DividerDecoration(
                 ContextCompat.getDrawable(this, R.drawable.recycler_divider)));
 
         fab.setOnClickListener(new View.OnClickListener() {

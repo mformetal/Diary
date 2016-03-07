@@ -4,10 +4,8 @@ package miles.diary.data.model.google;
  * Created by mbpeele on 3/6/16.
  */
 
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PlaceResponse {

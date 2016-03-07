@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.transition.Transition;
 import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,9 +18,9 @@ import javax.inject.Inject;
 import butterknife.ButterKnife;
 import miles.diary.DiaryApplication;
 import miles.diary.R;
-import miles.diary.util.DataStore;
 import miles.diary.data.api.WeatherService;
 import miles.diary.data.api.db.DataManager;
+import miles.diary.util.DataStore;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
 

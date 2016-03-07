@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Diary</string>
     <string name="activity_new_entry_name">Dear Diary…</string>
-    <string name="activity_auth_name">AUTHENTICATE</string>
+    <string name="activity_uri_name">Gallery</string>
     <string name="realm_name">Realm</string>
 
     <string name="no_internet">No internet connection found.</string>
@@ -16,9 +16,9 @@
     <string name="activity_entry_title_hint">Entry Title</string>
     <string name="activity_entry_body_hint">Memorialize your thoughts</string>
     <string name="activity_entry_no_camera_error">This device doesn\'t support Camera.</string>
-    <string name="activity_entry_image_chooser_gallery">Photo</string>
-    <string name="activity_entry_image_chooser_camera">Camera</string>
-    <string name="activity_entry_image_chooser_video">Video</string>
+
+    <string name="activity_uri_camera">Camera</string>
+    <string name="activity_uri_video">Video</string>
 
     <string name="menu_new_entry_done">Add Entry</string>
     <string name="menu_home_new_entry">New Entry</string>

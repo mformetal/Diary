@@ -1,7 +1,6 @@
 package miles.diary;
 
 import android.app.Application;
-import android.os.Build;
 
 import com.crashlytics.android.Crashlytics;
 import com.joanzapata.iconify.Iconify;

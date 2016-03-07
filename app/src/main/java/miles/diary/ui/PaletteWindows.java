@@ -3,26 +3,14 @@ package miles.diary.ui;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.graphics.Bitmap;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.support.v7.graphics.Palette;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
 import android.view.Window;
-import android.widget.ImageView;
-import android.widget.Toolbar;
 
 import java.lang.ref.SoftReference;
 
-import miles.diary.R;
 import miles.diary.util.ColorsUtils;
-import miles.diary.util.Logg;
 import miles.diary.util.ViewUtils;
 
 /**

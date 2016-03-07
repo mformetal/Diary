@@ -8,7 +8,7 @@ import butterknife.ButterKnife;
 /**
  * Created by mbpeele on 2/28/16.
  */
-public abstract class BindingViewHolder<T> extends RecyclerView.ViewHolder {
+abstract class BindingViewHolder<T> extends RecyclerView.ViewHolder {
 
     public BindingViewHolder(View itemView) {
         super(itemView);

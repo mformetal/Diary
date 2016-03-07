@@ -1,6 +1,5 @@
 package miles.diary.data.api.google;
 
-import android.app.Activity;
 import android.content.IntentSender;
 import android.location.Location;
 import android.location.LocationManager;
@@ -15,12 +14,10 @@ import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.PlaceFilter;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.PlacePhotoMetadata;
-import com.google.android.gms.location.places.PlacePhotoMetadataBuffer;
 import com.google.android.gms.location.places.PlacePhotoMetadataResult;
 import com.google.android.gms.location.places.PlacePhotoResult;
 import com.google.android.gms.location.places.Places;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import miles.diary.R;
@@ -128,7 +125,7 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
 
                 subscriber.onCompleted();
             }
-        });
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
     }
 
     public Observable<PlacePhotoMetadataResult> getPlacePhotos(final String placeId) {

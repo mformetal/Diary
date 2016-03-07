@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<miles.diary.ui.widget.AspectRatioImageView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/adapter_gallery_image"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:aspectRatioEnabled="true"
+    app:dominantMeasurement="width"
+    app:aspectRatio="1.333" >
+
+</miles.diary.ui.widget.AspectRatioImageView>

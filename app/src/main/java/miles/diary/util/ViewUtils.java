@@ -3,6 +3,7 @@ package miles.diary.util;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;

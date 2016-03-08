@@ -1,8 +1,10 @@
 package miles.diary.ui;
 
+import android.content.Context;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewCompat;
+import android.util.AttributeSet;
 import android.view.View;
 
 import miles.diary.util.AnimUtils;
@@ -11,6 +13,10 @@ import miles.diary.util.AnimUtils;
  * Created by mbpeele on 3/7/16.
  */
 public class ScrollVisibilityBehavior extends BaseBehavior<View> {
+
+    public ScrollVisibilityBehavior(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
 
     @Override
     public boolean onStartNestedScroll(final CoordinatorLayout coordinatorLayout,

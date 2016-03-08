@@ -10,7 +10,5 @@ import android.view.View;
  */
 public abstract class BaseBehavior<T extends View> extends CoordinatorLayout.Behavior<T> {
 
-    public BaseBehavior() {}
-
     public BaseBehavior(Context context, AttributeSet attrs) {}
 }

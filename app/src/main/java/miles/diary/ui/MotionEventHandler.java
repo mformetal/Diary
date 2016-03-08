@@ -13,7 +13,8 @@ public interface MotionEventHandler {
     enum Mode {
         NONE,
         DRAG,
-        ZOOM
+        ZOOM,
+        ROTATE
     }
 
     int INVALID_POINTER = -1;

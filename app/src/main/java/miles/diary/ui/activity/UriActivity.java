@@ -56,6 +56,7 @@ public class UriActivity extends BaseActivity {
         getWindow().getSharedElementReturnTransition().addListener(returnListener);
 
         setActionBar(toolbar);
+        toolbar.inflateMenu(R.menu.menu_uri);
         getActionBar().setDisplayShowTitleEnabled(false);
         getActionBar().setDisplayHomeAsUpEnabled(true);
 

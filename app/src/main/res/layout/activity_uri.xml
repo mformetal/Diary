@@ -26,6 +26,7 @@
         android:layout_height="wrap_content"
         android:weightSum="10"
         android:orientation="horizontal"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:layout_gravity="bottom" >
 
         <Space
@@ -40,7 +41,7 @@
             android:layout_height="wrap_content"
             android:theme="@style/AppTheme.ColoredButton"
             android:drawableTop="@drawable/ic_crop_24dp"
-            android:background="@color/scrim_with_alpha"
+            android:background="@color/accent_with_alpha"
             android:text="@string/activity_uri_crop"
             android:gravity="center"
             app:buttonAutofit="true" />
@@ -57,7 +58,7 @@
             android:layout_height="wrap_content"
             android:theme="@style/AppTheme.ColoredButton"
             android:drawableTop="@drawable/ic_format_color_text_24dp"
-            android:background="@color/scrim_with_alpha"
+            android:background="@color/accent_with_alpha"
             android:text="@string/activity_uri_text"
             android:gravity="center"
             app:buttonAutofit="true" />
@@ -74,7 +75,7 @@
             android:layout_height="wrap_content"
             android:theme="@style/AppTheme.ColoredButton"
             android:drawableTop="@drawable/ic_mode_edit_24dp"
-            android:background="@color/scrim_with_alpha"
+            android:background="@color/accent_with_alpha"
             android:text="@string/activity_uri_scribble"
             app:buttonAutofit="true" />
 

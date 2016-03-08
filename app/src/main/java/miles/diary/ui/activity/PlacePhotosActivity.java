@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.PlacePhotoMetadataBuffer;
@@ -16,6 +17,7 @@ import miles.diary.data.adapter.PlacePhotosAdapter;
 import miles.diary.data.api.google.GoogleService;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.ui.widget.TypefaceTextView;
+import miles.diary.util.AnimUtils;
 
 /**
  * Created by mbpeele on 3/6/16.
@@ -29,6 +31,8 @@ public class PlacePhotosActivity extends BaseActivity implements GoogleService.G
     TypefaceTextView nameView;
     @Bind(R.id.activity_place_photos_pager)
     ViewPager pager;
+    @Bind(R.id.activity_place_photos_progressbar)
+    ProgressBar progressBar;
 
     private PlacePhotosAdapter placePhotosAdapter;
     private GoogleService googleService;
@@ -56,6 +60,8 @@ public class PlacePhotosActivity extends BaseActivity implements GoogleService.G
                 .subscribe(new ActivitySubscriber<PlacePhotoMetadataResult>(this) {
                     @Override
                     public void onNext(PlacePhotoMetadataResult result) {
+                        AnimUtils.gone(progressBar).start();
+
                         PlacePhotoMetadataBuffer buffer = result.getPhotoMetadata();
                         if (buffer != null && buffer.getCount() > 0) {
                             placePhotosAdapter = new PlacePhotosAdapter(googleService, activity, result);

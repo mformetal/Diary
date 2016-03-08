@@ -7,9 +7,11 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Pair;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.Toolbar;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 
@@ -121,5 +123,13 @@ public abstract class BaseActivity extends AppCompatActivity {
     public View getStatusBarView() {
         View decor = getWindow().getDecorView();
         return decor.findViewById(android.R.id.statusBarBackground);
+    }
+
+    public MenuItem getMenuItem(Toolbar toolbar, int id) {
+        try {
+            return toolbar.getMenu().getItem(id);
+        } catch (IndexOutOfBoundsException e) {
+            return null;
+        }
     }
 }

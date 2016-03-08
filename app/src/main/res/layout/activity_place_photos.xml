@@ -13,6 +13,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <ProgressBar
+        android:id="@+id/activity_place_photos_progressbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_anchor="@id/activity_place_photos_root"
+        app:layout_anchorGravity="center" />
+
     <miles.diary.ui.widget.TypefaceTextView
         android:id="@+id/activity_place_name_view"
         android:layout_width="match_parent"
@@ -24,7 +31,6 @@
         app:layout_anchor="@id/activity_place_photos_root"
         app:layout_anchorGravity="top"
         app:textViewAutoFit="true"
-        app:layout_behavior="miles.diary.ui.SnackbarBehavior"
         tools:text="PLACE NAME" />
 
 </android.support.design.widget.CoordinatorLayout>

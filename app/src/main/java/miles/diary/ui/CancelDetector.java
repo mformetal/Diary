@@ -13,13 +13,13 @@ import java.util.Arrays;
 /**
  * Created by mbpeele on 2/6/16.
  */
-public class CancelListener {
+public class CancelDetector {
 
     private EditText widget;
     private Drawable[] hideDrawables;
     private Drawable canceler;
 
-    public CancelListener(EditText editText) {
+    public CancelDetector(EditText editText) {
         widget = editText;
         widget.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
             @Override

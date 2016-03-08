@@ -1,12 +1,10 @@
 package miles.diary.ui.activity;
 
-import android.app.Activity;
-import android.app.SharedElementCallback;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.graphics.Palette;
 import android.transition.ChangeImageTransform;
 import android.transition.ChangeTransform;
@@ -21,21 +19,17 @@ import android.widget.LinearLayout;
 import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
 import miles.diary.R;
 import miles.diary.ui.PaletteWindows;
-import miles.diary.ui.PreDrawer;
+import miles.diary.ui.Zoomer;
 import miles.diary.ui.transition.SimpleTransitionListener;
-import miles.diary.util.AnimUtils;
-import miles.diary.util.FileUtils;
 import miles.diary.util.Logg;
 import miles.diary.util.ViewUtils;
 
@@ -70,6 +64,8 @@ public class UriActivity extends BaseActivity {
         uri = intent.getData();
         postponeEnterTransition();
 
+        Zoomer zoomer = new Zoomer(imageView);
+
         Glide.with(this)
                 .load(uri)
                 .asBitmap()
@@ -85,12 +81,17 @@ public class UriActivity extends BaseActivity {
                     public boolean onResourceReady(Bitmap resource, Uri model, Target<Bitmap> target,
                                                    boolean isFromMemoryCache, boolean isFirstResource) {
                         startPostponedEnterTransition();
+                        invalidateOptionsMenu();
+
+                        final List<Drawable> drawables = new ArrayList<>();
+                        drawables.add(toolbar.getNavigationIcon());
+                        drawables.add(getMenuItem(toolbar, 0).getIcon());
 
                         Palette.from(resource)
                                 .maximumColorCount(3)
                                 .clearFilters()
                                 .generate(new PaletteWindows(UriActivity.this, resource,
-                                        null, Collections.singletonList(toolbar.getNavigationIcon())));
+                                        null, drawables));
                         return false;
                     }
                 })

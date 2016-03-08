@@ -76,13 +76,13 @@ public class GalleryActivity extends BaseActivity implements LoaderManager.Loade
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
-            Uri uri = null;
+            Uri uri;
             switch (requestCode) {
                 case RESULT_CAMERA:
                     uri = FileUtils.addFileToGallery(this, cameraFile.getAbsolutePath());
                     Intent intent = new Intent(this, UriActivity.class);
                     intent.setData(uri);
-                    startActivity(intent);
+                    startActivityForResult(intent, RESULT_SELECT);
                     break;
                 case RESULT_SELECT:
                     uri = data.getData();

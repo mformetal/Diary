@@ -164,16 +164,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
         switch (v.getId()) {
             case R.id.activity_new_entry_photo:
                 Intent intent = new Intent(this, GalleryActivity.class);
-                intent.setData(imageUri);
-
-                if (imageUri == null) {
-                    startActivityForResult(intent, REQUEST_IMAGE);
-                } else {
-                    ActivityOptions transitionActivityOptions =
-                            ActivityOptions.makeSceneTransitionAnimation(this, photo,
-                                    getString(R.string.transition_location_image));
-                    startActivityForResult(intent, REQUEST_IMAGE, transitionActivityOptions.toBundle());
-                }
+                startActivityForResult(intent, REQUEST_IMAGE);
                 break;
             case R.id.activity_new_entry_location:
                 if (placeName != null && placeId != null) {

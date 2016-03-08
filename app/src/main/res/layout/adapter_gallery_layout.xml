@@ -5,6 +5,7 @@
     android:id="@+id/adapter_gallery_image"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:elevation="@dimen/fab_elevation"
     app:aspectRatioEnabled="true"
     app:dominantMeasurement="width"
     app:aspectRatio="1.333" >

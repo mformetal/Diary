@@ -124,6 +124,12 @@ public class ViewUtils {
         }
     }
 
+    public static void invisible(ViewGroup viewGroup) {
+        for (int i = 0; i < viewGroup.getChildCount(); i++) {
+            viewGroup.getChildAt(i).setVisibility(View.INVISIBLE);
+        }
+    }
+
     public static void visible(ViewGroup viewGroup) {
         for (int i = 0; i < viewGroup.getChildCount(); i++) {
             viewGroup.getChildAt(i).setVisibility(View.VISIBLE);

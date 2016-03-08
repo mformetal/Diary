@@ -29,6 +29,7 @@ public class AnimUtils {
 
     private static int SHORT_ANIM = -1, MEDIUM_ANIM = -1, LONG_ANIM = -1;
     public final static String COLOR = "color";
+    public final static String STATUS_BAR = "statusBarColor";
 
     public static int shortAnim(Context context) {
         if (SHORT_ANIM < 0) {

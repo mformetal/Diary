@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
@@ -9,8 +10,79 @@
         android:id="@+id/activity_uri_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:layout_gravity="center"
         android:transitionName="@string/transition_gallery_to_uri" />
 
-    <!-- image controls -->
+    <Toolbar
+        android:id="@+id/activity_uri_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        style="@style/AppTheme.EntryActivity.Toolbar" />
+
+    <LinearLayout
+        android:id="@+id/activity_uri_button_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="10"
+        android:orientation="horizontal"
+        android:layout_gravity="bottom" >
+
+        <Space
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <miles.diary.ui.widget.TypefaceButton
+            android:id="@+id/activity_uri_crop"
+            android:layout_weight="2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:theme="@style/AppTheme.ColoredButton"
+            android:drawableTop="@drawable/ic_crop_24dp"
+            android:background="@color/scrim_with_alpha"
+            android:text="@string/activity_uri_crop"
+            android:gravity="center"
+            app:buttonAutofit="true" />
+
+        <Space
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <miles.diary.ui.widget.TypefaceButton
+            android:id="@+id/activity_uri_text"
+            android:layout_weight="2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:theme="@style/AppTheme.ColoredButton"
+            android:drawableTop="@drawable/ic_format_color_text_24dp"
+            android:background="@color/scrim_with_alpha"
+            android:text="@string/activity_uri_text"
+            android:gravity="center"
+            app:buttonAutofit="true" />
+
+        <Space
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <miles.diary.ui.widget.TypefaceButton
+            android:id="@+id/activity_uri_scribble"
+            android:layout_weight="2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:theme="@style/AppTheme.ColoredButton"
+            android:drawableTop="@drawable/ic_mode_edit_24dp"
+            android:background="@color/scrim_with_alpha"
+            android:text="@string/activity_uri_scribble"
+            app:buttonAutofit="true" />
+
+        <Space
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
 
 </FrameLayout>

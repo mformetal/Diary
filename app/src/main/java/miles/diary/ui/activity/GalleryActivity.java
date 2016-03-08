@@ -3,35 +3,42 @@ package miles.diary.ui.activity;
 import android.Manifest;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toolbar;
+
+import java.io.File;
+import java.io.IOException;
 
 import butterknife.Bind;
 import miles.diary.R;
 import miles.diary.data.adapter.GalleryAdapter;
 import miles.diary.ui.SpacingDecoration;
+import miles.diary.util.FileUtils;
 
 /**
  * Created by mbpeele on 1/29/16.
  */
 public class GalleryActivity extends BaseActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private final static int REQUEST_GALLERY = 1;
-    private final static int REQUEST_CAMERA = 2;
-    private final static int REQUEST_VIDEO = 3;
-    private final static int REQUESET_IMAGE_PERMISSION = 4;
-    private static final int LOADER_ID = 1;
+    private final static int RESULT_CAMERA = 1;
+    public final static int RESULT_SELECT = 2;
+    private final static int PERMISSION_IMAGE = 3;
+    private static final int LOADER_ID = 4;
 
     @Bind(R.id.activity_gallery_toolbar)
     Toolbar toolbar;
@@ -39,12 +46,12 @@ public class GalleryActivity extends BaseActivity implements LoaderManager.Loade
     RecyclerView recyclerView;
 
     private GalleryAdapter adapter;
+    private File cameraFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
-
         setActionBar(toolbar);
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -52,33 +59,73 @@ public class GalleryActivity extends BaseActivity implements LoaderManager.Loade
             String[] camera = new String[] {Manifest.permission.CAMERA,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE};
             if (!hasPermissions(camera)) {
-                ActivityCompat.requestPermissions(this, camera, REQUESET_IMAGE_PERMISSION);
+                ActivityCompat.requestPermissions(this, camera, PERMISSION_IMAGE);
             } else {
-                getLoaderManager().initLoader(LOADER_ID, null, this);
-
-                RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(this, 3,
-                        LinearLayoutManager.VERTICAL, false);
-                recyclerView.setLayoutManager(gridLayoutManager);
-                recyclerView.addItemDecoration(new SpacingDecoration(20));
-                adapter = new GalleryAdapter(this);
-                recyclerView.setAdapter(adapter);
+                setupGallery();
             }
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_uri, menu);
+        getMenuInflater().inflate(R.menu.menu_gallery, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            Uri uri = null;
+            switch (requestCode) {
+                case RESULT_CAMERA:
+                    uri = FileUtils.addFileToGallery(this, cameraFile.getAbsolutePath());
+                    Intent intent = new Intent(this, UriActivity.class);
+                    intent.setData(uri);
+                    startActivity(intent);
+                    break;
+                case RESULT_SELECT:
+                    uri = data.getData();
+                    Intent intent1 = new Intent();
+                    intent1.setData(uri);
+                    setResult(RESULT_OK, intent1);
+                    finish();
+                    break;
+            }
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_gallery_camera:
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                    try {
+                        cameraFile = FileUtils.createPhotoFile();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (cameraFile != null) {
+                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(cameraFile));
+                        startActivityForResult(takePictureIntent, RESULT_CAMERA);
+                    }
+                }
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
-            case REQUESET_IMAGE_PERMISSION:
+            case PERMISSION_IMAGE:
                 if (!permissionsGranted(grantResults)) {
                     finish();
+                } else {
+                    setupGallery();
                 }
                 break;
             default:
@@ -101,5 +148,16 @@ public class GalleryActivity extends BaseActivity implements LoaderManager.Loade
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         adapter.setCursor(null);
+    }
+
+    private void setupGallery() {
+        getLoaderManager().initLoader(LOADER_ID, null, this);
+
+        RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(this, 3,
+                LinearLayoutManager.VERTICAL, false);
+        recyclerView.setLayoutManager(gridLayoutManager);
+        recyclerView.addItemDecoration(new SpacingDecoration(20));
+        adapter = new GalleryAdapter(this);
+        recyclerView.setAdapter(adapter);
     }
 }

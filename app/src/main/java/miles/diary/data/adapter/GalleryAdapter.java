@@ -25,6 +25,7 @@ import butterknife.Bind;
 import miles.diary.R;
 import miles.diary.ui.activity.BaseActivity;
 import miles.diary.ui.activity.EntryActivity;
+import miles.diary.ui.activity.GalleryActivity;
 import miles.diary.ui.activity.HomeActivity;
 import miles.diary.ui.activity.UriActivity;
 
@@ -92,9 +93,13 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
                         Intent intent = new Intent(host, UriActivity.class);
                         ActivityOptions options =
                                 ActivityOptions.makeSceneTransitionAnimation(host,
-                                        imageView, host.getString(R.string.transition_gallery_to_uri));
+                                        Pair.create((View) imageView,
+                                                host.getString(R.string.transition_gallery_to_uri)),
+                                        host.getNavigationBarSharedElement(),
+                                        host.getStatusBarSharedElement());
                         intent.setData(uri);
-                        host.startActivity(intent, options.toBundle());
+                        host.startActivityForResult(intent, GalleryActivity.RESULT_SELECT,
+                                options.toBundle());
                     }
                 });
             }

@@ -2,9 +2,9 @@
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activity_gallery_root"
     android:orientation="vertical"
     android:gravity="center"
-    android:id="@+id/activity_uri_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -16,6 +16,7 @@
             android:id="@+id/activity_gallery_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?android:attr/actionBarSize"
+            app:layout_scrollFlags="scroll|enterAlways"
             style="@style/AppTheme.Widget.Toolbar" />
 
     </android.support.design.widget.AppBarLayout>
@@ -26,5 +27,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <!--<android.support.design.widget.FloatingActionButton-->
+        <!--android:id="@+id/activity_gallery_confirm"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_margin="@dimen/fab_margin"-->
+        <!--android:src="@drawable/ic_done_24dp"-->
+        <!--app:layout_behavior="miles.diary.ui.ScrollVisibilityBehavior"-->
+        <!--app:layout_anchor="@id/activity_gallery_root"-->
+        <!--app:layout_anchorGravity="bottom|end" />-->
 
 </android.support.design.widget.CoordinatorLayout>

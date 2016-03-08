@@ -36,7 +36,8 @@ public class AspectRatioImageView extends ImageView {
         a.recycle();
     }
 
-    @Override protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         if (!aspectRatioEnabled) return;
 

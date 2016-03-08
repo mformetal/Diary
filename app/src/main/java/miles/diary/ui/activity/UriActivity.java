@@ -32,6 +32,7 @@ import miles.diary.ui.Zoomer;
 import miles.diary.ui.transition.SimpleTransitionListener;
 import miles.diary.util.Logg;
 import miles.diary.util.ViewUtils;
+import uk.co.senab.photoview.PhotoViewAttacher;
 
 /**
  * Created by mbpeele on 3/7/16.
@@ -65,7 +66,7 @@ public class UriActivity extends BaseActivity {
         uri = intent.getData();
         postponeEnterTransition();
 
-        Zoomer zoomer = new Zoomer(imageView);
+        new PhotoViewAttacher(imageView);
 
         Glide.with(this)
                 .load(uri)

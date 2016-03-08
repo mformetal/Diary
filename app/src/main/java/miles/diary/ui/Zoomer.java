@@ -2,6 +2,8 @@ package miles.diary.ui;
 
 import android.graphics.Matrix;
 import android.graphics.PointF;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
@@ -267,7 +269,7 @@ public class Zoomer implements MotionEventHandler, ZoomerInterface {
 
     @Override
     public void setScale(float scale, float px, float py) {
-        matrix.setScale(scale, scale, px, py);
+        matrix.postScale(scale, scale, px, py);
         updateImageView();
     }
 
@@ -300,7 +302,7 @@ public class Zoomer implements MotionEventHandler, ZoomerInterface {
     }
 
     private void updateImageView() {
-        ImageView imageView = getImageView();;
+        ImageView imageView = getImageView();
         if (imageView != null) {
             imageView.setImageMatrix(matrix);
             imageView.invalidate();

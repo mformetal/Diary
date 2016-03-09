@@ -144,6 +144,9 @@ public class EntryActivity extends TransitionActivity {
             case R.id.menu_entry_delete:
                 setResultAction(Action.DELETE);
                 break;
+            case android.R.id.home:
+                finishAfterTransition();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -329,7 +332,7 @@ public class EntryActivity extends TransitionActivity {
                     .alpha(1f)
                     .setDuration(duration)
                     .setInterpolator(new DecelerateInterpolator())
-                    .setStartDelay(50 + 50 * i)
+                    .setStartDelay(150 + 50 * i)
                     .start();
         }
     }

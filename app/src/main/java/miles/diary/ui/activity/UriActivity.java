@@ -58,12 +58,6 @@ public class UriActivity extends BaseActivity {
         getActionBar().setDisplayShowTitleEnabled(false);
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setDisplayShowHomeEnabled(true);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finishAfterTransition();
-            }
-        });
 
         Intent intent = getIntent();
 
@@ -109,6 +103,9 @@ public class UriActivity extends BaseActivity {
                 intent.setData(uri);
                 setResult(RESULT_OK, intent);
                 finish();
+                break;
+            case android.R.id.home:
+                finishAfterTransition();
                 break;
         }
         return super.onOptionsItemSelected(item);

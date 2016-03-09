@@ -31,6 +31,7 @@ import miles.diary.data.model.google.PlaceInfo;
 import miles.diary.data.model.google.PlaceResponse;
 import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.data.rx.GoogleResultObservable;
+import miles.diary.data.rx.OkHttpObservable;
 import miles.diary.ui.activity.BaseActivity;
 import miles.diary.util.IntentUtils;
 import miles.diary.util.Logg;
@@ -85,31 +86,18 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
     }
 
     public Observable<PlaceResponse> searchNearby(Location location, float radius) {
-        return Observable.create(new Observable.OnSubscribe<PlaceResponse>() {
-            @Override
-            public void call(Subscriber<? super PlaceResponse> subscriber) {
-                try {
-                    String url = GoogleUrlFormatter.searchNearby(activity.getString(R.string.maps_url),
-                            location, radius, activity.getString(R.string.google_web_api_key));
+        String url = GoogleUrlFormatter.searchNearby(activity.getString(R.string.maps_url),
+                location, radius, activity.getString(R.string.google_web_api_key));
 
-                    Response response = okHttpClient.newCall(new Request.Builder()
-                            .url(url)
-                            .build()).execute();
+        OkHttpObservable<PlaceResponse> okHttpObservable =
+                new OkHttpObservable.Builder<>(okHttpClient, PlaceResponse.class)
+                        .url(url)
+                        .gson(new Gson())
+                        .build();
 
-                    Reader reader = response.body().charStream();
-                    subscriber.onNext(gson.fromJson(reader, PlaceResponse.class));
-                    reader.close();
-                } catch (IOException e) {
-                    Logg.log(e);
-                    subscriber.onError(e);
-                } catch (JsonSyntaxException e1) {
-                    subscriber.onError(e1);
-                    Logg.log(e1);
-                } finally {
-                    subscriber.onCompleted();
-                }
-            }
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        return okHttpObservable.execute()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     @SuppressWarnings({"ResourceType"})
@@ -156,7 +144,6 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
     }
 
     public Observable<PlacePhotoMetadataResult> getPlacePhotos(final String placeId) {
-        final String test = "ChIJrTLr-GyuEmsRBfy61i59si0";
         return Observable.create(new GoogleResultObservable<>(
                 Places.GeoDataApi.getPlacePhotos(client, placeId)))
                 .subscribeOn(Schedulers.io())

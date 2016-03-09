@@ -36,26 +36,6 @@ public class WeatherService {
     }
 
     public Observable<WeatherResponse> getWeather(final Double latitude, final Double longitude) {
-//        return Observable.create(new Observable.OnSubscribe<WeatherResponse>() {
-//            @Override
-//            public void call(Subscriber<? super WeatherResponse> subscriber) {
-//                try {
-//                    Response response = client.newCall(new Request.Builder()
-//                            .url(formatUrl(latitude, longitude))
-//                            .build()).execute();
-//
-//                    Reader reader = response.body().charStream();
-//                    subscriber.onNext(new Gson().fromJson(reader, WeatherResponse.class));
-//                    subscriber.onCompleted();
-//                    reader.close();
-//                } catch (IOException e) {
-//                    Logg.log(e);
-//                    subscriber.onError(e);
-//                } catch (JsonSyntaxException e1) {
-//                    subscriber.onError(e1);
-//                    Logg.log(e1);
-//                }
-//            }})
         OkHttpObservable<WeatherResponse> okHttpObservable =
                 new OkHttpObservable.Builder<>(client, WeatherResponse.class)
                 .url(formatUrl(latitude, longitude))

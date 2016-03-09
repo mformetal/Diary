@@ -55,12 +55,6 @@ public class GalleryActivity extends BaseActivity implements LoaderManager.Loade
         setActionBar(toolbar);
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setDisplayShowHomeEnabled(true);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finishAfterTransition();
-            }
-        });
 
         if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
             String[] camera = new String[] {Manifest.permission.CAMERA,
@@ -119,6 +113,9 @@ public class GalleryActivity extends BaseActivity implements LoaderManager.Loade
                         startActivityForResult(takePictureIntent, RESULT_CAMERA);
                     }
                 }
+                break;
+            case android.R.id.home:
+                finishAfterTransition();
                 break;
         }
         return super.onOptionsItemSelected(item);

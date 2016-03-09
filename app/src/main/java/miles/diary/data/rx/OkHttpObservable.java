@@ -34,6 +34,7 @@ public class OkHttpObservable<T> {
         return Observable.create(new Observable.OnSubscribe<T>() {
             @Override
             public void call(Subscriber<? super T> subscriber) {
+                subscriber.onStart();
                 try {
                     Response response = client.newCall(new Request.Builder()
                             .url(url)
@@ -42,6 +43,7 @@ public class OkHttpObservable<T> {
                     Reader reader = response.body().charStream();
                     subscriber.onNext(gson.fromJson(reader, clazz));
                     subscriber.onCompleted();
+
                     reader.close();
                 } catch (IOException e) {
                     Logg.log(e);

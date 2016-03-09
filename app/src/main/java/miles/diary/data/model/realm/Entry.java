@@ -117,4 +117,8 @@ public class Entry extends RealmObject {
         }
         return entry;
     }
+
+    public static String key() {
+        return KEY;
+    }
 }

@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_new_entry_root"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
     android:transitionName="@string/transition_fab_dialog_new_entry"
     android:descendantFocusability="beforeDescendants"
     android:focusableInTouchMode="true">
@@ -15,55 +18,39 @@
         android:layout_height="?android:attr/actionBarSize"
         style="@style/AppTheme.Widget.Toolbar" />
 
+    <miles.diary.ui.widget.CircleImageView
+        android:id="@+id/activity_new_entry_photo"
+        android:src="@drawable/ic_photo_24dp"
+        android:transitionName="@string/transition_location_image"
+        android:layout_width="@dimen/fab_normal_dimens"
+        android:layout_height="@dimen/fab_normal_dimens"
+        android:layout_marginTop="@dimen/small_fab_margin"
+        android:layout_gravity="center_horizontal" />
+
+    <miles.diary.ui.widget.TypefaceButton
+        android:id="@+id/activity_new_entry_location"
+        android:transitionName="@string/transition_location_image"
+        android:visibility="gone"
+        android:textSize="@dimen/subtitle_text_size"
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        tools:visibility="visible"
+        tools:text="Westerre Parkway" />
+
     <miles.diary.ui.widget.NotebookEditText
         android:id="@+id/activity_new_entry_body"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:textSize="@dimen/subtitle_text_size"
-        android:layout_marginTop="@dimen/action_bar_margin"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:layout_marginBottom="@dimen/action_bar_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:gravity="start|top"
         android:inputType="textCapSentences|textMultiLine|textAutoCorrect"
-        android:hint="@string/activity_entry_body_hint" />
+        android:hint="@string/activity_entry_body_hint"
+        tools:text="THIS IS A DIARY ENTRY" />
 
-    <RelativeLayout
-        android:id="@+id/activity_new_entry_fab_menu"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_anchor="@id/activity_new_entry_root"
-        app:layout_anchorGravity="bottom|center_horizontal"
-        app:layout_behavior="miles.diary.ui.SnackbarBehavior" >
-
-        <miles.diary.ui.widget.CircleImageView
-            android:id="@+id/activity_new_entry_photo"
-            android:src="@drawable/ic_photo_24dp"
-            android:transitionName="@string/transition_location_image"
-            android:layout_width="@dimen/fab_normal_dimens"
-            android:layout_height="@dimen/fab_normal_dimens"
-            android:layout_margin="@dimen/small_fab_margin"
-            android:layout_alignParentStart="true" />
-
-        <miles.diary.ui.widget.TypefaceIconTextView
-            android:id="@+id/activity_new_entry_temperature"
-            android:layout_width="@dimen/fab_normal_dimens"
-            android:layout_height="@dimen/fab_normal_dimens"
-            android:textColor="@color/accent"
-            android:gravity="center"
-            android:background="@drawable/fab_normal_background"
-            android:layout_centerInParent="true" />
-
-        <ImageView
-            android:id="@+id/activity_new_entry_location"
-            android:src="@drawable/ic_place_24dp"
-            android:transitionName="@string/transition_location_image"
-            android:layout_width="@dimen/fab_normal_dimens"
-            android:layout_height="@dimen/fab_normal_dimens"
-            android:layout_margin="@dimen/small_fab_margin"
-            android:layout_alignParentEnd="true" />
-
-    </RelativeLayout>
-
-</android.support.design.widget.CoordinatorLayout>
+</LinearLayout>

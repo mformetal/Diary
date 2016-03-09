@@ -63,7 +63,6 @@ public class LocationActivity extends BaseActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location);
-        transitionSetup();
 
         String[] permissions = new String[] {Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.ACCESS_FINE_LOCATION};
@@ -191,45 +190,5 @@ public class LocationActivity extends BaseActivity implements View.OnClickListen
         intent.putExtra(NewEntryActivity.PLACE_NAME, placeName);
         intent.putExtra(NewEntryActivity.PLACE_ID, placeId);
         setResult(RESULT_OK, intent);
-    }
-
-    private void transitionSetup() {
-        PreDrawer.addPreDrawer(root, new PreDrawer.OnPreDrawListener<ViewGroup>() {
-            @Override
-            public boolean onPreDraw(ViewGroup view) {
-                float offset = root.getHeight() / 4;
-                for (int i = 0; i < root.getChildCount(); i++) {
-                    View v = root.getChildAt(i);
-                    v.setTranslationY(offset);
-                    v.setAlpha(0f);
-                    v.animate()
-                            .alpha(1f)
-                            .translationY(0f)
-                            .setDuration(AnimUtils.mediumAnim(LocationActivity.this))
-                            .setStartDelay(150)
-                            .setInterpolator(new FastOutSlowInInterpolator());
-
-                    offset *= 1.8f;
-
-                    Context context = view.getContext();
-                    AnimUtils.colorFilter(mapIcon.getDrawable(),
-                            Color.WHITE, ContextCompat.getColor(context, R.color.accent)).start();
-                }
-                return true;
-            }
-        });
-
-
-        Transition returnTransition = getWindow().getSharedElementReturnTransition();
-
-        TransitionSet set = new TransitionSet();
-        set.setOrdering(TransitionSet.ORDERING_TOGETHER);
-        set.addTransition(returnTransition);
-        ColorTransition colorTransition = new ColorTransition(
-                ContextCompat.getColor(this, R.color.accent), Color.WHITE);
-        colorTransition.addTarget(mapIcon);
-        set.addTransition(colorTransition);
-
-        getWindow().setSharedElementReturnTransition(set);
     }
 }

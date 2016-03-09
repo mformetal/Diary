@@ -4,15 +4,24 @@ import android.app.Application;
 
 import com.google.common.collect.Lists;
 
+import java.io.File;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Objects;
 
 import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
+import io.realm.annotations.PrimaryKey;
 import miles.diary.data.error.NoInternetException;
+import miles.diary.data.error.NoRealmObjectKeyException;
 import miles.diary.data.model.realm.Entry;
 import miles.diary.data.rx.DataObservable;
 import miles.diary.data.rx.DataTransaction;
+import miles.diary.util.Logg;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -23,6 +32,7 @@ public class DataManager implements DataManagerInterface {
 
     private Application application;
     private Realm realm;
+    private final static String KEY = "key";
 
     public DataManager(Application application) {
         this.application = application;
@@ -60,10 +70,23 @@ public class DataManager implements DataManagerInterface {
 
     @Override
     public <T extends RealmObject> Observable<T> getObject(Class<T> tClass, long key) {
-        return realm.where(tClass)
-                .equalTo(Entry.KEY, key)
-                .findFirst()
-                .asObservable();
+        try {
+            Method method = tClass.getDeclaredMethod(KEY);
+            try {
+                String keyValue = (String) method.invoke(null);
+
+                return realm.where(tClass)
+                        .equalTo(keyValue, key)
+                        .findFirst()
+                        .asObservable();
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+
+        return Observable.error(new NoRealmObjectKeyException());
     }
 
     @Override

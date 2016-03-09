@@ -16,7 +16,9 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
 import android.transition.ArcMotion;
+import android.transition.ChangeImageTransform;
 import android.transition.Transition;
+import android.transition.TransitionSet;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -47,6 +49,7 @@ import miles.diary.ui.widget.TypefaceTextView;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.TextUtils;
 import miles.diary.util.ViewUtils;
+import uk.co.senab.photoview.PhotoViewAttacher;
 
 /**
  * Created by mbpeele on 2/8/16.
@@ -218,8 +221,11 @@ public class EntryActivity extends TransitionActivity {
                 @Override
                 public void onTransitionEnd(Transition transition) {
                     AnimUtils.visible(toolbar).start();
+                    ViewUtils.setZoomControls(image);
                 }
             });
+
+            TransitionSet returnSet = new TransitionSet();
 
             RoundedImageViewTransition unreveal = new RoundedImageViewTransition(
                     0, Math.min(image.getWidth(), image.getHeight()) / 2f);
@@ -232,8 +238,11 @@ public class EntryActivity extends TransitionActivity {
                 }
             });
 
+            returnSet.addTransition(unreveal);
+            returnSet.addTransition(new ChangeImageTransform());
+
             getWindow().setSharedElementEnterTransition(reveal);
-            getWindow().setSharedElementReturnTransition(unreveal);
+            getWindow().setSharedElementReturnTransition(returnSet);
         }
     }
 
@@ -254,6 +263,7 @@ public class EntryActivity extends TransitionActivity {
 
         String placeName = entry.getPlaceName();
         if (placeName != null) {
+            place.setVisibility(View.VISIBLE);
             place.setText(placeName);
         } else {
             photosFab.setVisibility(View.GONE);
@@ -265,6 +275,7 @@ public class EntryActivity extends TransitionActivity {
 
         String string = entry.getWeather();
         if (string != null) {
+            weather.setVisibility(View.VISIBLE);
             WeatherResponse weatherResponse = new Gson().fromJson(string, WeatherResponse.class);
             weather.setText(weatherResponse.getOneLineTemperatureString());
         } else {
@@ -278,7 +289,6 @@ public class EntryActivity extends TransitionActivity {
                     .fromString()
                     .asBitmap()
                     .load(entry.getUri())
-                    .dontAnimate()
                     .centerCrop()
                     .listener(new RequestListener<String, Bitmap>() {
                         @Override

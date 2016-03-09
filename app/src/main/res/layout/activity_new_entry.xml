@@ -37,7 +37,7 @@
         app:layout_anchorGravity="bottom|center_horizontal"
         app:layout_behavior="miles.diary.ui.SnackbarBehavior" >
 
-        <de.hdodenhof.circleimageview.CircleImageView
+        <miles.diary.ui.widget.CircleImageView
             android:id="@+id/activity_new_entry_photo"
             android:src="@drawable/ic_photo_24dp"
             android:transitionName="@string/transition_location_image"

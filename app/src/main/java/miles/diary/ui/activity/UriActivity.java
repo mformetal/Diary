@@ -1,11 +1,13 @@
 package miles.diary.ui.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.graphics.Palette;
+import android.transition.ChangeBounds;
 import android.transition.ChangeImageTransform;
 import android.transition.ChangeTransform;
 import android.transition.Transition;
@@ -15,7 +17,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AnticipateOvershootInterpolator;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
@@ -28,7 +29,7 @@ import java.util.List;
 import butterknife.Bind;
 import miles.diary.R;
 import miles.diary.ui.PaletteWindows;
-import miles.diary.ui.Zoomer;
+import miles.diary.ui.transition.ScalingImageTransition;
 import miles.diary.ui.transition.SimpleTransitionListener;
 import miles.diary.util.Logg;
 import miles.diary.util.ViewUtils;
@@ -43,8 +44,6 @@ public class UriActivity extends BaseActivity {
     Toolbar toolbar;
     @Bind(R.id.activity_uri_image)
     ImageView imageView;
-    @Bind(R.id.activity_uri_button_row)
-    LinearLayout buttons;
 
     private Uri uri;
 
@@ -53,25 +52,27 @@ public class UriActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_uri);
         setupTransitions();
-        getWindow().getSharedElementEnterTransition().addListener(enterListener);
-        getWindow().getSharedElementReturnTransition().addListener(returnListener);
 
         setActionBar(toolbar);
         toolbar.inflateMenu(R.menu.menu_uri);
         getActionBar().setDisplayShowTitleEnabled(false);
         getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setDisplayShowHomeEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finishAfterTransition();
+            }
+        });
 
         Intent intent = getIntent();
 
         uri = intent.getData();
         postponeEnterTransition();
 
-        new PhotoViewAttacher(imageView);
-
         Glide.with(this)
                 .load(uri)
                 .asBitmap()
-                .centerCrop()
                 .listener(new RequestListener<Uri, Bitmap>() {
                     @Override
                     public boolean onException(Exception e, Uri model, Target<Bitmap> target, boolean isFirstResource) {
@@ -83,17 +84,11 @@ public class UriActivity extends BaseActivity {
                     public boolean onResourceReady(Bitmap resource, Uri model, Target<Bitmap> target,
                                                    boolean isFromMemoryCache, boolean isFirstResource) {
                         startPostponedEnterTransition();
-                        invalidateOptionsMenu();
-
-                        final List<Drawable> drawables = new ArrayList<>();
-                        drawables.add(toolbar.getNavigationIcon());
-                        drawables.add(getMenuItem(toolbar, 0).getIcon());
 
                         Palette.from(resource)
                                 .maximumColorCount(3)
                                 .clearFilters()
-                                .generate(new PaletteWindows(UriActivity.this, resource,
-                                        null, drawables));
+                                .generate(new PaletteWindows(UriActivity.this, resource));
                         return false;
                     }
                 })
@@ -113,62 +108,21 @@ public class UriActivity extends BaseActivity {
                 Intent intent = new Intent();
                 intent.setData(uri);
                 setResult(RESULT_OK, intent);
-                finishAfterTransition();
+                finish();
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
     private void setupTransitions() {
-        TransitionSet set = new TransitionSet();
-        set.addTransition(getWindow().getSharedElementEnterTransition());
-        set.addTransition(new ChangeImageTransform());
-        set.addTransition(new ChangeTransform());
-        set.setOrdering(TransitionSet.ORDERING_TOGETHER);
-        getWindow().setSharedElementEnterTransition(set);
+        getWindow().setSharedElementEnterTransition(new ScalingImageTransition());
+        getWindow().setSharedElementReturnTransition(new ScalingImageTransition());
 
-//        TransitionSet set1 = new TransitionSet();
-//        set.addTransition(getWindow().getSharedElementReturnTransition());
-//        set.addTransition(new ChangeImageTransform());
-//        set.setOrdering(TransitionSet.ORDERING_TOGETHER);
-//        getWindow().setSharedElementReturnTransition(set1);
-    }
-
-    private SimpleTransitionListener enterListener = new SimpleTransitionListener() {
-        @Override
-        public void onTransitionStart(Transition transition) {
-            ViewUtils.invisible(buttons);
-        }
-
-        @Override
-        public void onTransitionEnd(Transition transition) {
-            for (int i = 0; i < buttons.getChildCount(); i++) {
-                final View view = buttons.getChildAt(i);
-
-                view.setScaleX(0f);
-                view.setScaleY(0f);
-
-                view.animate()
-                        .scaleX(1f)
-                        .scaleY(1f)
-                        .setDuration(200)
-                        .setStartDelay(50 + 100 * i)
-                        .setInterpolator(new AnticipateOvershootInterpolator())
-                        .withStartAction(new Runnable() {
-                            @Override
-                            public void run() {
-                                root.bringChildToFront(view);
-                                view.setVisibility(View.VISIBLE);
-                            }
-                        });
+        getWindow().getSharedElementEnterTransition().addListener(new SimpleTransitionListener() {
+            @Override
+            public void onTransitionEnd(Transition transition) {
+                ViewUtils.setZoomControls(imageView);
             }
-        }
-    };
-
-    private SimpleTransitionListener returnListener = new SimpleTransitionListener() {
-        @Override
-        public void onTransitionStart(Transition transition) {
-            ViewUtils.gone(buttons);
-        }
-    };
+        });
+    }
 }

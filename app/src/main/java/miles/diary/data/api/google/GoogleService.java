@@ -17,7 +17,11 @@ import com.google.android.gms.location.places.PlacePhotoMetadata;
 import com.google.android.gms.location.places.PlacePhotoMetadataResult;
 import com.google.android.gms.location.places.PlacePhotoResult;
 import com.google.android.gms.location.places.Places;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.util.List;
 
 import miles.diary.R;
@@ -25,14 +29,16 @@ import miles.diary.data.api.LocationService;
 import miles.diary.data.model.google.LikelyPlace;
 import miles.diary.data.model.google.PlaceInfo;
 import miles.diary.data.model.google.PlaceResponse;
+import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.data.rx.GoogleResultObservable;
 import miles.diary.ui.activity.BaseActivity;
 import miles.diary.util.IntentUtils;
 import miles.diary.util.Logg;
 import miles.diary.util.SimpleLocationListener;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.logging.HttpLoggingInterceptor;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -48,11 +54,22 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
     private final GoogleApiClient client;
     private final BaseActivity activity;
     private GoogleServiceCallback callback;
-    private MapsAPI mapsService;
+    private OkHttpClient okHttpClient;
+    private Gson gson;
 
     public GoogleService(final BaseActivity activity1, GoogleApiClient.Builder builder,
                          GoogleServiceCallback googleServiceCallback) {
         activity = activity1;
+
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addInterceptor(logging);
+        okHttpClient = httpClient.build();
+
+        okHttpClient = new OkHttpClient();
+
+        gson = new Gson();
 
         client = builder
                 .addConnectionCallbacks(this)
@@ -68,21 +85,31 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
     }
 
     public Observable<PlaceResponse> searchNearby(Location location, float radius) {
-        if (mapsService == null) {
-            Retrofit builder = new Retrofit.Builder()
-                    .baseUrl(activity.getString(R.string.maps_url))
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                    .build();
+        return Observable.create(new Observable.OnSubscribe<PlaceResponse>() {
+            @Override
+            public void call(Subscriber<? super PlaceResponse> subscriber) {
+                try {
+                    String url = GoogleUrlFormatter.searchNearby(activity.getString(R.string.maps_url),
+                            location, radius, activity.getString(R.string.google_web_api_key));
 
-            mapsService = builder.create(MapsAPI.class);
-        }
+                    Response response = okHttpClient.newCall(new Request.Builder()
+                            .url(url)
+                            .build()).execute();
 
-        String string = location.getLatitude() + "," + location.getLongitude();
-        return mapsService.searchNearby(string, radius,
-                activity.getString(R.string.google_web_api_key))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+                    Reader reader = response.body().charStream();
+                    subscriber.onNext(gson.fromJson(reader, PlaceResponse.class));
+                    reader.close();
+                } catch (IOException e) {
+                    Logg.log(e);
+                    subscriber.onError(e);
+                } catch (JsonSyntaxException e1) {
+                    subscriber.onError(e1);
+                    Logg.log(e1);
+                } finally {
+                    subscriber.onCompleted();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
     }
 
     @SuppressWarnings({"ResourceType"})

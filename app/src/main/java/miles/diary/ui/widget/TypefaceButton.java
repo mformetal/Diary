@@ -8,7 +8,6 @@ import android.graphics.drawable.Drawable;
 import android.support.v7.widget.AppCompatButton;
 import android.util.AttributeSet;
 
-import me.grantland.widget.AutofitHelper;
 import miles.diary.R;
 import miles.diary.ui.PreDrawer;
 import miles.diary.util.TextUtils;
@@ -40,11 +39,6 @@ public class TypefaceButton extends AppCompatButton {
 
         if (attrs != null) {
             TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.TypefaceButton);
-
-            if (array.getBoolean(R.styleable.TypefaceButton_buttonAutofit, false)) {
-                AutofitHelper helper = AutofitHelper.create(this, attrs);
-                helper.setTextSize(getTextSize());
-            }
 
             int color = array.getColor(R.styleable.TypefaceButton_tintDrawable, Color.TRANSPARENT);
             if (color != Color.TRANSPARENT) {

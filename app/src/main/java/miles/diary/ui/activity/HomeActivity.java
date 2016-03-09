@@ -28,6 +28,8 @@ import miles.diary.ui.DividerDecoration;
 import miles.diary.ui.transition.FabDialogHelper;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.Logg;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class HomeActivity extends TransitionActivity implements DataLoadingListener {
 

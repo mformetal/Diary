@@ -34,19 +34,10 @@ public class PaletteWindows implements Palette.PaletteAsyncListener {
 
     private final SoftReference<Activity> softReference;
     private final Bitmap resource;
-    private List<View> overlappingViews;
-    private List<Drawable> overlappingDrawables;
 
     public PaletteWindows(Activity activity, Bitmap bitmap) {
         softReference = new SoftReference<Activity>(activity);
         resource = bitmap;
-    }
-
-    public PaletteWindows(Activity activity, Bitmap bitmap, List<View> views, List<Drawable> drawables) {
-        softReference = new SoftReference<Activity>(activity);
-        resource = bitmap;
-        overlappingViews = views;
-        overlappingDrawables = drawables;
     }
 
     @Override
@@ -64,21 +55,6 @@ public class PaletteWindows implements Palette.PaletteAsyncListener {
 
             if (!isDark) {
                 int darkColor = ContextCompat.getColor(activity, R.color.dark_icons);
-                if (overlappingViews != null) {
-                    for (View view: overlappingViews) {
-                        if (view instanceof ImageView) {
-                            ((ImageView) view).setColorFilter(darkColor);
-                        } else {
-                            view.setBackgroundColor(darkColor);
-                        }
-                    }
-                }
-
-                if (overlappingDrawables != null) {
-                    for (Drawable drawable: overlappingDrawables) {
-                        drawable.setColorFilter(darkColor, PorterDuff.Mode.SRC_IN);
-                    }
-                }
             }
 
             int statusBarColor = window.getStatusBarColor();

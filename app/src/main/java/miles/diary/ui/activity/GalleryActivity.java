@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -29,6 +28,7 @@ import miles.diary.R;
 import miles.diary.data.adapter.GalleryAdapter;
 import miles.diary.ui.SpacingDecoration;
 import miles.diary.util.FileUtils;
+import miles.diary.util.Logg;
 
 /**
  * Created by mbpeele on 1/29/16.
@@ -54,6 +54,13 @@ public class GalleryActivity extends BaseActivity implements LoaderManager.Loade
         setContentView(R.layout.activity_gallery);
         setActionBar(toolbar);
         getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setDisplayShowHomeEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finishAfterTransition();
+            }
+        });
 
         if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
             String[] camera = new String[] {Manifest.permission.CAMERA,
@@ -79,7 +86,7 @@ public class GalleryActivity extends BaseActivity implements LoaderManager.Loade
             Uri uri;
             switch (requestCode) {
                 case RESULT_CAMERA:
-                    uri = FileUtils.addFileToGallery(this, cameraFile.getAbsolutePath());
+                    uri = FileUtils.addFileToFolder(this, cameraFile.getAbsolutePath());
                     Intent intent = new Intent(this, UriActivity.class);
                     intent.setData(uri);
                     startActivityForResult(intent, RESULT_SELECT);
@@ -135,7 +142,7 @@ public class GalleryActivity extends BaseActivity implements LoaderManager.Loade
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String[] projection = new String[] {MediaStore.Images.Thumbnails.DATA};
+        String[] projection = new String[] { MediaStore.Images.Media.DATA };
         return new CursorLoader(this, MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 projection, null, null, MediaStore.Images.ImageColumns.DATE_TAKEN);
     }

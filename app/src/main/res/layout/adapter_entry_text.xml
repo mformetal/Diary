@@ -28,7 +28,6 @@
         android:textSize="@dimen/small_text_size"
         android:textColor="@color/secondary_text"
         android:maxLines="1"
-        app:textViewAutoFit="true"
         tools:text="MOUNTAIN BIKING" />
 
     <miles.diary.ui.widget.TypefaceTextView

@@ -2,9 +2,7 @@ package miles.diary.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
-import android.view.View;
 import android.widget.ProgressBar;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -16,8 +14,11 @@ import miles.diary.R;
 import miles.diary.data.adapter.PlacePhotosAdapter;
 import miles.diary.data.api.google.GoogleService;
 import miles.diary.data.rx.ActivitySubscriber;
+import miles.diary.ui.fragment.BaseDialogFragment;
+import miles.diary.ui.fragment.ConfirmationDialog;
 import miles.diary.ui.widget.TypefaceTextView;
 import miles.diary.util.AnimUtils;
+import rx.functions.Action1;
 
 /**
  * Created by mbpeele on 3/6/16.
@@ -57,6 +58,12 @@ public class PlacePhotosActivity extends BaseActivity implements GoogleService.G
     @Override
     public void onConnected(Bundle bundle, GoogleApiClient client, final BaseActivity activity) {
         googleService.getPlacePhotos(id)
+                .doOnError(new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        onErrorOrEmpty();
+                    }
+                })
                 .subscribe(new ActivitySubscriber<PlacePhotoMetadataResult>(this) {
                     @Override
                     public void onNext(PlacePhotoMetadataResult result) {
@@ -68,18 +75,21 @@ public class PlacePhotosActivity extends BaseActivity implements GoogleService.G
                             pager.setOffscreenPageLimit(2);
                             pager.setAdapter(placePhotosAdapter);
                         } else {
-                            Snackbar.make(root,
-                                    getString(R.string.activity_place_photos_empty),
-                                    Snackbar.LENGTH_INDEFINITE)
-                                    .setAction(android.R.string.ok, new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            finish();
-                                        }
-                                    })
-                                    .show();
+                            onErrorOrEmpty();
                         }
                     }
                 });
+    }
+
+    private void onErrorOrEmpty() {
+        ConfirmationDialog dialog =
+                ConfirmationDialog.newInstance(getString(R.string.activity_place_photos_empty));
+        dialog.setDismissListener(new BaseDialogFragment.OnDismissListener() {
+            @Override
+            public void onDismiss(BaseDialogFragment fragment) {
+                finish();
+            }
+        });
+        dialog.show(getFragmentManager(), CONFIRMATION_DIALOG);
     }
 }

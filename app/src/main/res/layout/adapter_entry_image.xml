@@ -28,10 +28,9 @@
         android:textSize="@dimen/small_text_size"
         android:textColor="@color/secondary_text"
         android:maxLines="1"
-        app:textViewAutoFit="true"
         tools:text="MOUNTAIN BIKING" />
 
-    <de.hdodenhof.circleimageview.CircleImageView
+    <miles.diary.ui.widget.CircleImageView
         android:id="@+id/adapter_entry_image_view"
         android:layout_width="@dimen/adapter_image_dimens"
         android:layout_height="@dimen/adapter_image_dimens"

@@ -10,6 +10,8 @@ import butterknife.ButterKnife;
  */
 public class BaseFragment extends Fragment {
 
+    public BaseFragment() {}
+
     public void bind(View view) {
         ButterKnife.bind(this, view);
     }

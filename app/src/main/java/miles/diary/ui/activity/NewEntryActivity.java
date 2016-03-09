@@ -26,7 +26,6 @@ import com.google.gson.Gson;
 
 import butterknife.Bind;
 import butterknife.OnClick;
-import de.hdodenhof.circleimageview.CircleImageView;
 import miles.diary.R;
 import miles.diary.data.api.LocationService;
 import miles.diary.data.api.google.GoogleService;
@@ -35,10 +34,13 @@ import miles.diary.data.model.realm.Entry;
 import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.ui.transition.FabDialogHelper;
+import miles.diary.ui.widget.CircleImageView;
 import miles.diary.ui.widget.TypefaceEditText;
 import miles.diary.ui.widget.TypefaceIconTextView;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.ViewUtils;
+import rx.Observable;
+import rx.functions.Func1;
 
 public class NewEntryActivity extends BaseActivity implements View.OnClickListener {
 
@@ -68,7 +70,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_entry);
-        FabDialogHelper.makeFabDialogTransition(this, root, 20);
+        FabDialogHelper.makeFabDialogTransition(this, root, 20, AnimUtils.longAnim(this));
 
         setActionBar(toolbar);
 
@@ -255,8 +257,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
 
     private void getWeather(Location location) {
         if (temperature == null) {
-            weatherService.getWeather(location.getLatitude(),
-                    location.getLongitude())
+            weatherService.getWeather(location.getLatitude(), location.getLongitude())
                     .subscribe(new ActivitySubscriber<WeatherResponse>(this) {
                         @Override
                         public void onNext(WeatherResponse weatherResponse) {
@@ -300,14 +301,16 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
         if (hasPermissions(permissions)) {
             if (hasConnection()) {
                 if (LocationService.isLocationEnabled(this)) {
-                    googleService.getLocation()
-                            .subscribe(new ActivitySubscriber<Location>(this) {
-                                @Override
-                                public void onNext(Location location) {
-                                    getWeather(location);
-                                    getPlace(location);
-                                }
-                            });
+                    addSubscription(
+                            googleService.getLocation()
+                                    .switchMap(new Func1<Location, Observable<?>>() {
+                                        @Override
+                                        public Observable<?> call(Location location) {
+                                            getWeather(location);
+                                            getPlace(location);
+                                            return Observable.just(location);
+                                        }
+                                    }).subscribe());
                 } else {
                     LocationService.getLocationAvailabilityUpdate(this, new LocationService.AvailabilityCallback() {
                         @Override

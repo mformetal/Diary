@@ -39,6 +39,8 @@ public abstract class BaseActivity extends AppCompatActivity {
     private CompositeSubscription compositeSubscription;
     protected ViewGroup root;
 
+    protected final static String CONFIRMATION_DIALOG = "confirmation";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

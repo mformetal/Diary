@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import miles.diary.ui.PreDrawer;
+import uk.co.senab.photoview.PhotoViewAttacher;
 
 /**
  * Created by mbpeele on 1/14/16.
@@ -76,6 +77,10 @@ public class ViewUtils {
                 }
             });
         }
+    }
+
+    public static void setZoomControls(ImageView imageView) {
+        new PhotoViewAttacher(imageView);
     }
 
     public static int getActionBarSize(Context context) {

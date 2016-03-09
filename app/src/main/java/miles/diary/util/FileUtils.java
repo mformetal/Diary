@@ -31,24 +31,28 @@ import rx.schedulers.Schedulers;
  */
 public class FileUtils {
 
+    private static final File FILE_DIR = Environment.getExternalStoragePublicDirectory(
+            Environment.DIRECTORY_DOCUMENTS);
+    private static final String FOLDER_NAME = "Diary";
+    private static final String IMAGE_TYPE = ".jpg";
+
     private final static String MIME_IMAGE = "image/jpeg";
     private final static String MIME_VIDEO = "video/mp4";
 
     private FileUtils() {}
 
     public static File createPhotoFile() throws IOException {
+        File dir = new File(FILE_DIR.toString() + "/" + FOLDER_NAME + "/");
+        if (!dir.exists() || !dir.isDirectory()) {
+            dir.mkdirs();
+        }
+
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES);
-        return File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
+        return File.createTempFile(imageFileName, IMAGE_TYPE, dir);
     }
 
-    public static Uri addFileToGallery(Context context, String filePath) {
+    public static Uri addFileToFolder(Context context, String filePath) {
         Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         File f = new File(filePath);
         Uri contentUri = Uri.fromFile(f);

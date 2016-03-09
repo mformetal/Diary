@@ -125,7 +125,6 @@ public class FabContainerTransition extends ChangeBounds {
             }
         }
 
-
         AnimatorSet transition = new AnimatorSet();
         transition.playTogether(changeBounds, corners, color);
         transition.setDuration(AnimUtils.mediumAnim(sceneRoot.getContext()));

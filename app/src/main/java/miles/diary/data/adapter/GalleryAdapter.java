@@ -5,8 +5,10 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.transition.Fade;
 import android.transition.Transition;
@@ -23,11 +25,16 @@ import java.io.File;
 
 import butterknife.Bind;
 import miles.diary.R;
+import miles.diary.data.model.weather.Weather;
+import miles.diary.data.model.weather.WeatherResponse;
+import miles.diary.data.rx.OkHttpObservable;
+import miles.diary.ui.SquareTransformation;
 import miles.diary.ui.activity.BaseActivity;
 import miles.diary.ui.activity.EntryActivity;
 import miles.diary.ui.activity.GalleryActivity;
 import miles.diary.ui.activity.HomeActivity;
 import miles.diary.ui.activity.UriActivity;
+import miles.diary.util.Logg;
 
 /**
  * Created by mbpeele on 3/7/16.
@@ -78,30 +85,32 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
             if (cursor.moveToPosition(position)) {
                 final int index = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
                 final String path = cursor.getString(index);
-                final Uri uri = Uri.fromFile(new File(path));
 
-                Glide.with(host)
-                        .load(uri)
-                        .into(imageView);
+                File file = new File(path);
+                if (file.length() != 0) {
+                    final Uri uri = Uri.fromFile(file);
 
-                imageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        String name = host.getString(R.string.transition_gallery_to_uri);
-                        imageView.setTransitionName(name);
+                    Glide.with(host)
+                            .load(uri)
+                            .into(imageView);
 
-                        Intent intent = new Intent(host, UriActivity.class);
-                        ActivityOptions options =
-                                ActivityOptions.makeSceneTransitionAnimation(host,
-                                        Pair.create((View) imageView,
-                                                host.getString(R.string.transition_gallery_to_uri)),
-                                        host.getNavigationBarSharedElement(),
-                                        host.getStatusBarSharedElement());
-                        intent.setData(uri);
-                        host.startActivityForResult(intent, GalleryActivity.RESULT_SELECT,
-                                options.toBundle());
-                    }
-                });
+                    imageView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            String name = host.getString(R.string.transition_gallery_to_uri);
+                            imageView.setTransitionName(name);
+
+                            Intent intent = new Intent(host, UriActivity.class);
+                            ActivityOptions options =
+                                    ActivityOptions.makeSceneTransitionAnimation(host,
+                                            imageView,
+                                            host.getString(R.string.transition_gallery_to_uri));
+                            intent.setData(uri);
+                            host.startActivityForResult(intent, GalleryActivity.RESULT_SELECT,
+                                    options.toBundle());
+                        }
+                    });
+                }
             }
         }
     }

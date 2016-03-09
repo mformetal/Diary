@@ -3,16 +3,25 @@
 
     <declare-styleable name="TypefaceTextView">
         <attr name="textViewFont" format="string" />
-        <attr name="textViewAutoFit" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="TypefaceButton">
-        <attr name="buttonAutofit" format="boolean" />
         <attr name="tintDrawable" format="reference" />
     </declare-styleable>
 
     <declare-styleable name="TypefaceEditText">
         <attr name="editTextFont" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="CheckableTypefaceButton" >
+        <attr name="checked" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="CircleImageView">
+        <attr name="civ_border_width" format="dimension" />
+        <attr name="civ_border_color" format="color" />
+        <attr name="civ_border_overlay" format="boolean" />
+        <attr name="civ_fill_color" format="color" />
     </declare-styleable>
 
     <declare-styleable name="AspectRatioImageView">

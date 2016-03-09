@@ -5,7 +5,6 @@ import android.content.res.TypedArray;
 import android.support.v7.widget.AppCompatTextView;
 import android.util.AttributeSet;
 
-import me.grantland.widget.AutofitHelper;
 import miles.diary.R;
 import miles.diary.util.TextUtils;
 
@@ -41,12 +40,6 @@ public class TypefaceTextView extends AppCompatTextView {
                 setTypeface(TextUtils.getFont(getContext(), font));
             } else {
                 setTypeface(TextUtils.getDefaultFont(getContext()));
-            }
-
-            boolean autofit = array.getBoolean(R.styleable.TypefaceTextView_textViewAutoFit, false);
-            if (autofit) {
-                AutofitHelper helper = AutofitHelper.create(this, attrs);
-                helper.setTextSize(getTextSize());
             }
             array.recycle();
         } else {

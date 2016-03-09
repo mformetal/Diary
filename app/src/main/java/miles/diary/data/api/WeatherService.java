@@ -9,7 +9,9 @@ import java.io.IOException;
 import java.io.Reader;
 
 import miles.diary.R;
+import miles.diary.data.model.weather.Weather;
 import miles.diary.data.model.weather.WeatherResponse;
+import miles.diary.data.rx.OkHttpObservable;
 import miles.diary.util.Logg;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -26,7 +28,6 @@ public class WeatherService {
 
     private OkHttpClient client;
     private String baseUrl, apiKey;
-    private Observable<WeatherResponse> weatherResponseObservable;
 
     public WeatherService(Application application) {
         client = new OkHttpClient();
@@ -35,31 +36,37 @@ public class WeatherService {
     }
 
     public Observable<WeatherResponse> getWeather(final Double latitude, final Double longitude) {
-        if (weatherResponseObservable == null) {
-            weatherResponseObservable = Observable.create(new Observable.OnSubscribe<WeatherResponse>() {
-                @Override
-                public void call(Subscriber<? super WeatherResponse> subscriber) {
-                    try {
-                        Response response = client.newCall(new Request.Builder()
-                                .url(formatUrl(latitude, longitude))
-                                .build()).execute();
+//        return Observable.create(new Observable.OnSubscribe<WeatherResponse>() {
+//            @Override
+//            public void call(Subscriber<? super WeatherResponse> subscriber) {
+//                try {
+//                    Response response = client.newCall(new Request.Builder()
+//                            .url(formatUrl(latitude, longitude))
+//                            .build()).execute();
+//
+//                    Reader reader = response.body().charStream();
+//                    subscriber.onNext(new Gson().fromJson(reader, WeatherResponse.class));
+//                    subscriber.onCompleted();
+//                    reader.close();
+//                } catch (IOException e) {
+//                    Logg.log(e);
+//                    subscriber.onError(e);
+//                } catch (JsonSyntaxException e1) {
+//                    subscriber.onError(e1);
+//                    Logg.log(e1);
+//                }
+//            }})
+        OkHttpObservable<WeatherResponse> okHttpObservable =
+                new OkHttpObservable.Builder<>(client, WeatherResponse.class)
+                .url(formatUrl(latitude, longitude))
+                .gson(new Gson())
+                .build();
 
-                        Reader reader = response.body().charStream();
-                        subscriber.onNext(new Gson().fromJson(reader, WeatherResponse.class));
-                        subscriber.onCompleted();
-                        reader.close();
-                    } catch (IOException e) {
-                        Logg.log(e);
-                        subscriber.onError(e);
-                    } catch (JsonSyntaxException e1) {
-                        subscriber.onError(e1);
-                        Logg.log(e1);
-                    }
-                }
-            }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
-        }
-
-        return weatherResponseObservable;
+        return okHttpObservable.execute()
+                .cache()
+                .retry(1)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     private String formatUrl(final double latitude, final double longitude) {

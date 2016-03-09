@@ -12,7 +12,7 @@ import com.google.android.gms.location.places.PlacePhotoMetadataResult;
 import butterknife.Bind;
 import miles.diary.R;
 import miles.diary.data.adapter.PlacePhotosAdapter;
-import miles.diary.data.api.google.GoogleService;
+import miles.diary.data.api.GoogleService;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.ui.fragment.BaseDialogFragment;
 import miles.diary.ui.fragment.ConfirmationDialog;

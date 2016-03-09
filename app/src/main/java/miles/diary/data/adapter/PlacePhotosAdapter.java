@@ -15,7 +15,7 @@ import com.google.android.gms.location.places.PlacePhotoMetadataResult;
 import com.google.android.gms.location.places.PlacePhotoResult;
 
 import miles.diary.R;
-import miles.diary.data.api.google.GoogleService;
+import miles.diary.data.api.GoogleService;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.ui.PreDrawer;
 import miles.diary.ui.activity.BaseActivity;

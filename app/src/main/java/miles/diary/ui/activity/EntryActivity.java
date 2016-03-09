@@ -195,15 +195,6 @@ public class EntryActivity extends TransitionActivity {
             int color = ContextCompat.getColor(this, R.color.dark_icons);
             toolbar.getNavigationIcon().mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
             toolbar.setTitleTextColor(color);
-
-            Animator animator = AnimUtils.background(root,
-                    Color.TRANSPARENT,
-                    Color.WHITE)
-                    .setDuration(AnimUtils.longAnim(this));
-            animator.setInterpolator(new DecelerateInterpolator());
-            animator.start();
-
-            slideUpView(root, AnimUtils.shortAnim(this));
         } else {
             ArcMotion arcMotion = new ArcMotion();
             arcMotion.setMinimumHorizontalAngle(50f);

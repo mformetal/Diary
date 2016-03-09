@@ -4,7 +4,7 @@
     <string name="activity_gallery_name">Gallery</string>
     <string name="realm_name">Realm</string>
 
-    <string name="no_internet">No internet connection found.</string>
+    <string name="error_no_internet">No internet connection found.</string>
 
     <string name="activity_place_photos_empty">No Photos Found :(</string>
 

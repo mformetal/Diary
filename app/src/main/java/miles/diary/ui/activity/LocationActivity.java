@@ -30,7 +30,7 @@ import butterknife.Bind;
 import butterknife.OnClick;
 import miles.diary.R;
 import miles.diary.data.adapter.AutoCompleteAdapter;
-import miles.diary.data.api.google.GoogleService;
+import miles.diary.data.api.GoogleService;
 import miles.diary.data.model.google.AutoCompleteItem;
 import miles.diary.data.model.google.LikelyPlace;
 import miles.diary.data.model.google.PlaceInfo;

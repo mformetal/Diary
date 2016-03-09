@@ -95,7 +95,10 @@ public class EntryAdapter extends BaseRealmAdapter<RecyclerView.ViewHolder> {
                 @Override
                 public void onClick(View v) {
                     Intent intent = EntryActivity.newIntent(host, entry);
-                    host.startActivityForResult(intent, HomeActivity.RESULT_CODE_ENTRY);
+                    ActivityOptions options =
+                            ActivityOptions.makeSceneTransitionAnimation(host,
+                                    body, host.getString(R.string.transition_entry_text));
+                    host.startActivityForResult(intent, HomeActivity.RESULT_CODE_ENTRY, options.toBundle());
                 }
             });
 

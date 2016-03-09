@@ -36,21 +36,19 @@ public class WeatherService {
     }
 
     public Observable<WeatherResponse> getWeather(final Double latitude, final Double longitude) {
+        String url = baseUrl + "data/2.5/weather?" +
+                "lat=" + latitude + "&lon=" + longitude + "&APPID=" + apiKey;
+
         OkHttpObservable<WeatherResponse> okHttpObservable =
-                new OkHttpObservable.Builder<>(client, WeatherResponse.class)
-                .url(formatUrl(latitude, longitude))
+                new OkHttpObservable.Builder<>(WeatherResponse.class)
+                .url(url)
                 .gson(new Gson())
                 .build();
 
-        return okHttpObservable.execute()
+        return okHttpObservable.execute(client)
                 .cache()
                 .retry(1)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
-    }
-
-    private String formatUrl(final double latitude, final double longitude) {
-        return baseUrl + "data/2.5/weather?" +
-                "lat=" + latitude + "&lon=" + longitude + "&APPID=" + apiKey;
     }
 }

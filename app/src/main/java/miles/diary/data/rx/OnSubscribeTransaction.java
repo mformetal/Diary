@@ -7,11 +7,11 @@ import rx.Subscriber;
 /**
  * Created by mbpeele on 3/3/16.
  */
-public abstract class OnSubscribeDataTransaction<T> implements Observable.OnSubscribe<T> {
+public abstract class OnSubscribeTransaction<T> implements Observable.OnSubscribe<T> {
 
     private final Realm realm;
 
-    public OnSubscribeDataTransaction(Realm realm) {
+    public OnSubscribeTransaction(Realm realm) {
         this.realm = realm;
     }
 

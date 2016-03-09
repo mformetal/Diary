@@ -41,6 +41,7 @@
         android:layout_marginBottom="@dimen/adapter_entry_margin"
         android:gravity="center_vertical"
         android:textSize="@dimen/medium_text_size"
+        android:transitionName="@string/transition_entry_text"
         tools:text="MOUNTAIN BIKING" />
 
     <miles.diary.ui.widget.TypefaceTextView

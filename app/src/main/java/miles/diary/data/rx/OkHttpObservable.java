@@ -20,17 +20,15 @@ public class OkHttpObservable<T> {
 
     private String url;
     private Class<T> clazz;
-    private OkHttpClient client;
     private Gson gson;
 
     private OkHttpObservable(Builder builder) {
         this.url = builder.url;
         this.clazz = builder.clazz;
-        this.client = builder.client;
         this.gson = builder.gson;
     }
 
-    public Observable<T> execute() {
+    public Observable<T> execute(OkHttpClient client) {
         return Observable.create(new Observable.OnSubscribe<T>() {
             @Override
             public void call(Subscriber<? super T> subscriber) {
@@ -59,11 +57,9 @@ public class OkHttpObservable<T> {
 
         public String url;
         public Class clazz;
-        public OkHttpClient client;
         public Gson gson;
 
-        public Builder(OkHttpClient client, Class<T> clazz) {
-            this.client = client;
+        public Builder(Class<T> clazz) {
             this.clazz = clazz;
         }
 

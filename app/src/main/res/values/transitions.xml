@@ -2,6 +2,7 @@
 <resources>
     <string name="transition_location_image">location</string>
     <string name="transition_entry_image">entry</string>
+    <string name="transition_entry_text">entryText</string>
     <string name="transition_fab_dialog_new_entry">new_entry</string>
     <string name="transition_gallery_to_uri">gallery</string>
 </resources>

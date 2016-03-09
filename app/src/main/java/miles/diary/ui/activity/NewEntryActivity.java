@@ -28,7 +28,7 @@ import butterknife.Bind;
 import butterknife.OnClick;
 import miles.diary.R;
 import miles.diary.data.api.LocationService;
-import miles.diary.data.api.google.GoogleService;
+import miles.diary.data.api.GoogleService;
 import miles.diary.data.model.google.PlaceResponse;
 import miles.diary.data.model.realm.Entry;
 import miles.diary.data.model.weather.WeatherResponse;

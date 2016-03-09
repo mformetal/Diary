@@ -115,6 +115,7 @@
                 android:textColor="@color/dialog_text"
                 android:gravity="start|top"
                 android:layout_below="@id/activity_entry_date"
+                android:transitionName="@string/transition_entry_text"
                 tools:text="BODY" />
 
         </RelativeLayout>

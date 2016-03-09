@@ -1,4 +1,4 @@
-package miles.diary.data.api.google;
+package miles.diary.data.api;
 
 import android.content.IntentSender;
 import android.location.Location;
@@ -18,18 +18,13 @@ import com.google.android.gms.location.places.PlacePhotoMetadataResult;
 import com.google.android.gms.location.places.PlacePhotoResult;
 import com.google.android.gms.location.places.Places;
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 
-import java.io.IOException;
-import java.io.Reader;
 import java.util.List;
 
 import miles.diary.R;
-import miles.diary.data.api.LocationService;
 import miles.diary.data.model.google.LikelyPlace;
 import miles.diary.data.model.google.PlaceInfo;
 import miles.diary.data.model.google.PlaceResponse;
-import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.data.rx.GoogleResultObservable;
 import miles.diary.data.rx.OkHttpObservable;
 import miles.diary.ui.activity.BaseActivity;
@@ -37,8 +32,6 @@ import miles.diary.util.IntentUtils;
 import miles.diary.util.Logg;
 import miles.diary.util.SimpleLocationListener;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 import rx.Observable;
 import rx.Subscriber;
@@ -86,16 +79,17 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
     }
 
     public Observable<PlaceResponse> searchNearby(Location location, float radius) {
-        String url = GoogleUrlFormatter.searchNearby(activity.getString(R.string.maps_url),
-                location, radius, activity.getString(R.string.google_web_api_key));
+        String url = activity.getString(R.string.maps_url) + "maps/api/place/nearbysearch/json?" + "location=" +
+                location.getLatitude() + ',' + location.getLongitude() + "&radius=" + radius + "&key=" +
+                activity.getString(R.string.google_web_api_key);
 
         OkHttpObservable<PlaceResponse> okHttpObservable =
-                new OkHttpObservable.Builder<>(okHttpClient, PlaceResponse.class)
+                new OkHttpObservable.Builder<>(PlaceResponse.class)
                         .url(url)
-                        .gson(new Gson())
+                        .gson(gson)
                         .build();
 
-        return okHttpObservable.execute()
+        return okHttpObservable.execute(okHttpClient)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }

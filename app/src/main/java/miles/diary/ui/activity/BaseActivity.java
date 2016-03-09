@@ -81,7 +81,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     public void noInternet() {
-        Snackbar.make(root, getString(R.string.no_internet), Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(root, getString(R.string.error_no_internet), Snackbar.LENGTH_SHORT).show();
     }
 
     public boolean hasPermissions(String[] permissions) {

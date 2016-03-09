@@ -17,7 +17,7 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 
 import miles.diary.R;
-import miles.diary.ui.drawable.MorphDrawable;
+import miles.diary.ui.drawable.RoundRectDrawable;
 import miles.diary.util.AnimUtils;
 
 /**
@@ -101,11 +101,11 @@ public class FabContainerTransition extends ChangeBounds {
             return null;
         }
 
-        MorphDrawable background = new MorphDrawable(startColor, startCornerRadius);
+        RoundRectDrawable background = new RoundRectDrawable(startColor, startCornerRadius);
         endValues.view.setBackground(background);
 
-        Animator color = ObjectAnimator.ofArgb(background, MorphDrawable.COLOR, endColor);
-        Animator corners = ObjectAnimator.ofFloat(background, MorphDrawable.CORNER_RADIUS,
+        Animator color = ObjectAnimator.ofArgb(background, RoundRectDrawable.COLOR, endColor);
+        Animator corners = ObjectAnimator.ofFloat(background, RoundRectDrawable.CORNER_RADIUS,
                 endCornerRadius);
 
         // ease in the dialog's child views (slide up & fade in)

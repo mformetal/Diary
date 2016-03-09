@@ -12,10 +12,11 @@
     <string name="activity_location_no_input">Choose a place first!</string>
     <string name="activity_location_not_enabled">Enable Location!</string>
 
-    <string name="activity_entry_no_text_error">Your Entry must not be empty</string>
-    <string name="activity_entry_title_hint">Entry Title</string>
-    <string name="activity_entry_body_hint">Memorialize your thoughts</string>
-    <string name="activity_entry_no_camera_error">This device doesn\'t support Camera.</string>
+    <string name="activity_new_entry_location_hint">Add Location</string>
+    <string name="activity_new_entry_no_input_error">Your Entry must not be empty</string>
+    <string name="activity_new_entry_body_hint">Memorialize your thoughts</string>
+
+    <string name="activity_gallery_no_camera_error">This device doesn\'t support Camera.</string>
 
     <string name="activity_gallery_camera">Camera</string>
     <string name="activity_gallery_video">Video</string>

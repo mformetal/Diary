@@ -41,6 +41,7 @@ import miles.diary.ui.widget.TypefaceAutoCompleteTextView;
 import miles.diary.ui.widget.TypefaceButton;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.Logg;
+import miles.diary.util.ViewUtils;
 
 /**
  * Created by mbpeele on 2/6/16.
@@ -63,6 +64,8 @@ public class LocationActivity extends BaseActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location);
+
+        ViewUtils.mutate(mapIcon, ContextCompat.getColor(this, R.color.accent));
 
         String[] permissions = new String[] {Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.ACCESS_FINE_LOCATION};
@@ -104,8 +107,6 @@ public class LocationActivity extends BaseActivity implements View.OnClickListen
             ActivityCompat.requestPermissions(this, permissions, REQUEST_LOCATION_PERMISSION);
         }
     }
-
-
 
     @Override
     public void onBackPressed() {

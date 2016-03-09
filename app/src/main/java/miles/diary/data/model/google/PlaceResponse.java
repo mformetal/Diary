@@ -11,16 +11,16 @@ import java.util.List;
 public class PlaceResponse {
 
     @SerializedName("results")
-    private List<Result> results;
+    private List<PlaceResult> results;
 
     @SerializedName("status")
     private String status;
 
-    public List<Result> getResults() {
+    public List<PlaceResult> getResults() {
         return results;
     }
 
-    public void setResults(List<Result> results) {
+    public void setResults(List<PlaceResult> results) {
         this.results = results;
     }
 
@@ -32,7 +32,7 @@ public class PlaceResponse {
         this.status = status;
     }
 
-    public static class Result {
+    public static class PlaceResult {
 
         @SerializedName("icon")
         private String icon;

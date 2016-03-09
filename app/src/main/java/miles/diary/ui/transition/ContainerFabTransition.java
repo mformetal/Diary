@@ -15,7 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import miles.diary.R;
-import miles.diary.ui.drawable.MorphDrawable;
+import miles.diary.ui.drawable.RoundRectDrawable;
 import miles.diary.util.AnimUtils;
 
 /**
@@ -92,7 +92,7 @@ public class ContainerFabTransition extends ChangeBounds {
             return null;
         }
 
-        MorphDrawable background = new MorphDrawable(startColor, startCornerRadius);
+        RoundRectDrawable background = new RoundRectDrawable(startColor, startCornerRadius);
         endValues.view.setBackground(background);
 
         Animator color = ObjectAnimator.ofArgb(background, background.COLOR, endColor);

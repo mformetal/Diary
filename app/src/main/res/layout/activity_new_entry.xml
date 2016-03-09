@@ -30,14 +30,14 @@
     <miles.diary.ui.widget.TypefaceButton
         android:id="@+id/activity_new_entry_location"
         android:transitionName="@string/transition_location_image"
-        android:visibility="gone"
         android:textSize="@dimen/subtitle_text_size"
         android:gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        tools:visibility="visible"
-        tools:text="Westerre Parkway" />
+        android:backgroundTint="@color/accent_with_alpha"
+        android:textColorHint="@android:color/white"
+        android:hint="@string/activity_new_entry_location_hint" />
 
     <miles.diary.ui.widget.NotebookEditText
         android:id="@+id/activity_new_entry_body"
@@ -46,11 +46,11 @@
         android:textSize="@dimen/subtitle_text_size"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:layout_marginTop="@dimen/half_activity_vertical_margin"
+        android:layout_marginBottom="@dimen/half_activity_vertical_margin"
         android:gravity="start|top"
         android:inputType="textCapSentences|textMultiLine|textAutoCorrect"
-        android:hint="@string/activity_entry_body_hint"
+        android:hint="@string/activity_new_entry_body_hint"
         tools:text="THIS IS A DIARY ENTRY" />
 
 </LinearLayout>

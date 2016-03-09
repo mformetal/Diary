@@ -10,12 +10,12 @@ import android.util.Property;
 
 import miles.diary.util.AnimUtils;
 
-public class MorphDrawable extends Drawable {
+public class RoundRectDrawable extends Drawable {
 
     private float cornerRadius;
     private Paint paint;
 
-    public MorphDrawable(@ColorInt int color, float cornerRadius) {
+    public RoundRectDrawable(@ColorInt int color, float cornerRadius) {
         this.cornerRadius = cornerRadius;
         paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setColor(color);
@@ -67,31 +67,31 @@ public class MorphDrawable extends Drawable {
         return paint.getAlpha();
     }
 
-    public static final Property<MorphDrawable, Float> CORNER_RADIUS
-            = new AnimUtils.FloatProperty<MorphDrawable>("cornerRadius") {
+    public static final Property<RoundRectDrawable, Float> CORNER_RADIUS
+            = new AnimUtils.FloatProperty<RoundRectDrawable>("cornerRadius") {
 
         @Override
-        public void setValue(MorphDrawable morphDrawable, float value) {
-            morphDrawable.setCornerRadius(value);
+        public void setValue(RoundRectDrawable roundRectDrawable, float value) {
+            roundRectDrawable.setCornerRadius(value);
         }
 
         @Override
-        public Float get(MorphDrawable morphDrawable) {
-            return morphDrawable.getCornerRadius();
+        public Float get(RoundRectDrawable roundRectDrawable) {
+            return roundRectDrawable.getCornerRadius();
         }
     };
 
-    public static final Property<MorphDrawable, Integer> COLOR =
-            new AnimUtils.IntProperty<MorphDrawable>("color") {
+    public static final Property<RoundRectDrawable, Integer> COLOR =
+            new AnimUtils.IntProperty<RoundRectDrawable>("color") {
 
         @Override
-        public void setValue(MorphDrawable morphDrawable, int value) {
-            morphDrawable.setColor(value);
+        public void setValue(RoundRectDrawable roundRectDrawable, int value) {
+            roundRectDrawable.setColor(value);
         }
 
         @Override
-        public Integer get(MorphDrawable morphDrawable) {
-            return morphDrawable.getColor();
+        public Integer get(RoundRectDrawable roundRectDrawable) {
+            return roundRectDrawable.getColor();
         }
     };
 }

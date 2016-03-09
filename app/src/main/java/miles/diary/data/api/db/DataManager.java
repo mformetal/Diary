@@ -79,11 +79,12 @@ public class DataManager implements DataManagerInterface {
                         .equalTo(keyValue, key)
                         .findFirst()
                         .asObservable();
+
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            return Observable.error(e);
         }
 
         return Observable.error(new NoRealmObjectKeyException());

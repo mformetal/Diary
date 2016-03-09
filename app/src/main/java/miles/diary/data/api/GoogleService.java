@@ -25,7 +25,7 @@ import miles.diary.R;
 import miles.diary.data.model.google.LikelyPlace;
 import miles.diary.data.model.google.PlaceInfo;
 import miles.diary.data.model.google.PlaceResponse;
-import miles.diary.data.rx.GoogleResultObservable;
+import miles.diary.data.rx.GoogleObservable;
 import miles.diary.data.rx.OkHttpObservable;
 import miles.diary.ui.activity.BaseActivity;
 import miles.diary.util.IntentUtils;
@@ -96,8 +96,7 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
 
     @SuppressWarnings({"ResourceType"})
     public Observable<List<LikelyPlace>> getCurrentPlace(PlaceFilter placeFilter) {
-        return Observable.create(new GoogleResultObservable<PlaceLikelihoodBuffer>(
-                Places.PlaceDetectionApi.getCurrentPlace(client, placeFilter)))
+        return GoogleObservable.execute(Places.PlaceDetectionApi.getCurrentPlace(client, placeFilter))
                 .map(new Func1<PlaceLikelihoodBuffer, List<LikelyPlace>>() {
                     @Override
                     public List<LikelyPlace> call(PlaceLikelihoodBuffer placeLikelihoods) {
@@ -138,26 +137,25 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
     }
 
     public Observable<PlacePhotoMetadataResult> getPlacePhotos(final String placeId) {
-        return Observable.create(new GoogleResultObservable<>(
-                Places.GeoDataApi.getPlacePhotos(client, placeId)))
+        return GoogleObservable.execute(Places.GeoDataApi.getPlacePhotos(client, placeId))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
     public Observable<PlacePhotoResult> getPlacePhoto(PlacePhotoMetadata metadata) {
-        return Observable.create(new GoogleResultObservable<PlacePhotoResult>(metadata.getPhoto(client)))
+        return GoogleObservable.execute(metadata.getPhoto(client))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
     public Observable<PlacePhotoResult> getScaledPhoto(PlacePhotoMetadata metadata, int w, int h) {
-        return Observable.create(new GoogleResultObservable<PlacePhotoResult>(metadata.getScaledPhoto(client, w, h)))
+        return GoogleObservable.execute(metadata.getScaledPhoto(client, w, h))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
     public Observable<PlaceInfo> getPlaceById(final String placeId) {
-        return Observable.create(new GoogleResultObservable<>(Places.GeoDataApi.getPlaceById(client, placeId)))
+        return GoogleObservable.execute(Places.GeoDataApi.getPlaceById(client, placeId))
                 .map(new Func1<PlaceBuffer, PlaceInfo>() {
                     @Override
                     public PlaceInfo call(PlaceBuffer places) {

@@ -147,7 +147,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                     setResult(RESULT_OK, result);
                     finishAfterTransition();
                 } else {
-                    Snackbar.make(root, R.string.activity_entry_no_text_error,
+                    Snackbar.make(root, R.string.activity_new_entry_no_input_error,
                             Snackbar.LENGTH_SHORT).show();
                 }
                 break;
@@ -227,7 +227,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                     .subscribe(new ActivitySubscriber<PlaceResponse>(this) {
                         @Override
                         public void onNext(PlaceResponse placeResponse) {
-                            PlaceResponse.Result result = placeResponse.getResults().get(0);
+                            PlaceResponse.PlaceResult result = placeResponse.getResults().get(0);
                             placeName = result.getName();
                             placeId = result.getId();
 

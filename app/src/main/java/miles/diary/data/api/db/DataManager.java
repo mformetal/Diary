@@ -63,43 +63,41 @@ public class DataManager implements DataManagerInterface {
 
     @Override
     public <T extends RealmObject> Observable<T> getObject(Class<T> tClass, long key) {
-        for (Field field: tClass.getDeclaredFields()) {
-            String name = field.getName();
-            if (Objects.equals(name, IRealmInterface.CLASS_KEY)) {
-                try {
-                    String classKey = (String) field.get(null);
+        try {
+            Field fieldName = tClass.getDeclaredField(IRealmInterface.CLASS_KEY);
 
-                    return realm.where(tClass)
-                            .equalTo(classKey, key)
-                            .findFirst()
-                            .asObservable();
-                } catch (IllegalAccessException e) {
-                    return Observable.error(e);
-                }
+            try {
+                String classKey = (String) fieldName.get(null);
+
+                return realm.where(tClass)
+                        .equalTo(classKey, key)
+                        .findFirst()
+                        .asObservable();
+            } catch (IllegalAccessException e) {
+                return Observable.error(e);
             }
+        } catch (NoSuchFieldException e) {
+            return Observable.error(new NoRealmObjectKeyException());
         }
-
-        return Observable.error(new NoRealmObjectKeyException());
     }
 
     @Override
     public <T extends RealmObject> T get(Class<T> tClass, long key) {
-        for (Field field: tClass.getDeclaredFields()) {
-            String name = field.getName();
-            if (Objects.equals(name, IRealmInterface.CLASS_KEY)) {
-                try {
-                    String classKey = (String) field.get(null);
+        try {
+            Field fieldName = tClass.getDeclaredField(IRealmInterface.CLASS_KEY);
 
-                    return realm.where(tClass)
-                            .equalTo(classKey, key)
-                            .findFirst();
-                } catch (IllegalAccessException e) {
-                    return null;
-                }
+            try {
+                String classKey = (String) fieldName.get(null);
+
+                return realm.where(tClass)
+                        .equalTo(classKey, key)
+                        .findFirst();
+            } catch (IllegalAccessException e) {
+                return null;
             }
+        } catch (NoSuchFieldException e) {
+            throw new NoRealmObjectKeyException();
         }
-
-        throw new NoRealmObjectKeyException();
     }
 
     @Override

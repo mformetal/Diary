@@ -36,7 +36,8 @@
         android:backgroundTint="@color/accent_with_alpha"
         android:textColorHint="@android:color/white"
         android:transitionName="@string/transition_location"
-        android:hint="@string/activity_new_entry_location_hint" />
+        android:hint="@string/activity_new_entry_location_hint"
+        android:textAllCaps="false" />
 
     <miles.diary.ui.widget.NotebookEditText
         android:id="@+id/activity_new_entry_body"

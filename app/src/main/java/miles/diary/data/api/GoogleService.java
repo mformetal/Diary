@@ -1,6 +1,8 @@
 package miles.diary.data.api;
 
 import android.content.IntentSender;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -19,12 +21,15 @@ import com.google.android.gms.location.places.PlacePhotoResult;
 import com.google.android.gms.location.places.Places;
 import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 import miles.diary.R;
 import miles.diary.data.model.google.LikelyPlace;
 import miles.diary.data.model.google.PlaceInfo;
 import miles.diary.data.model.google.PlaceResponse;
+import miles.diary.data.rx.GeocodeObservable;
 import miles.diary.data.rx.GoogleObservable;
 import miles.diary.data.rx.OkHttpObservable;
 import miles.diary.ui.activity.BaseActivity;
@@ -90,6 +95,7 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
                         .build();
 
         return okHttpObservable.execute(okHttpClient)
+                .retry(1)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -123,6 +129,7 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
                     SimpleLocationListener simpleLocationListener = new SimpleLocationListener() {
                         @Override
                         public void onLocationChanged(Location location) {
+                            Logg.log("ANDROID LOCATION GETS SHIT");
                             locationManager.removeUpdates(this);
                             subscriber.onNext(location);
                         }
@@ -134,6 +141,12 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
                 subscriber.onCompleted();
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Observable<List<Address>> getAddressFromLocation(Location location, int results) {
+        return GeocodeObservable.geocode(activity, location, results)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     public Observable<PlacePhotoMetadataResult> getPlacePhotos(final String placeId) {

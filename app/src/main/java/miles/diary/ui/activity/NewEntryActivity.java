@@ -1,11 +1,17 @@
 package miles.diary.ui.activity;
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.ActivityOptions;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.location.Address;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -26,12 +32,16 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
 
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import butterknife.Bind;
 import butterknife.OnClick;
 import miles.diary.R;
 import miles.diary.data.api.LocationService;
 import miles.diary.data.api.GoogleService;
 import miles.diary.data.api.WeatherService;
+import miles.diary.data.model.google.LikelyPlace;
 import miles.diary.data.model.google.PlaceResponse;
 import miles.diary.data.model.realm.Entry;
 import miles.diary.data.model.weather.WeatherResponse;
@@ -44,6 +54,8 @@ import miles.diary.ui.widget.TypefaceEditText;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.Logg;
 import miles.diary.util.ViewUtils;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class NewEntryActivity extends BaseActivity implements View.OnClickListener {
 
@@ -228,23 +240,39 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     }
 
     private void setLocationText(String name) {
+        Drawable drawable = ContextCompat.getDrawable(
+                NewEntryActivity.this, R.drawable.ic_place_24dp);
         location.setVisibility(View.VISIBLE);
-        location.setCompoundDrawablesWithIntrinsicBounds(
-                ContextCompat.getDrawable(this, R.drawable.ic_place_24dp), null, null, null);
+        location.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
         location.setText(name);
+
+        ObjectAnimator.ofFloat(location, View.SCALE_X, 0f, 1f)
+                .setDuration(AnimUtils.mediumAnim(this))
+                .start();
     }
 
     private void getPlace(Location location1) {
         if (placeName == null && placeId == null) {
-            googleService.searchNearby(location1, 5)
-                    .subscribe(new ActivitySubscriber<PlaceResponse>(this) {
+            googleService.getAddressFromLocation(location1, 1)
+                    .delay(1, TimeUnit.SECONDS)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new ActivitySubscriber<List<Address>>(this) {
                         @Override
-                        public void onNext(PlaceResponse placeResponse) {
-                            PlaceResponse.PlaceResult result = placeResponse.getResults().get(0);
-                            placeName = result.getName();
-                            placeId = result.getId();
+                        public void onNext(List<Address> addresses) {
+                            placeName = addresses.get(0).getAddressLine(0);
 
                             setLocationText(placeName);
+
+                            googleService.searchNearby(location1, 5)
+                                    .subscribe(new ActivitySubscriber<PlaceResponse>(NewEntryActivity.this) {
+                                        @Override
+                                        public void onNext(PlaceResponse placeResponse) {
+                                            PlaceResponse.PlaceResult result = placeResponse.getResults().get(0);
+                                            placeName = result.getName();
+                                            placeId = result.getId();
+                                        }
+                                    });
+
                         }
                     });
         } else {

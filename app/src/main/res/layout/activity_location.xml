@@ -5,12 +5,12 @@
     android:orientation="vertical"
     android:gravity="center"
     android:layout_gravity="center"
-    android:background="@color/dialog_background"
     android:id="@+id/activity_location_root"
     android:layout_width="@dimen/dialog_min_width"
     android:layout_height="wrap_content"
     android:descendantFocusability="beforeDescendants"
-    android:focusableInTouchMode="true">
+    android:transitionName="@string/transition_location"
+    android:focusableInTouchMode="true" >
 
     <miles.diary.ui.widget.SquareImageView
         android:id="@+id/activity_location_image"
@@ -18,7 +18,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="center_horizontal"
         android:scaleType="centerCrop"
-        android:src="@drawable/ic_place_24dp"
+        android:src="@drawable/ic_place_24dp_accent"
         android:layout_margin="@dimen/activity_vertical_margin" />
 
     <android.support.design.widget.TextInputLayout

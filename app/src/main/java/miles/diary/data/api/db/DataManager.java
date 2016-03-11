@@ -2,26 +2,20 @@ package miles.diary.data.api.db;
 
 import android.app.Application;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 
-import java.io.File;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
 
 import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
-import io.realm.annotations.PrimaryKey;
 import miles.diary.data.error.NoInternetException;
 import miles.diary.data.error.NoRealmObjectKeyException;
-import miles.diary.data.model.realm.Entry;
+import miles.diary.data.model.realm.IRealmInterface;
 import miles.diary.data.rx.DataObservable;
 import miles.diary.data.rx.DataTransaction;
-import miles.diary.util.Logg;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -32,7 +26,6 @@ public class DataManager implements DataManagerInterface {
 
     private Application application;
     private Realm realm;
-    private final static String KEY = "key";
 
     public DataManager(Application application) {
         this.application = application;
@@ -62,7 +55,7 @@ public class DataManager implements DataManagerInterface {
                 .map(new Func1<RealmResults<T>, List<T>>() {
                     @Override
                     public List<T> call(RealmResults<T> ts) {
-                        return Lists.newArrayList(ts);
+                        return ImmutableList.copyOf(ts);
                     }
                 })
                 .first();
@@ -70,21 +63,20 @@ public class DataManager implements DataManagerInterface {
 
     @Override
     public <T extends RealmObject> Observable<T> getObject(Class<T> tClass, long key) {
-        try {
-            Method method = tClass.getDeclaredMethod(KEY);
-            try {
-                String keyValue = (String) method.invoke(null);
+        for (Field field: tClass.getDeclaredFields()) {
+            String name = field.getName();
+            if (Objects.equals(name, IRealmInterface.CLASS_KEY)) {
+                try {
+                    String classKey = (String) field.get(null);
 
-                return realm.where(tClass)
-                        .equalTo(keyValue, key)
-                        .findFirst()
-                        .asObservable();
-
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
+                    return realm.where(tClass)
+                            .equalTo(classKey, key)
+                            .findFirst()
+                            .asObservable();
+                } catch (IllegalAccessException e) {
+                    return Observable.error(e);
+                }
             }
-        } catch (NoSuchMethodException e) {
-            return Observable.error(e);
         }
 
         return Observable.error(new NoRealmObjectKeyException());
@@ -92,9 +84,22 @@ public class DataManager implements DataManagerInterface {
 
     @Override
     public <T extends RealmObject> T get(Class<T> tClass, long key) {
-        return realm.where(tClass)
-                .equalTo(Entry.KEY, key)
-                .findFirst();
+        for (Field field: tClass.getDeclaredFields()) {
+            String name = field.getName();
+            if (Objects.equals(name, IRealmInterface.CLASS_KEY)) {
+                try {
+                    String classKey = (String) field.get(null);
+
+                    return realm.where(tClass)
+                            .equalTo(classKey, key)
+                            .findFirst();
+                } catch (IllegalAccessException e) {
+                    return null;
+                }
+            }
+        }
+
+        throw new NoRealmObjectKeyException();
     }
 
     @Override

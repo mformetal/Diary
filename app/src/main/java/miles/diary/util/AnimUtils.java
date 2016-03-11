@@ -12,6 +12,7 @@ import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.util.Property;
 import android.view.View;
 import android.view.ViewAnimationUtils;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -29,6 +30,7 @@ public class AnimUtils {
 
     private static int SHORT_ANIM = -1, MEDIUM_ANIM = -1, LONG_ANIM = -1;
     public final static String COLOR = "color";
+    public final static String BACKGROUND_COLOR = "backgroundColor";
     public final static String STATUS_BAR = "statusBarColor";
 
     public static int shortAnim(Context context) {
@@ -171,7 +173,7 @@ public class AnimUtils {
         final SoftReference<View> softReference = new SoftReference<View>(view);
         ValueAnimator color = ValueAnimator.ofArgb(colors);
         color.setDuration(AnimUtils.mediumAnim(view.getContext()));
-        color.setInterpolator(new DecelerateInterpolator());
+        color.setInterpolator(new FastOutSlowInInterpolator());
         color.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {

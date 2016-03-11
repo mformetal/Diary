@@ -12,13 +12,16 @@ import miles.diary.util.TextUtils;
 /**
  * Created by mbpeele on 1/18/16.
  */
-public class Entry extends RealmObject {
+public class Entry extends RealmObject implements IRealmInterface {
 
     public final static String KEY = "dateMillis";
 
-    @Required private Date date;
-    @PrimaryKey private long dateMillis;
-    @Required private String body;
+    @Required
+    private Date date;
+    @PrimaryKey
+    private long dateMillis;
+    @Required
+    private String body;
     private String uri;
     private String placeName;
     private String placeId;
@@ -116,9 +119,5 @@ public class Entry extends RealmObject {
             entry.setUri(uri.toString());
         }
         return entry;
-    }
-
-    public static String key() {
-        return KEY;
     }
 }

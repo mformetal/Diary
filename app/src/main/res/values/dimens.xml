@@ -3,7 +3,7 @@
     <dimen name="activity_vertical_margin">20dp</dimen>
     <dimen name="activity_horizontal_margin">20dp</dimen>
 
-    <dimen name="activity_location_image_size">150dp</dimen>
+    <dimen name="activity_location_image_size">100dp</dimen>
 
     <dimen name="action_bar_margin">68dp</dimen>
 
@@ -15,7 +15,9 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="fab_elevation">6dp</dimen>
     <dimen name="fab_normal_dimens">56dp</dimen>
+    <dimen name="fab_large_dimens">88dp</dimen>
     <dimen name="fab_mini_dimens">40dp</dimen>
+    <dimen name="fab_corner_radius">2dp</dimen>
 
     <dimen name="dialog_margin">16dp</dimen>
     <dimen name="dialog_button_height">36dp</dimen>

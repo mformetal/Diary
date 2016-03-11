@@ -29,19 +29,9 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    public Application provideAppContext() {
-        return mApplication;
-    }
-
-    @Provides
-    @Singleton
     public DataStore getDataStore() {
         return new DataStore(mApplication);
     }
-
-    @Provides
-    @Singleton
-    public WeatherService getWeatherService() { return new WeatherService(mApplication); }
 
     @Provides
     @Singleton

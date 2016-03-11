@@ -56,7 +56,7 @@ public class PlacePhotosActivity extends BaseActivity implements GoogleService.G
     }
 
     @Override
-    public void onConnected(Bundle bundle, GoogleApiClient client, final BaseActivity activity) {
+    public void onConnected(Bundle bundle, GoogleApiClient client) {
         googleService.getPlacePhotos(id)
                 .doOnError(new Action1<Throwable>() {
                     @Override
@@ -71,7 +71,8 @@ public class PlacePhotosActivity extends BaseActivity implements GoogleService.G
 
                         PlacePhotoMetadataBuffer buffer = result.getPhotoMetadata();
                         if (buffer != null && buffer.getCount() > 0) {
-                            placePhotosAdapter = new PlacePhotosAdapter(googleService, activity, result);
+                            placePhotosAdapter = new PlacePhotosAdapter(googleService,
+                                    PlacePhotosActivity.this, result);
                             pager.setOffscreenPageLimit(2);
                             pager.setAdapter(placePhotosAdapter);
                         } else {

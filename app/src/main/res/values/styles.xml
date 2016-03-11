@@ -18,9 +18,6 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
 
-    <style name="AppTheme.Home" parent="AppTheme" >
-    </style>
-
     <style name="AppTheme.DialogActivity" parent="AppTheme">
         <item name="android:windowActivityTransitions">true</item>
         <item name="android:windowContentTransitions">true</item>

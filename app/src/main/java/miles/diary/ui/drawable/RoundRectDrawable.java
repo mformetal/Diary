@@ -21,6 +21,11 @@ public class RoundRectDrawable extends Drawable {
         paint.setColor(color);
     }
 
+    public RoundRectDrawable(@ColorInt int color) {
+        paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setColor(color);
+    }
+
     public float getCornerRadius() {
         return cornerRadius;
     }

@@ -28,9 +28,7 @@ import miles.diary.data.model.google.PlaceResponse;
 import miles.diary.data.rx.GoogleObservable;
 import miles.diary.data.rx.OkHttpObservable;
 import miles.diary.ui.activity.BaseActivity;
-import miles.diary.util.IntentUtils;
 import miles.diary.util.Logg;
-import miles.diary.util.SimpleLocationListener;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import rx.Observable;
@@ -50,6 +48,8 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
     private GoogleServiceCallback callback;
     private OkHttpClient okHttpClient;
     private Gson gson;
+
+    private static int FAILED_CODE = 5;
 
     public GoogleService(final BaseActivity activity1, GoogleApiClient.Builder builder,
                          GoogleServiceCallback googleServiceCallback) {
@@ -177,7 +177,7 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
     public void onConnected(Bundle bundle) {
         if (checkActivity()) {
             if (callback != null) {
-                callback.onConnected(bundle, client, activity);
+                callback.onConnected(bundle, client);
             }
         }
     }
@@ -192,7 +192,7 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
         if (checkActivity()) {
             if (connectionResult.hasResolution()) {
                 try {
-                    connectionResult.startResolutionForResult(activity, IntentUtils.GOOGLE_API_CLIENT_FAILED_CODE);
+                    connectionResult.startResolutionForResult(activity, FAILED_CODE);
                 } catch (IntentSender.SendIntentException e) {
                     e.printStackTrace();
                 }
@@ -204,6 +204,6 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
 
     public interface GoogleServiceCallback {
 
-        void onConnected(Bundle bundle, GoogleApiClient client, BaseActivity activity);
+        void onConnected(Bundle bundle, GoogleApiClient client);
     }
 }

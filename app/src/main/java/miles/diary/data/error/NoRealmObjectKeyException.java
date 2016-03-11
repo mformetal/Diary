@@ -6,6 +6,6 @@ package miles.diary.data.error;
 public class NoRealmObjectKeyException extends IllegalArgumentException {
 
     public NoRealmObjectKeyException() {
-        super("RealmObject does not have a field declared as 'KEY'");
+        super("RealmObject does not have a public final static variable named 'KEY'");
     }
 }

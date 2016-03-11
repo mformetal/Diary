@@ -31,7 +31,6 @@ import rx.subscriptions.CompositeSubscription;
  */
 public abstract class BaseActivity extends AppCompatActivity {
 
-    @Inject WeatherService weatherService;
     @Inject DataStore datastore;
     @Inject GoogleApiClient.Builder googleApiClientBuilder;
     @Inject DataManager dataManager;

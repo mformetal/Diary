@@ -1,6 +1,7 @@
 package miles.diary.data.api;
 
 import android.app.Application;
+import android.content.Context;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -29,10 +30,10 @@ public class WeatherService {
     private OkHttpClient client;
     private String baseUrl, apiKey;
 
-    public WeatherService(Application application) {
+    public WeatherService(Context context) {
         client = new OkHttpClient();
-        apiKey = application.getResources().getString(R.string.weather_api_key);
-        baseUrl = application.getResources().getString(R.string.weather_base);
+        apiKey = context.getResources().getString(R.string.weather_api_key);
+        baseUrl = context.getResources().getString(R.string.weather_base);
     }
 
     public Observable<WeatherResponse> getWeather(final Double latitude, final Double longitude) {

@@ -25,13 +25,12 @@ import miles.diary.data.api.db.DataLoadingListener;
 import miles.diary.data.model.realm.Entry;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.ui.DividerDecoration;
-import miles.diary.ui.transition.FabDialogHelper;
+import miles.diary.ui.PreDrawer;
+import miles.diary.ui.transition.FabContainerTransition;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.Logg;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
-public class HomeActivity extends TransitionActivity implements DataLoadingListener {
+public class HomeActivity extends BaseActivity implements DataLoadingListener {
 
     @Bind(R.id.activity_home_recycler) RecyclerView recyclerView;
     @Bind(R.id.activity_home_toolbar) Toolbar toolbar;
@@ -49,6 +48,14 @@ public class HomeActivity extends TransitionActivity implements DataLoadingListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        PreDrawer.addPreDrawer(root, new PreDrawer.OnPreDrawListener<ViewGroup>() {
+            @Override
+            public boolean onPreDraw(ViewGroup view) {
+                AnimUtils.pop(fab, 0f, 1f).setDuration(AnimUtils.longAnim(view.getContext())).start();
+                return true;
+            }
+        });
+
         setActionBar(toolbar);
 
         fetchData();
@@ -57,8 +64,6 @@ public class HomeActivity extends TransitionActivity implements DataLoadingListe
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(entryAdapter);
-        recyclerView.addItemDecoration(new DividerDecoration(
-                ContextCompat.getDrawable(this, R.drawable.recycler_divider)));
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,32 +71,6 @@ public class HomeActivity extends TransitionActivity implements DataLoadingListe
                 startNewEntryActivity();
             }
         });
-    }
-
-    @Override
-    void onEnter(ViewGroup root, Intent calledIntent, boolean hasSavedInstanceState) {
-        View view = toolbar.getChildAt(0);
-        if (view != null && view instanceof TextView) {
-            TextView textView = (TextView) view;
-            AnimatorSet animatorSet = new AnimatorSet();
-            animatorSet.playTogether(
-                    AnimUtils.pop(fab, 0f, 1f)
-                            .setDuration(AnimUtils.longAnim(this)),
-                    AnimUtils.textScale(textView, null, .8f, 1f)
-                            .setDuration(AnimUtils.longAnim(this)),
-                    AnimUtils.alpha(textView, 0f, 1f)
-                            .setDuration(AnimUtils.longAnim(this)));
-            animatorSet.start();
-        }
-    }
-
-    @Override
-    void onExit(ViewGroup root) {
-    }
-
-    @Override
-    boolean shouldRunCustomExitAnimation() {
-        return false;
     }
 
     @Override
@@ -185,7 +164,8 @@ public class HomeActivity extends TransitionActivity implements DataLoadingListe
 
     private void startNewEntryActivity() {
         Intent intent = new Intent(this, NewEntryActivity.class);
-        intent.putExtra(FabDialogHelper.START_COLOR, ContextCompat.getColor(this, R.color.accent));
+        intent.putExtra(FabContainerTransition.START_COLOR, ContextCompat.getColor(this, R.color.accent));
+        intent.putExtra(FabContainerTransition.END_COLOR, ContextCompat.getColor(this, R.color.window_background));
         ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this, fab,
                 getString(R.string.transition_fab_dialog_new_entry));
         startActivityForResult(intent, RESULT_CODE_NEW_ENTRY, options.toBundle());

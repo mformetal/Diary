@@ -1,7 +1,6 @@
 package miles.diary.ui.activity;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -9,9 +8,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.animation.FastOutSlowInInterpolator;
-import android.transition.Transition;
-import android.transition.TransitionSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -35,18 +31,15 @@ import miles.diary.data.model.google.AutoCompleteItem;
 import miles.diary.data.model.google.LikelyPlace;
 import miles.diary.data.model.google.PlaceInfo;
 import miles.diary.data.rx.ActivitySubscriber;
-import miles.diary.ui.PreDrawer;
-import miles.diary.ui.transition.ColorTransition;
 import miles.diary.ui.widget.TypefaceAutoCompleteTextView;
 import miles.diary.ui.widget.TypefaceButton;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.Logg;
-import miles.diary.util.ViewUtils;
 
 /**
  * Created by mbpeele on 2/6/16.
  */
-public class LocationActivity extends BaseActivity implements View.OnClickListener {
+public class LocationActivity extends TransitionActivity implements View.OnClickListener {
 
     private final static int REQUEST_LOCATION_PERMISSION = 1;
     private final static int REQUEST_PLACE_PICKER = 2;
@@ -65,8 +58,6 @@ public class LocationActivity extends BaseActivity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location);
 
-        ViewUtils.mutate(mapIcon, ContextCompat.getColor(this, R.color.accent));
-
         String[] permissions = new String[] {Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.ACCESS_FINE_LOCATION};
         if (hasPermissions(permissions)) {
@@ -83,8 +74,8 @@ public class LocationActivity extends BaseActivity implements View.OnClickListen
 
                 googleService = new GoogleService(this, googleApiClientBuilder, new GoogleService.GoogleServiceCallback() {
                     @Override
-                    public void onConnected(Bundle bundle, GoogleApiClient client, BaseActivity activity) {
-                        autoCompleteAdapter = new AutoCompleteAdapter(activity,
+                    public void onConnected(Bundle bundle, GoogleApiClient client) {
+                        autoCompleteAdapter = new AutoCompleteAdapter(LocationActivity.this,
                                 R.layout.autocomplete_adapter, client, null, null);
                         autoCompleteTextView.setAdapter(autoCompleteAdapter);
 
@@ -112,6 +103,25 @@ public class LocationActivity extends BaseActivity implements View.OnClickListen
     public void onBackPressed() {
         setReturnData();
         super.onBackPressed();
+    }
+
+    @Override
+    boolean overrideTransitions() {
+        return false;
+    }
+
+    @Override
+    void onEnter(ViewGroup root, Intent calledIntent, boolean hasSavedInstanceState) {
+        AnimUtils.background(root, ContextCompat.getColor(this, R.color.accent), Color.WHITE)
+                .setDuration(500)
+                .start();
+    }
+
+    @Override
+    void onExit(ViewGroup root) {
+        AnimUtils.background(root, Color.WHITE, ContextCompat.getColor(this, R.color.accent))
+                .setDuration(500)
+                .start();
     }
 
     @Override

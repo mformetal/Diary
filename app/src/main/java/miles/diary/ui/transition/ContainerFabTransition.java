@@ -13,10 +13,12 @@ import android.transition.TransitionValues;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Interpolator;
 
 import miles.diary.R;
 import miles.diary.ui.drawable.RoundRectDrawable;
 import miles.diary.util.AnimUtils;
+import miles.diary.util.Logg;
 
 /**
  * Created by mbpeele on 3/6/16.
@@ -30,19 +32,16 @@ public class ContainerFabTransition extends ChangeBounds {
             PROPERTY_CORNER_RADIUS
     };
 
-    private @ColorInt int endColor = Color.TRANSPARENT;
+    private int startColor, endColor;
 
-    public ContainerFabTransition(@ColorInt int endColor) {
+    public ContainerFabTransition(int startColor, int endColor) {
         super();
-        setEndColor(endColor);
+        this.startColor = startColor;
+        this.endColor = endColor;
     }
 
     public ContainerFabTransition(Context context, AttributeSet attrs) {
         super(context, attrs);
-    }
-
-    public void setEndColor(@ColorInt int endColor) {
-        this.endColor = endColor;
     }
 
     @Override
@@ -57,9 +56,8 @@ public class ContainerFabTransition extends ChangeBounds {
         if (view.getWidth() <= 0 || view.getHeight() <= 0) {
             return;
         }
-        transitionValues.values.put(PROPERTY_COLOR,
-                ContextCompat.getColor(view.getContext(), R.color.window_background));
-        transitionValues.values.put(PROPERTY_CORNER_RADIUS, 20);
+        transitionValues.values.put(PROPERTY_COLOR, startColor);
+        transitionValues.values.put(PROPERTY_CORNER_RADIUS, 0);
     }
 
     @Override
@@ -99,17 +97,38 @@ public class ContainerFabTransition extends ChangeBounds {
         Animator corners = ObjectAnimator.ofFloat(background, background.CORNER_RADIUS,
                 endCornerRadius);
 
-        // hide child views (offset down & fade out)
         if (endValues.view instanceof ViewGroup) {
             ViewGroup vg = (ViewGroup) endValues.view;
+            Interpolator interpolator = new FastOutSlowInInterpolator();
             for (int i = 0; i < vg.getChildCount(); i++) {
-                AnimUtils.gone(vg.getChildAt(i)).start();
+                View v = vg.getChildAt(i);
+
+                if (v instanceof ViewGroup) {
+                    ViewGroup viewGroup = (ViewGroup) v;
+                    for (int x = 0; x < viewGroup.getChildCount(); x++) {
+                        View view = viewGroup.getChildAt(x);
+
+                        view.animate()
+                                .alpha(0f)
+                                .scaleX(0f)
+                                .scaleY(0f)
+                                .setDuration(50)
+                                .setInterpolator(interpolator);
+                    }
+                }
+
+                v.animate()
+                        .alpha(0f)
+                        .scaleX(0f)
+                        .scaleY(0f)
+                        .setDuration(50)
+                        .setInterpolator(interpolator);
             }
         }
 
         AnimatorSet transition = new AnimatorSet();
         transition.playTogether(changeBounds, corners, color);
-        transition.setDuration(AnimUtils.mediumAnim(sceneRoot.getContext()));
+        transition.setDuration(AnimUtils.longAnim(sceneRoot.getContext()));
         transition.setInterpolator(new FastOutSlowInInterpolator());
         return transition;
     }

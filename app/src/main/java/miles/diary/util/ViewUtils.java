@@ -80,7 +80,6 @@ public class ViewUtils {
     }
 
     public static void setZoomControls(ImageView imageView) {
-        new PhotoViewAttacher(imageView);
     }
 
     public static int getActionBarSize(Context context) {

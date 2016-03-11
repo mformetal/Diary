@@ -10,6 +10,7 @@ import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.graphics.Palette;
 import android.text.SpannableString;
@@ -99,14 +100,8 @@ public class EntryActivity extends TransitionActivity {
         setActionBar(toolbar);
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
-        dataManager.getObject(Entry.class, getIntent().getLongExtra(INTENT_KEY, -1))
-                .subscribe(new ActivitySubscriber<Entry>(this) {
-                    @Override
-                    public void onNext(Entry entry1) {
-                        entry = entry1;
-                        updateView(entry1);
-                    }
-                });
+        entry = dataManager.get(Entry.class, getIntent().getLongExtra(INTENT_KEY, -1));
+        updateView(entry);
     }
 
     @Override
@@ -116,6 +111,11 @@ public class EntryActivity extends TransitionActivity {
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    boolean overrideTransitions() {
+        return false;
     }
 
     @Override
@@ -182,11 +182,6 @@ public class EntryActivity extends TransitionActivity {
             default:
                 super.onActivityResult(requestCode, resultCode, data);
         }
-    }
-
-    @Override
-    boolean shouldRunCustomExitAnimation() {
-        return false;
     }
 
     @Override
@@ -338,9 +333,13 @@ public class EntryActivity extends TransitionActivity {
 
     @OnClick(R.id.activity_entry_place_photos)
     protected void fabClick() {
-        Intent intent = new Intent(this, PlacePhotosActivity.class);
-        intent.putExtra(PlacePhotosActivity.ID, entry.getPlaceId());
-        intent.putExtra(PlacePhotosActivity.NAME, entry.getPlaceName());
-        startActivity(intent);
+        if (hasConnection()) {
+            Intent intent = new Intent(this, PlacePhotosActivity.class);
+            intent.putExtra(PlacePhotosActivity.ID, entry.getPlaceId());
+            intent.putExtra(PlacePhotosActivity.NAME, entry.getPlaceName());
+            startActivity(intent);
+        } else {
+            Snackbar.make(root, R.string.error_no_internet, Snackbar.LENGTH_SHORT).show();
+        }
     }
 }

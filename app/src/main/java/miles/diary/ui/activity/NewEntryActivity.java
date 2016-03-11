@@ -1,9 +1,11 @@
 package miles.diary.ui.activity;
 
 import android.Manifest;
+import android.app.ActivityOptions;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,9 +13,13 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.animation.FastOutSlowInInterpolator;
+import android.transition.ArcMotion;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AnimationUtils;
+import android.view.animation.Interpolator;
 import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
@@ -25,18 +31,19 @@ import butterknife.OnClick;
 import miles.diary.R;
 import miles.diary.data.api.LocationService;
 import miles.diary.data.api.GoogleService;
+import miles.diary.data.api.WeatherService;
 import miles.diary.data.model.google.PlaceResponse;
 import miles.diary.data.model.realm.Entry;
 import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.data.rx.ActivitySubscriber;
-import miles.diary.ui.transition.FabDialogHelper;
+import miles.diary.ui.transition.ContainerFabTransition;
+import miles.diary.ui.transition.FabContainerTransition;
 import miles.diary.ui.widget.CircleImageView;
 import miles.diary.ui.widget.TypefaceButton;
 import miles.diary.ui.widget.TypefaceEditText;
 import miles.diary.util.AnimUtils;
+import miles.diary.util.Logg;
 import miles.diary.util.ViewUtils;
-import rx.Observable;
-import rx.functions.Func1;
 
 public class NewEntryActivity extends BaseActivity implements View.OnClickListener {
 
@@ -60,12 +67,13 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     private Uri imageUri;
     private WeatherResponse weather;
     private GoogleService googleService;
+    private WeatherService weatherService;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_entry);
-        FabDialogHelper.makeFabDialogTransition(this, root, 20, AnimUtils.longAnim(this));
+        setupTransitions();
 
         setActionBar(toolbar);
 
@@ -86,10 +94,12 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
 
         ViewUtils.mutate(location, ContextCompat.getColor(this, R.color.accent));
 
+        weatherService = new WeatherService(this);
+
         googleService = new GoogleService(this, googleApiClientBuilder,
                 new GoogleService.GoogleServiceCallback() {
                     @Override
-                    public void onConnected(Bundle bundle, GoogleApiClient client, BaseActivity activity) {
+                    public void onConnected(Bundle bundle, GoogleApiClient client) {
                         getLocationData();
                     }
                 });
@@ -165,7 +175,10 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                 break;
             case R.id.activity_new_entry_location:
                 Intent intent1 = new Intent(this, LocationActivity.class);
-                startActivityForResult(intent1, RESULT_LOCATION);
+                ActivityOptions options =
+                        ActivityOptions.makeSceneTransitionAnimation(this, location,
+                                getString(R.string.transition_location));
+                startActivityForResult(intent1, RESULT_LOCATION, options.toBundle());
                 break;
         }
     }
@@ -283,20 +296,19 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
         if (hasPermissions(permissions)) {
             if (hasConnection()) {
                 if (LocationService.isLocationEnabled(this)) {
-                    addSubscription(
-                            googleService.getLocation()
-                                    .switchMap(new Func1<Location, Observable<?>>() {
-                                        @Override
-                                        public Observable<?> call(Location location) {
-                                            getWeather(location);
-                                            getPlace(location);
-                                            return Observable.just(location);
-                                        }
-                                    }).subscribe());
+                    googleService.getLocation()
+                            .subscribe(new ActivitySubscriber<Location>(this) {
+                                @Override
+                                public void onNext(Location location) {
+                                    getWeather(location);
+                                    getPlace(location);
+                                }
+                            });
                 } else {
                     LocationService.getLocationAvailabilityUpdate(this, new LocationService.AvailabilityCallback() {
                         @Override
                         public void onLocationEnabled(Context context, BroadcastReceiver receiver, Intent intent) {
+                            unregisterReceiver(receiver);
                             getLocationData();
                         }
                     });
@@ -312,11 +324,40 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                             })
                             .show();
                 }
-            } else {
-                noInternet();
             }
         } else {
             ActivityCompat.requestPermissions(this, permissions, REQUEST_LOCATION_PERMISSION);
         }
+    }
+
+    private void setupTransitions() {
+        int dur = AnimUtils.longAnim(this);
+        int start = getIntent().getIntExtra(FabContainerTransition.START_COLOR, Color.TRANSPARENT);
+        int end = getIntent().getIntExtra(FabContainerTransition.END_COLOR, Color.TRANSPARENT);
+        Interpolator easeInOut = new FastOutSlowInInterpolator();
+
+        FabContainerTransition sharedEnter = new FabContainerTransition(start, end,
+                getResources().getDimensionPixelSize(R.dimen.fab_corner_radius));
+        ArcMotion arcMotion = new ArcMotion();
+        arcMotion.setMinimumHorizontalAngle(30f);
+        arcMotion.setMinimumVerticalAngle(30f);
+
+        sharedEnter.setPathMotion(arcMotion);
+        sharedEnter.setInterpolator(easeInOut);
+        sharedEnter.addTarget(root);
+        sharedEnter.setDuration(dur);
+
+        ContainerFabTransition sharedReturn = new ContainerFabTransition(end, start);
+        ArcMotion returnArc = new ArcMotion();
+        returnArc.setMinimumHorizontalAngle(70f);
+        returnArc.setMinimumVerticalAngle(70f);
+
+        sharedReturn.setPathMotion(returnArc);
+        sharedReturn.setInterpolator(easeInOut);
+        sharedReturn.addTarget(root);
+        sharedReturn.setDuration(dur);
+
+        getWindow().setSharedElementEnterTransition(sharedEnter);
+        getWindow().setSharedElementReturnTransition(sharedReturn);
     }
 }

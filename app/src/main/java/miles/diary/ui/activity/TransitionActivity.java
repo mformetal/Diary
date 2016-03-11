@@ -35,14 +35,15 @@ public abstract class TransitionActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        if (shouldRunCustomExitAnimation()) {
+        if (overrideTransitions()) {
             onExit(root);
         } else {
+            onExit(root);
             super.onBackPressed();
         }
     }
 
-    abstract boolean shouldRunCustomExitAnimation();
+    abstract boolean overrideTransitions();
 
     abstract void onEnter(ViewGroup root, Intent calledIntent, boolean hasSavedInstanceState);
 

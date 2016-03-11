@@ -19,11 +19,15 @@ import android.view.animation.Interpolator;
 import miles.diary.R;
 import miles.diary.ui.drawable.RoundRectDrawable;
 import miles.diary.util.AnimUtils;
+import miles.diary.util.Logg;
 
 /**
  * Created by mbpeele on 3/6/16.
  */
 public class FabContainerTransition extends ChangeBounds {
+
+    public final static String START_COLOR = "startColor";
+    public final static String END_COLOR = "endColor";
 
     private static final String PROPERTY_COLOR = "plaid:circleMorph:color";
     private static final String PROPERTY_CORNER_RADIUS = "plaid:circleMorph:cornerRadius";
@@ -32,26 +36,18 @@ public class FabContainerTransition extends ChangeBounds {
             PROPERTY_CORNER_RADIUS
     };
 
-    private @ColorInt
-    int startColor = Color.TRANSPARENT;
+    private int startColor, endColor;
     private int endCornerRadius;
 
-    public FabContainerTransition(@ColorInt int startColor, int endCornerRadius) {
+    public FabContainerTransition(int startColor, int endColor, int endCornerRadius) {
         super();
-        setStartColor(startColor);
-        setEndCornerRadius(endCornerRadius);
+        this.startColor = startColor;
+        this.endColor = endColor;
+        this.endCornerRadius = endCornerRadius;
     }
 
     public FabContainerTransition(Context context, AttributeSet attrs) {
         super(context, attrs);
-    }
-
-    public void setStartColor(@ColorInt int startColor) {
-        this.startColor = startColor;
-    }
-
-    public void setEndCornerRadius(int endCornerRadius) {
-        this.endCornerRadius = endCornerRadius;
     }
 
     @Override
@@ -77,8 +73,7 @@ public class FabContainerTransition extends ChangeBounds {
         if (view.getWidth() <= 0 || view.getHeight() <= 0) {
             return;
         }
-        transitionValues.values.put(PROPERTY_COLOR,
-                ContextCompat.getColor(view.getContext(), R.color.window_background));
+        transitionValues.values.put(PROPERTY_COLOR, endColor);
         transitionValues.values.put(PROPERTY_CORNER_RADIUS, endCornerRadius);
     }
 
@@ -104,14 +99,13 @@ public class FabContainerTransition extends ChangeBounds {
         RoundRectDrawable background = new RoundRectDrawable(startColor, startCornerRadius);
         endValues.view.setBackground(background);
 
-        Animator color = ObjectAnimator.ofArgb(background, RoundRectDrawable.COLOR, endColor);
-        Animator corners = ObjectAnimator.ofFloat(background, RoundRectDrawable.CORNER_RADIUS,
+        Animator color = ObjectAnimator.ofArgb(background, background.COLOR, endColor);
+        Animator corners = ObjectAnimator.ofFloat(background, background.CORNER_RADIUS,
                 endCornerRadius);
 
-        // ease in the dialog's child views (slide up & fade in)
         if (endValues.view instanceof ViewGroup) {
             ViewGroup vg = (ViewGroup) endValues.view;
-            int duration = AnimUtils.mediumAnim(sceneRoot.getContext());
+            int duration = AnimUtils.shortAnim(sceneRoot.getContext());
             Interpolator interpolator = new FastOutSlowInInterpolator();
             for (int i = 0; i < vg.getChildCount(); i++) {
                 View v = vg.getChildAt(i);
@@ -128,8 +122,7 @@ public class FabContainerTransition extends ChangeBounds {
         AnimatorSet transition = new AnimatorSet();
         transition.playTogether(changeBounds, corners, color);
         transition.setDuration(AnimUtils.mediumAnim(sceneRoot.getContext()));
-        transition.setInterpolator(AnimationUtils.loadInterpolator(sceneRoot.getContext(),
-                android.R.interpolator.fast_out_slow_in));
+        transition.setInterpolator(new FastOutSlowInInterpolator());
         return transition;
     }
 

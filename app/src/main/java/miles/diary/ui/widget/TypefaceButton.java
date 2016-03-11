@@ -1,10 +1,12 @@
 package miles.diary.ui.widget;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.v7.widget.AppCompatButton;
 import android.util.AttributeSet;
 
@@ -52,18 +54,14 @@ public class TypefaceButton extends AppCompatButton {
     }
 
     private void tintDrawables(final int color) {
-        PreDrawer.addPreDrawer(this, new PreDrawer.OnPreDrawListener<TypefaceButton>() {
-            @Override
-            public boolean onPreDraw(TypefaceButton view) {
-                Drawable[] drawables = getCompoundDrawables();
-                for (Drawable drawable: drawables) {
-                    if (drawable != null) {
-                        drawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
-                    }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            setCompoundDrawableTintList(ColorStateList.valueOf(color));
+        } else {
+            for (Drawable drawable: getCompoundDrawables()) {
+                if (drawable != null) {
+                    drawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
                 }
-
-                return true;
             }
-        });
+        }
     }
 }

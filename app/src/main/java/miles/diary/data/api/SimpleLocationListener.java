@@ -1,4 +1,4 @@
-package miles.diary.util;
+package miles.diary.data.api;
 
 import android.location.LocationListener;
 import android.os.Bundle;

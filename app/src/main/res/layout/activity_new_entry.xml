@@ -21,15 +21,13 @@
     <miles.diary.ui.widget.CircleImageView
         android:id="@+id/activity_new_entry_photo"
         android:src="@drawable/ic_photo_24dp"
-        android:transitionName="@string/transition_location_image"
-        android:layout_width="@dimen/fab_normal_dimens"
-        android:layout_height="@dimen/fab_normal_dimens"
+        android:layout_width="@dimen/fab_large_dimens"
+        android:layout_height="@dimen/fab_large_dimens"
         android:layout_marginTop="@dimen/small_fab_margin"
         android:layout_gravity="center_horizontal" />
 
     <miles.diary.ui.widget.TypefaceButton
         android:id="@+id/activity_new_entry_location"
-        android:transitionName="@string/transition_location_image"
         android:textSize="@dimen/subtitle_text_size"
         android:gravity="center"
         android:layout_width="wrap_content"
@@ -37,6 +35,7 @@
         android:layout_gravity="center_horizontal"
         android:backgroundTint="@color/accent_with_alpha"
         android:textColorHint="@android:color/white"
+        android:transitionName="@string/transition_location"
         android:hint="@string/activity_new_entry_location_hint" />
 
     <miles.diary.ui.widget.NotebookEditText
@@ -46,7 +45,6 @@
         android:textSize="@dimen/subtitle_text_size"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/half_activity_vertical_margin"
         android:layout_marginBottom="@dimen/half_activity_vertical_margin"
         android:gravity="start|top"
         android:inputType="textCapSentences|textMultiLine|textAutoCorrect"

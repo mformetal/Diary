@@ -1,8 +1,8 @@
 package miles.diary.ui.activity;
 
-import android.animation.AnimatorSet;
 import android.app.ActivityOptions;
 import android.content.Intent;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -12,19 +12,22 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
+import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toolbar;
 
+import java.util.Date;
 import java.util.List;
 
 import butterknife.Bind;
+import io.realm.RealmObject;
 import miles.diary.R;
 import miles.diary.data.adapter.EntryAdapter;
 import miles.diary.data.api.db.DataLoadingListener;
 import miles.diary.data.model.realm.Entry;
+import miles.diary.data.model.realm.Test;
 import miles.diary.data.rx.ActivitySubscriber;
-import miles.diary.ui.DividerDecoration;
+import miles.diary.data.rx.DataTransaction;
 import miles.diary.ui.PreDrawer;
 import miles.diary.ui.transition.FabContainerTransition;
 import miles.diary.util.AnimUtils;
@@ -51,7 +54,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
         PreDrawer.addPreDrawer(root, new PreDrawer.OnPreDrawListener<ViewGroup>() {
             @Override
             public boolean onPreDraw(ViewGroup view) {
-                AnimUtils.pop(fab, 0f, 1f).setDuration(AnimUtils.longAnim(view.getContext())).start();
+                fab.startAnimation(AnimationUtils.loadAnimation(view.getContext(), R.anim.glide_pop));
                 return true;
             }
         });
@@ -84,18 +87,23 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
                     final String placeName = bundle.getString(NewEntryActivity.PLACE_NAME);
                     final String placeId = bundle.getString(NewEntryActivity.PLACE_ID);
                     final String weather = bundle.getString(NewEntryActivity.TEMPERATURE);
+                    final Location location = bundle.getParcelable(NewEntryActivity.LOCATION);
 
-                    dataManager.uploadObject(new Entry(body, uri, placeName, placeId, weather))
-                            .subscribe(new ActivitySubscriber<Entry>(this) {
-                                @Override
-                                public void onNext(Entry entry) {
-                                    entryAdapter.addData(entry);
-                                }
-                            });
+                    dataManager.uploadObject(new DataTransaction<Entry>() {
+                        @Override
+                        public Entry call() {
+                            return Entry.construct(body, uri, placeName, placeId, weather, location);
+                        }
+                    }).subscribe(new ActivitySubscriber<Entry>(this) {
+                        @Override
+                        public void onNext(Entry entry) {
+                            entryAdapter.addData(entry);
 
-                    if (emptyView != null) {
-                        emptyView.setVisibility(View.GONE);
-                    }
+                            if (emptyView != null) {
+                                emptyView.setVisibility(View.GONE);
+                            }
+                        }
+                    });
                 }
                 break;
             case RESULT_CODE_ENTRY:

@@ -100,28 +100,26 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
     }
 
     @Override
-    public void onBackPressed() {
-        setReturnData();
-        super.onBackPressed();
-    }
-
-    @Override
     boolean overrideTransitions() {
         return false;
     }
 
     @Override
     void onEnter(ViewGroup root, Intent calledIntent, boolean hasSavedInstanceState) {
-        AnimUtils.background(root, ContextCompat.getColor(this, R.color.accent), Color.WHITE)
-                .setDuration(500)
-                .start();
+        if (getWindow().getSharedElementEnterTransition() != null) {
+            AnimUtils.background(root, ContextCompat.getColor(this, R.color.accent), Color.WHITE)
+                    .setDuration(500)
+                    .start();
+        }
     }
 
     @Override
     void onExit(ViewGroup root) {
-        AnimUtils.background(root, Color.WHITE, ContextCompat.getColor(this, R.color.accent))
-                .setDuration(500)
-                .start();
+        if (getWindow().getSharedElementEnterTransition() != null) {
+            AnimUtils.background(root, Color.WHITE, ContextCompat.getColor(this, R.color.accent))
+                    .setDuration(500)
+                    .start();
+        }
     }
 
     @Override

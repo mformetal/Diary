@@ -1,5 +1,6 @@
 package miles.diary.data.model.realm;
 
+import android.location.Location;
 import android.net.Uri;
 
 import java.util.Date;
@@ -7,11 +8,17 @@ import java.util.Date;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+import lombok.experimental.Builder;
 import miles.diary.util.TextUtils;
 
-/**
- * Created by mbpeele on 1/18/16.
- */
+@EqualsAndHashCode(callSuper = true)
+@Accessors(chain = true)
+@Data
 public class Entry extends RealmObject implements IRealmInterface {
 
     public final static String KEY = "dateMillis";
@@ -26,98 +33,46 @@ public class Entry extends RealmObject implements IRealmInterface {
     private String placeName;
     private String placeId;
     private String weather;
+    private Double latitude;
+    private Double longitude;
 
     public Entry() {
         super();
     }
 
-    public Entry(String body, Uri uri, String placeName,
-              String placeId, String temperature) {
-        super();
-        setBody(body);
-        Date date = new Date();
-        setDate(date);
-        setDateMillis(date.getTime());
+    public static Entry construct(String body, Uri uri, String placeName, String placeId,
+                                  String weather, Location location) {
+        String uriString = null;
         if (uri != null) {
-            setUri(uri.toString());
+            uriString = uri.toString();
         }
-        setPlaceName(placeName);
-        setPlaceId(placeId);
-        setWeather(temperature);
+
+        Double latitude = null;
+        Double longitude = null;
+        if (location != null) {
+            latitude = location.getLatitude();
+            longitude = location.getLongitude();
+        }
+
+        Date date = new Date();
+        return new Entry()
+                .setBody(body)
+                .setUri(uriString)
+                .setDate(date)
+                .setDateMillis(date.getTime())
+                .setPlaceName(placeName)
+                .setPlaceId(placeId)
+                .setWeather(weather)
+                .setLatitude(latitude)
+                .setLongitude(longitude);
     }
 
-    public String getWeather() {
-        return weather;
-    }
-
-    public void setWeather(String weather) {
-        this.weather = weather;
-    }
-
-    public String getPlaceId() {
-        return placeId;
-    }
-
-    public void setPlaceId(String placeId) {
-        this.placeId = placeId;
-    }
-
-    public String getPlaceName() {
-        return placeName;
-    }
-
-    public void setPlaceName(String placeName) {
-        this.placeName = placeName;
-    }
-
-    public String getUri() {
-        return uri;
-    }
-
-    public void setUri(String uri) {
-        this.uri = uri;
-    }
-
-    public String getBody() {
-        return body;
-    }
-
-    public void setBody(String body) {
-        this.body = body;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public long getDateMillis() {
-        return dateMillis;
-    }
-
-    public void setDateMillis(long dateMillis) {
-        this.dateMillis = dateMillis;
-    }
-
-    public static String formatDiaryPrefaceText(Entry entry) {
-        return "Dear Diary, " +
-                TextUtils.repeat(2, TextUtils.LINE_SEPERATOR) +
-                TextUtils.repeat(5, TextUtils.TAB) +
-                entry.getBody();
-    }
-
-    public static Entry update(Entry entry, String body, Uri uri, String placeName,
-                               String placeId, String temperature) {
+    public static Entry update(Entry entry, String body, Uri uri, String placeName, String placeId) {
         entry.setBody(body);
-        entry.setPlaceId(placeId);
-        entry.setPlaceName(placeName);
-        entry.setWeather(temperature);
         if (uri != null) {
             entry.setUri(uri.toString());
         }
+        entry.setPlaceName(placeName).setPlaceId(placeId);
         return entry;
     }
 }

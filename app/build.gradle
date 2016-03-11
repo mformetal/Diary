@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'
 apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'realm-android'
@@ -40,6 +39,8 @@ android {
 dependencies {
     provided 'com.google.dagger:dagger-compiler:2.0'
     provided 'org.glassfish:javax.annotation:10.0-b28'
+    provided "org.projectlombok:lombok:1.12.6"
+    apt "org.projectlombok:lombok:1.12.6"
     compile 'com.google.dagger:dagger:2.0'
     compile 'com.google.guava:guava:18.0'
     compile 'com.google.android.gms:play-services-location:8.4.0'
@@ -56,7 +57,4 @@ dependencies {
     compile 'com.github.bumptech.glide:glide:3.6.1'
     compile 'com.commit451:PhotoView:1.2.4'
     compile 'com.joanzapata.iconify:android-iconify-weathericons:2.1.1'
-    compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
-        transitive = true;
-    }
 }

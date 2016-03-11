@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -162,12 +163,11 @@ public class EntryActivity extends TransitionActivity {
                     final Uri uri = bundle.getParcelable(NewEntryActivity.URI);
                     final String placeName = bundle.getString(NewEntryActivity.PLACE_NAME);
                     final String placeId = bundle.getString(NewEntryActivity.PLACE_ID);
-                    final String weather = bundle.getString(NewEntryActivity.TEMPERATURE);
 
                     dataManager.updateObject(new DataTransaction<Entry>() {
                         @Override
                         public Entry call() {
-                            return Entry.update(entry, body, uri, placeName, placeId, weather);
+                            return Entry.update(entry, body, uri, placeName, placeId);
                         }
                     }).subscribe(new ActivitySubscriber<Entry>(this) {
                         @Override
@@ -244,7 +244,12 @@ public class EntryActivity extends TransitionActivity {
         ViewUtils.mutate(place, place.getCurrentTextColor());
         ViewUtils.mutate(date, place.getCurrentTextColor());
 
-        SpannableString spannableString = new SpannableString(Entry.formatDiaryPrefaceText(entry));
+        String text = "Dear Diary, " +
+                TextUtils.repeat(2, TextUtils.LINE_SEPERATOR) +
+                TextUtils.repeat(5, TextUtils.TAB) +
+                entry.getBody();
+
+        SpannableString spannableString = new SpannableString(text);
         spannableString.setSpan(new RelativeSizeSpan(1.4f), 0, 12, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
         spannableString.setSpan(new TypefacerSpan(TextUtils.getFont(this, getString(R.string.default_font))),
                 12, spannableString.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);

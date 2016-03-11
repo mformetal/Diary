@@ -110,6 +110,15 @@ public class DataManager implements DataManagerInterface {
     }
 
     @Override
+    public <T extends RealmObject> Observable<T> uploadObject(DataTransaction<T> dataTransaction) {
+        if (hasConnection()) {
+            return DataObservable.upload(dataTransaction, realm);
+        } else {
+            return Observable.error(new NoInternetException());
+        }
+    }
+
+    @Override
     public <T extends RealmObject> Observable<T> deleteObject(T object) {
         if (hasConnection()) {
             return DataObservable.delete(object, realm);

@@ -29,6 +29,16 @@ public class DataObservable {
         });
     }
 
+    public static <T extends RealmObject> Observable<T> upload(final DataTransaction<T> dataTransaction,
+                                                               final Realm realm) {
+        return Observable.create(new OnSubscribeTransaction<T>(realm) {
+            @Override
+            public T execute() {
+                return realm.copyToRealm(dataTransaction.call());
+            }
+        });
+    }
+
     public static <T extends RealmObject> Observable<T> update(final DataTransaction<T> dataTransaction,
                                                                final Realm realm) {
         return Observable.create(new OnSubscribeTransaction<T>(realm) {

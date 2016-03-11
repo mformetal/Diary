@@ -24,6 +24,8 @@ public interface DataManagerInterface {
 
     <T extends RealmObject> Observable<T> uploadObject(T object);
 
+    <T extends RealmObject> Observable<T> uploadObject(DataTransaction<T> dataTransaction);
+
     <T extends RealmObject> Observable<T> deleteObject(T object);
 
     <T extends RealmObject> Observable<T> updateObject(DataTransaction<T> dataTransaction);

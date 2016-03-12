@@ -13,15 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <ProgressBar
-        android:id="@+id/activity_place_photos_progressbar"
-        android:layout_width="@dimen/medium_progress_bar"
-        android:layout_height="@dimen/medium_progress_bar"
-        android:indeterminateTint="@color/icons"
-        android:indeterminateTintMode="src_in"
-        app:layout_anchor="@id/activity_place_photos_root"
-        app:layout_anchorGravity="center" />
-
     <miles.diary.ui.widget.TypefaceTextView
         android:id="@+id/activity_place_name_view"
         android:layout_width="match_parent"

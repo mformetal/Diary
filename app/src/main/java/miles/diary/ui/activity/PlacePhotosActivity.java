@@ -18,6 +18,7 @@ import miles.diary.ui.fragment.BaseDialogFragment;
 import miles.diary.ui.fragment.ConfirmationDialog;
 import miles.diary.ui.widget.TypefaceTextView;
 import miles.diary.util.AnimUtils;
+import miles.diary.util.Logg;
 import rx.functions.Action1;
 
 /**
@@ -32,8 +33,6 @@ public class PlacePhotosActivity extends BaseActivity implements GoogleService.G
     TypefaceTextView nameView;
     @Bind(R.id.activity_place_photos_pager)
     ViewPager pager;
-    @Bind(R.id.activity_place_photos_progressbar)
-    ProgressBar progressBar;
 
     private PlacePhotosAdapter placePhotosAdapter;
     private GoogleService googleService;
@@ -57,6 +56,10 @@ public class PlacePhotosActivity extends BaseActivity implements GoogleService.G
 
     @Override
     public void onConnected(Bundle bundle) {
+        placePhotosAdapter = new PlacePhotosAdapter(googleService, this);
+        pager.setOffscreenPageLimit(2);
+        pager.setAdapter(placePhotosAdapter);
+
         googleService.getPlacePhotos(id)
                 .doOnError(new Action1<Throwable>() {
                     @Override
@@ -67,13 +70,10 @@ public class PlacePhotosActivity extends BaseActivity implements GoogleService.G
                 .subscribe(new ActivitySubscriber<PlacePhotoMetadataResult>(this) {
                     @Override
                     public void onNext(PlacePhotoMetadataResult result) {
-                        AnimUtils.gone(progressBar).start();
-
                         PlacePhotoMetadataBuffer buffer = result.getPhotoMetadata();
                         if (buffer != null && buffer.getCount() > 0) {
-                            placePhotosAdapter = new PlacePhotosAdapter(googleService,
-                                    PlacePhotosActivity.this, result);
-                            pager.setOffscreenPageLimit(2);
+                            pager.setAdapter(null);
+                            placePhotosAdapter.setBuffer(buffer);
                             pager.setAdapter(placePhotosAdapter);
                         } else {
                             onErrorOrEmpty();

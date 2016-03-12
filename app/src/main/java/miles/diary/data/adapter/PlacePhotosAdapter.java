@@ -20,24 +20,32 @@ import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.ui.PreDrawer;
 import miles.diary.ui.activity.BaseActivity;
 import miles.diary.util.AnimUtils;
+import miles.diary.util.Logg;
 
 /**
  * Created by mbpeele on 3/6/16.
  */
 public class PlacePhotosAdapter extends PagerAdapter {
 
-    private final PlacePhotoMetadataBuffer buffer;
+    private PlacePhotoMetadataBuffer buffer;
     private final BaseActivity activity;
     private final GoogleService service;
-    private LayoutInflater inflater;
+    private final LayoutInflater inflater;
 
-    public PlacePhotosAdapter(GoogleService googleService, BaseActivity baseActivity,
-                              PlacePhotoMetadataResult result) {
+    public PlacePhotosAdapter(GoogleService googleService, BaseActivity baseActivity) {
         super();
         service = googleService;
         activity = baseActivity;
-        buffer = result.getPhotoMetadata();
         inflater = LayoutInflater.from(baseActivity);
+    }
+
+    @Override
+    public int getItemPosition(Object object) {
+        if (buffer != null) {
+            return super.getItemPosition(object);
+        } else {
+            return POSITION_NONE;
+        }
     }
 
     @Override
@@ -49,40 +57,42 @@ public class PlacePhotosAdapter extends PagerAdapter {
         final ImageView imageView = (ImageView) frameLayout.findViewById(R.id.adapter_place_photo_image);
         final ProgressBar progressBar = (ProgressBar) frameLayout.findViewById(R.id.adapter_place_photo_progress);
 
-        final PlacePhotoMetadata metadata = buffer.get(position);
-        final int width = imageView.getWidth();
-        final int height = imageView.getHeight();
+        if (buffer != null) {
+            final PlacePhotoMetadata metadata = buffer.get(position);
+            final int width = imageView.getWidth();
+            final int height = imageView.getHeight();
 
-        if (width == 0  || height == 0) {
-            PreDrawer.addPreDrawer(imageView, new PreDrawer.OnPreDrawListener<ImageView>() {
-                @Override
-                public boolean onPreDraw(final ImageView view) {
-                    service.getScaledPhoto(metadata, view.getWidth(), view.getHeight())
-                            .subscribe(new ActivitySubscriber<PlacePhotoResult>(activity) {
-                                @Override
-                                public void onNext(PlacePhotoResult placePhotoResult) {
-                                    Bitmap bitmap = placePhotoResult.getBitmap();
-                                    view.setImageBitmap(bitmap);
+            if (width == 0  || height == 0) {
+                PreDrawer.addPreDrawer(imageView, new PreDrawer.OnPreDrawListener<ImageView>() {
+                    @Override
+                    public boolean onPreDraw(final ImageView view) {
+                        service.getScaledPhoto(metadata, view.getWidth(), view.getHeight())
+                                .subscribe(new ActivitySubscriber<PlacePhotoResult>(activity) {
+                                    @Override
+                                    public void onNext(PlacePhotoResult placePhotoResult) {
+                                        Bitmap bitmap = placePhotoResult.getBitmap();
+                                        view.setImageBitmap(bitmap);
 
-                                    AnimUtils.pop(view, 0f, 1f).start();
-                                    AnimUtils.gone(progressBar).start();
-                                }
-                            });
-                    return true;
-                }
-            });
-        } else {
-            service.getScaledPhoto(metadata, width, height)
-                    .subscribe(new ActivitySubscriber<PlacePhotoResult>(activity) {
-                        @Override
-                        public void onNext(PlacePhotoResult placePhotoResult) {
-                            Bitmap bitmap = placePhotoResult.getBitmap();
-                            imageView.setImageBitmap(bitmap);
+                                        AnimUtils.pop(view, 0f, 1f).start();
+                                        AnimUtils.gone(progressBar).start();
+                                    }
+                                });
+                        return true;
+                    }
+                });
+            } else {
+                service.getScaledPhoto(metadata, width, height)
+                        .subscribe(new ActivitySubscriber<PlacePhotoResult>(activity) {
+                            @Override
+                            public void onNext(PlacePhotoResult placePhotoResult) {
+                                Bitmap bitmap = placePhotoResult.getBitmap();
+                                imageView.setImageBitmap(bitmap);
 
-                            AnimUtils.pop(imageView, 0f, 1f).start();
-                            AnimUtils.gone(progressBar).start();
-                        }
-                    });
+                                AnimUtils.pop(imageView, 0f, 1f).start();
+                                AnimUtils.gone(progressBar).start();
+                            }
+                        });
+            }
         }
 
         return frameLayout;
@@ -90,7 +100,7 @@ public class PlacePhotosAdapter extends PagerAdapter {
 
     @Override
     public int getCount() {
-        return buffer.getCount();
+        return buffer != null ? buffer.getCount() : 1;
     }
 
     @Override
@@ -101,5 +111,10 @@ public class PlacePhotosAdapter extends PagerAdapter {
     @Override
     public void destroyItem(ViewGroup collection, int position, Object view) {
         collection.removeView((View) view);
+    }
+
+    public void setBuffer(PlacePhotoMetadataBuffer placePhotoMetadataBuffer) {
+        buffer = placePhotoMetadataBuffer;
+        notifyDataSetChanged();
     }
 }

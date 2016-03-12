@@ -5,17 +5,22 @@ import android.app.Application;
 import com.google.common.collect.ImmutableList;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import io.realm.Case;
 import io.realm.Realm;
 import io.realm.RealmObject;
+import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import miles.diary.data.error.NoInternetException;
 import miles.diary.data.error.NoRealmObjectKeyException;
 import miles.diary.data.model.realm.IRealmInterface;
 import miles.diary.data.rx.DataObservable;
 import miles.diary.data.rx.DataTransaction;
+import miles.diary.util.Logg;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -125,6 +130,37 @@ public class DataManager implements DataManagerInterface {
         } else {
             return Observable.error(new NoInternetException());
         }
+    }
+
+    @Override
+    public <T extends RealmObject> Observable<List<T>> searchStrings(Class<T> tClass, String constraint, Case casing, String... fieldNames) {
+        if (fieldNames.length == 0) {
+            throw new IllegalArgumentException("Must give some fieldNames as varargs searchStrings param");
+        }
+
+        RealmQuery<T> query =  realm.where(tClass);
+
+        query.beginGroup();
+        for (String fieldName: fieldNames) {
+            query.contains(fieldName, constraint, casing).or();
+        }
+        query.endGroup();
+
+        return query.findAllAsync()
+                .asObservable()
+                .filter(new Func1<RealmResults<T>, Boolean>() {
+                    @Override
+                    public Boolean call(RealmResults<T> ts) {
+                        return isDataValid(ts);
+                    }
+                })
+                .map(new Func1<RealmResults<T>, List<T>>() {
+                    @Override
+                    public List<T> call(RealmResults<T> ts) {
+                        return ImmutableList.copyOf(ts);
+                    }
+                })
+                .first();
     }
 
     @Override

@@ -14,7 +14,7 @@ import miles.diary.ui.activity.BaseActivity;
  * Created by mbpeele on 2/3/16.
  */
 public abstract class BaseRealmAdapter<VH extends RecyclerView.ViewHolder>
-        extends RecyclerView.Adapter<VH> {
+        extends RecyclerView.Adapter<VH> implements BaseAdapterInterface {
 
     protected final List<RealmObject> data;
     protected final BaseActivity host;
@@ -31,12 +31,12 @@ public abstract class BaseRealmAdapter<VH extends RecyclerView.ViewHolder>
         return data.size();
     }
 
-    public abstract RealmObject getItem(int position);
-
+    @Override
     public boolean isEmpty() {
-        return data.size() <= 0;
+        return data.isEmpty();
     }
 
+    @Override
     public <T extends RealmObject> boolean addData(T object) {
         boolean addition = data.add(object);
         if (addition) {
@@ -46,7 +46,8 @@ public abstract class BaseRealmAdapter<VH extends RecyclerView.ViewHolder>
         return addition;
     }
 
-    public boolean addData(Collection<? extends RealmObject> objects) {
+    @Override
+    public boolean addAll(Collection<? extends RealmObject> objects) {
         boolean addition = data.addAll(objects);
         if (addition) {
             notifyDataSetChanged();
@@ -55,13 +56,16 @@ public abstract class BaseRealmAdapter<VH extends RecyclerView.ViewHolder>
         return addition;
     }
 
+    @Override
     public List<RealmObject> getData() { return data; }
 
-    public void removeData(int position) {
+    @Override
+    public void removeObject(int position) {
         data.remove(position);
     }
 
-    public boolean removeData(RealmObject realmObject) {
+    @Override
+    public boolean removeObject(RealmObject realmObject) {
         boolean removal =  data.remove(realmObject);
         if (removal) {
             notifyDataSetChanged();
@@ -70,10 +74,12 @@ public abstract class BaseRealmAdapter<VH extends RecyclerView.ViewHolder>
         return removal;
     }
 
-    public boolean validateData(RealmObject realmObject) {
+    @Override
+    public boolean isDataValid(RealmObject realmObject) {
         return realmObject.isValid();
     }
 
+    @Override
     public void clear() {
         data.clear();
         notifyDataSetChanged();

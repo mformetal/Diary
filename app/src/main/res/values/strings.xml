@@ -6,6 +6,8 @@
 
     <string name="error_no_internet">No internet connection found.</string>
 
+    <string name="activity_home_search_widget_hint">Search anything</string>
+
     <string name="activity_place_photos_empty">Couldn\'t find any photos of this place.</string>
 
     <string name="activity_location_text_hint">Type place or click above</string>

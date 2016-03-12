@@ -2,6 +2,7 @@ package miles.diary.data.api.db;
 
 import java.util.List;
 
+import io.realm.Case;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
 import miles.diary.data.rx.DataTransaction;
@@ -29,6 +30,9 @@ public interface DataManagerInterface {
     <T extends RealmObject> Observable<T> uploadObject(DataTransaction<T> dataTransaction);
 
     <T extends RealmObject> Observable<T> deleteObject(T object);
+
+    <T extends RealmObject> Observable<List<T>> searchStrings(Class<T> tClass, String constraint,
+                                                              Case casing, String... fieldNames);
 
     <T extends RealmObject> void delete(T object);
 

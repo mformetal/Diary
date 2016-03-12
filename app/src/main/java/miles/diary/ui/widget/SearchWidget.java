@@ -6,17 +6,16 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.widget.AutoCompleteTextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import miles.diary.R;
 import miles.diary.ui.CancelDetector;
+import miles.diary.ui.SimpleTextWatcher;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.Logg;
 
@@ -50,6 +49,13 @@ public class SearchWidget extends TypefaceEditText {
 
         new CancelDetector(this);
 
+        addTextChangedListener(new SimpleTextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                callTextChangedListener(s);
+            }
+        });
+
         listeners = new ArrayList<>();
     }
 
@@ -69,8 +75,9 @@ public class SearchWidget extends TypefaceEditText {
         setPivotX(w);
     }
 
-    public boolean onBack() {
+    public boolean interceptBackButton() {
         if (getVisibility() == View.VISIBLE) {
+            setText("");
             toggle(new int[] { getWidth(), 0 });
             return true;
         }
@@ -82,13 +89,19 @@ public class SearchWidget extends TypefaceEditText {
         listeners.add(searchListener);
     }
 
-    public void callListeners(int[] position, boolean visible) {
+    public void callVisibilityListener(int[] position, boolean visible) {
         for (SearchListener listener : listeners) {
             if (visible) {
                 listener.onSearchShow(position);
             } else {
                 listener.onSearchDismiss(position);
             }
+        }
+    }
+
+    public void callTextChangedListener(CharSequence charSequence) {
+        for (SearchListener listener: listeners) {
+            listener.onSearchTextChanged(charSequence.toString());
         }
     }
 
@@ -102,7 +115,7 @@ public class SearchWidget extends TypefaceEditText {
             animatorSet.setInterpolator(new AccelerateDecelerateInterpolator());
             animatorSet.start();
 
-            callListeners(clickPosition, false);
+            callVisibilityListener(clickPosition, false);
         } else {
             ObjectAnimator alpha = AnimUtils.visible(this);
             ObjectAnimator scale = ObjectAnimator.ofFloat(this, SCALE_X, 0f, 1f);
@@ -112,13 +125,15 @@ public class SearchWidget extends TypefaceEditText {
             animatorSet.setInterpolator(new AccelerateDecelerateInterpolator());
             animatorSet.start();
 
-            callListeners(clickPosition, true);
+            callVisibilityListener(clickPosition, true);
         }
     }
 
     public interface SearchListener {
 
         void onSearchShow(int[] position);
+
+        void onSearchTextChanged(String text);
 
         void onSearchDismiss(int[] position);
     }

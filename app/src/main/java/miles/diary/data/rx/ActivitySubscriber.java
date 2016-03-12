@@ -53,12 +53,11 @@ public abstract class ActivitySubscriber<T> extends Subscriber<T> {
     public void onError(Throwable e) {
         removeSelf();
 
+        e.printStackTrace();
+
         BaseActivity activity = softReference.get();
         if (isListening && activity != null) {
             ((DataLoadingListener) activity).onLoadError(e);
-        } else if (activity != null) {
-            e.printStackTrace();
-            Logg.log(e, "ERROR FROM:", activity.getClass().getName());
         }
     }
 

@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 
 import butterknife.Bind;
+import io.realm.RealmObject;
 import miles.diary.R;
 import miles.diary.data.model.realm.Entry;
 import miles.diary.data.model.weather.WeatherResponse;
@@ -34,6 +35,7 @@ public class EntryAdapter extends BaseRealmAdapter<RecyclerView.ViewHolder> {
     private static final int TYPE_VIDEO = 2;
 
     private Gson gson;
+    private RecyclerView parent;
 
     public EntryAdapter(BaseActivity activity) {
         super(activity);
@@ -42,7 +44,7 @@ public class EntryAdapter extends BaseRealmAdapter<RecyclerView.ViewHolder> {
 
     @Override
     public int getItemViewType(int position) {
-        Entry entry = getItem(position);
+        Entry entry = getObject(position);
         if (entry.getUri() == null) {
             return TYPE_TEXT;
         } else {
@@ -63,7 +65,7 @@ public class EntryAdapter extends BaseRealmAdapter<RecyclerView.ViewHolder> {
 
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
-        final Entry entry = getItem(position);
+        final Entry entry = getObject(position);
 
         if (holder instanceof TextViewHolder) {
             ((TextViewHolder) holder).bind(entry);
@@ -73,8 +75,8 @@ public class EntryAdapter extends BaseRealmAdapter<RecyclerView.ViewHolder> {
     }
 
     @Override
-    public Entry getItem(int position) {
-        return (Entry) data.get(position);
+    public Entry getObject(int item) {
+        return (Entry) getData().get(item);
     }
 
     class TextViewHolder extends BindingViewHolder<Entry> {

@@ -40,6 +40,11 @@ public class Entry extends RealmObject implements IRealmInterface {
         super();
     }
 
+    public Entry(Date date) {
+        super();
+        setDate(date).setDateMillis(date.getTime());
+    }
+
     public static Entry construct(String body, Uri uri, String placeName, String placeId,
                                   String weather, Location location) {
         String uriString = null;
@@ -54,12 +59,9 @@ public class Entry extends RealmObject implements IRealmInterface {
             longitude = location.getLongitude();
         }
 
-        Date date = new Date();
-        return new Entry()
+        return new Entry(new Date())
                 .setBody(body)
                 .setUri(uriString)
-                .setDate(date)
-                .setDateMillis(date.getTime())
                 .setPlaceName(placeName)
                 .setPlaceId(placeId)
                 .setWeather(weather)

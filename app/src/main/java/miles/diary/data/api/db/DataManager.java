@@ -42,7 +42,7 @@ public class DataManager implements DataManagerInterface {
     }
 
     @Override
-    public <T extends RealmObject> Observable<List<T>> loadObjects(Class<T> tClass) {
+    public <T extends RealmObject> Observable<List<T>> getAll(Class<T> tClass) {
         return realm.where(tClass)
                 .findAllAsync()
                 .asObservable()
@@ -125,6 +125,16 @@ public class DataManager implements DataManagerInterface {
         } else {
             return Observable.error(new NoInternetException());
         }
+    }
+
+    @Override
+    public <T extends RealmObject> void delete(T object) {
+        object.removeFromRealm();
+    }
+
+    @Override
+    public void deleteAll() {
+        realm.deleteAll();
     }
 
     @Override

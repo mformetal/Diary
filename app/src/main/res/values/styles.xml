@@ -54,7 +54,7 @@
     </style>
 
     <style name="AppTheme.EntryActivity.Toolbar" parent="AppTheme.Widget.Toolbar">
-        <item name="android:background">@color/scrim_with_alpha</item>
+        <item name="android:background">@color/alpha_window_background</item>
     </style>
 
     <style name="AppTheme.ColoredButton" parent="AppTheme.Widget">

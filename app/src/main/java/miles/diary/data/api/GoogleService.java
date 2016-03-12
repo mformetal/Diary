@@ -7,6 +7,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.widget.ArrayAdapter;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -26,6 +27,8 @@ import java.util.List;
 import java.util.Locale;
 
 import miles.diary.R;
+import miles.diary.data.adapter.AutoCompleteAdapter;
+import miles.diary.data.model.google.AutoCompleteItem;
 import miles.diary.data.model.google.LikelyPlace;
 import miles.diary.data.model.google.PlaceInfo;
 import miles.diary.data.model.google.PlaceResponse;
@@ -33,6 +36,7 @@ import miles.diary.data.rx.GeocodeObservable;
 import miles.diary.data.rx.GoogleObservable;
 import miles.diary.data.rx.OkHttpObservable;
 import miles.diary.ui.activity.BaseActivity;
+import miles.diary.ui.activity.LocationActivity;
 import miles.diary.util.Logg;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -81,6 +85,10 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
 
     public void cleanup() {
         client.disconnect();
+    }
+
+    public AutoCompleteAdapter getAutoCompleteAdapter() {
+        return new AutoCompleteAdapter(activity, R.layout.autocomplete_adapter, client, null, null);
     }
 
     public Observable<PlaceResponse> searchNearby(Location location, float radius) {
@@ -190,7 +198,7 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
     public void onConnected(Bundle bundle) {
         if (checkActivity()) {
             if (callback != null) {
-                callback.onConnected(bundle, client);
+                callback.onConnected(bundle);
             }
         }
     }
@@ -217,6 +225,6 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
 
     public interface GoogleServiceCallback {
 
-        void onConnected(Bundle bundle, GoogleApiClient client);
+        void onConnected(Bundle bundle);
     }
 }

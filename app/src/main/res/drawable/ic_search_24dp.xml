@@ -5,5 +5,5 @@
         android:viewportHeight="24.0">
     <path
         android:fillColor="@color/icons"
-        android:pathData="@string/vector_close" />
+        android:pathData="@string/vector_search"/>
 </vector>

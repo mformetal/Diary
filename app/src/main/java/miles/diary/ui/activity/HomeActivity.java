@@ -2,6 +2,7 @@ package miles.diary.ui.activity;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,28 +10,31 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toolbar;
 
-import java.util.Date;
 import java.util.List;
 
 import butterknife.Bind;
-import io.realm.RealmObject;
 import miles.diary.R;
 import miles.diary.data.adapter.EntryAdapter;
 import miles.diary.data.api.db.DataLoadingListener;
 import miles.diary.data.model.realm.Entry;
-import miles.diary.data.model.realm.Test;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.data.rx.DataTransaction;
 import miles.diary.ui.PreDrawer;
+import miles.diary.ui.TintingSearchListener;
 import miles.diary.ui.transition.FabContainerTransition;
+import miles.diary.ui.widget.SearchWidget;
 import miles.diary.util.AnimUtils;
+import miles.diary.util.ColorsUtils;
 import miles.diary.util.Logg;
 
 public class HomeActivity extends BaseActivity implements DataLoadingListener {
@@ -39,6 +43,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
     @Bind(R.id.activity_home_toolbar) Toolbar toolbar;
     @Bind(R.id.activity_home_loading) ProgressBar progressBar;
     @Bind(R.id.activity_home_fab) FloatingActionButton fab;
+    @Bind(R.id.activity_home_search_widget) SearchWidget searchWidget;
 
     private final static int RESULT_CODE_NEW_ENTRY = 1;
     public final static int RESULT_CODE_ENTRY = 2;
@@ -51,13 +56,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        PreDrawer.addPreDrawer(root, new PreDrawer.OnPreDrawListener<ViewGroup>() {
-            @Override
-            public boolean onPreDraw(ViewGroup view) {
-                fab.startAnimation(AnimationUtils.loadAnimation(view.getContext(), R.anim.glide_pop));
-                return true;
-            }
-        });
+        runEnterAnimation();
 
         setActionBar(toolbar);
 
@@ -74,6 +73,37 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
                 startNewEntryActivity();
             }
         });
+
+        int color = ContextCompat.getColor(this, R.color.window_background);
+        searchWidget.addSearchListener(new TintingSearchListener(root, ColorsUtils.modifyAlpha(color, .8f)));
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (searchWidget.onBack()) {
+            return;
+        }
+
+        super.onBackPressed();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_home, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_home_search:
+                int[] pos = new int[2];
+                View search = toolbar.findViewById(R.id.menu_home_search);
+                search.getLocationOnScreen(pos);
+                searchWidget.toggle(pos);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -112,9 +142,11 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
                     final EntryActivity.Action action = (EntryActivity.Action)
                             bundle.getSerializable(EntryActivity.INTENT_KEY);
                     if (action != null) {
-                        long id = bundle.getLong(EntryActivity.INTENT_ACTION);
-                        Entry entry = dataManager.get(Entry.class, id);
-                        executeAction(action, entry);
+                        long id = bundle.getLong(EntryActivity.INTENT_ACTION, -1);
+                        if (id != -1) {
+                            Entry entry = dataManager.get(Entry.class, id);
+                            executeAction(action, entry);
+                        }
                     }
                 }
                 break;
@@ -158,7 +190,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
     }
 
     private void fetchData() {
-        dataManager.loadObjects(Entry.class)
+        dataManager.getAll(Entry.class)
                 .subscribe(new ActivitySubscriber<List<Entry>>(this, true) {
                     @Override
                     public void onNext(List<Entry> entries) {
@@ -168,6 +200,29 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
                         }
                     }
                 });
+    }
+
+    private void runEnterAnimation() {
+        PreDrawer.addPreDrawer(root, new PreDrawer.OnPreDrawListener<ViewGroup>() {
+            @Override
+            public boolean onPreDraw(ViewGroup view) {
+                fab.startAnimation(AnimationUtils.loadAnimation(view.getContext(), R.anim.glide_pop));
+
+                View title = toolbar.getChildAt(0);
+                if (title != null && title instanceof TextView) {
+                    TextView textView = (TextView) title;
+
+                    AnimUtils.textScale(textView, null, .8f, 1f)
+                            .setDuration(AnimUtils.longAnim(view.getContext()))
+                            .start();
+
+                    AnimUtils.alpha(textView, 0f, 1f)
+                            .setDuration(AnimUtils.longAnim(view.getContext()))
+                            .start();
+                }
+                return true;
+            }
+        });
     }
 
     private void startNewEntryActivity() {
@@ -198,7 +253,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
                 if (entryAdapter.isEmpty()) {
                     onLoadEmpty();
                 }
-                addSubscription(dataManager.deleteObject(entry).subscribe());
+                dataManager.delete(entry);
                 break;
             case EDIT:
                 entryAdapter.clear();

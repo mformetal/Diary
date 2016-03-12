@@ -101,8 +101,14 @@ public class EntryActivity extends TransitionActivity {
         setActionBar(toolbar);
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
-        entry = dataManager.get(Entry.class, getIntent().getLongExtra(INTENT_KEY, -1));
-        updateView(entry);
+        dataManager.getObject(Entry.class, getIntent().getLongExtra(INTENT_KEY, -1))
+                .subscribe(new ActivitySubscriber<Entry>(this) {
+                    @Override
+                    public void onNext(Entry entry1) {
+                        entry = entry1;
+                        updateView(entry);
+                    }
+                });
     }
 
     @Override
@@ -138,9 +144,6 @@ public class EntryActivity extends TransitionActivity {
                 Intent intent = new Intent(this, NewEntryActivity.class);
                 intent.putExtra(EntryActivity.INTENT_KEY, entry.getDateMillis());
                 startActivityForResult(intent, REQUEST_EDIT_ENTRY);
-                break;
-            case R.id.menu_entry_favorite:
-                setResultAction(Action.FAVORITE);
                 break;
             case R.id.menu_entry_delete:
                 setResultAction(Action.DELETE);

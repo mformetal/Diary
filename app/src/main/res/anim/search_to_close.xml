@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<objectAnimator
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="@android:integer/config_mediumAnimTime"
+    android:propertyName="@string/path_transform_property"
+    android:valueType="pathType"
+    android:fillAfter="true"
+    android:valueFrom="@string/vector_close"
+    android:valueTo="@string/vector_search" >
+
+</objectAnimator>

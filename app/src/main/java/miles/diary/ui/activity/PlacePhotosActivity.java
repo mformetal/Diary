@@ -56,7 +56,7 @@ public class PlacePhotosActivity extends BaseActivity implements GoogleService.G
     }
 
     @Override
-    public void onConnected(Bundle bundle, GoogleApiClient client) {
+    public void onConnected(Bundle bundle) {
         googleService.getPlacePhotos(id)
                 .doOnError(new Action1<Throwable>() {
                     @Override

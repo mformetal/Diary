@@ -21,6 +21,7 @@ import miles.diary.ui.activity.HomeActivity;
 import miles.diary.ui.widget.TypefaceIconTextView;
 import miles.diary.ui.widget.TypefaceTextView;
 import miles.diary.util.AnimUtils;
+import miles.diary.util.Logg;
 import miles.diary.util.TextUtils;
 
 /**
@@ -64,12 +65,10 @@ public class EntryAdapter extends BaseRealmAdapter<RecyclerView.ViewHolder> {
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
         final Entry entry = getItem(position);
 
-        if (entry != null) {
-            if (holder instanceof TextViewHolder) {
-                ((TextViewHolder) holder).bind(entry);
-            } else if (holder instanceof ImageViewHolder) {
-                ((ImageViewHolder) holder).bind(entry);
-            }
+        if (holder instanceof TextViewHolder) {
+            ((TextViewHolder) holder).bind(entry);
+        } else if (holder instanceof ImageViewHolder) {
+            ((ImageViewHolder) holder).bind(entry);
         }
     }
 

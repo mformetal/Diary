@@ -49,9 +49,8 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
     @Bind(R.id.activity_location_image) ImageView mapIcon;
 
     private GoogleService googleService;
-    private ArrayAdapter<AutoCompleteItem> autoCompleteAdapter;
-    String placeName;
-    String placeId;
+    private String placeName;
+    private String placeId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,9 +73,8 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
 
                 googleService = new GoogleService(this, googleApiClientBuilder, new GoogleService.GoogleServiceCallback() {
                     @Override
-                    public void onConnected(Bundle bundle, GoogleApiClient client) {
-                        autoCompleteAdapter = new AutoCompleteAdapter(LocationActivity.this,
-                                R.layout.autocomplete_adapter, client, null, null);
+                    public void onConnected(Bundle bundle) {
+                        AutoCompleteAdapter autoCompleteAdapter = googleService.getAutoCompleteAdapter();
                         autoCompleteTextView.setAdapter(autoCompleteAdapter);
 
                         autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

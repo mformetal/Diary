@@ -17,7 +17,15 @@
             android:layout_width="match_parent"
             android:layout_height="?android:attr/actionBarSize"
             app:layout_scrollFlags="scroll|enterAlways"
-            style="@style/AppTheme.Widget.Toolbar" />
+            style="@style/AppTheme.Widget.Toolbar" >
+
+            <miles.diary.ui.widget.SearchWidget
+                android:id="@+id/activity_home_search_widget"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+
+        </Toolbar>
 
     </android.support.design.widget.AppBarLayout>
 

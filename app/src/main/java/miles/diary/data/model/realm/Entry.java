@@ -72,7 +72,7 @@ public class Entry extends RealmObject implements IRealmInterface {
         if (uri != null) {
             entry.setUri(uri.toString());
         }
-        entry.setPlaceName(placeName).setPlaceId(placeId);
-        return entry;
+        return entry.setPlaceName(placeName)
+                .setPlaceId(placeId);
     }
 }

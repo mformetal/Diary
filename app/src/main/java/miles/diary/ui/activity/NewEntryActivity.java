@@ -101,7 +101,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
         googleService = new GoogleService(this, googleApiClientBuilder,
                 new GoogleService.GoogleServiceCallback() {
                     @Override
-                    public void onConnected(Bundle bundle, GoogleApiClient client) {
+                    public void onConnected(Bundle bundle) {
                         getLocationData();
                     }
                 });
@@ -180,6 +180,8 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                 ActivityOptions options =
                         ActivityOptions.makeSceneTransitionAnimation(this, locationName,
                                 getString(R.string.transition_location));
+                intent1.putExtra(PLACE_NAME, placeName);
+                intent1.putExtra(PLACE_ID, placeId);
                 startActivityForResult(intent1, RESULT_LOCATION, options.toBundle());
                 break;
         }

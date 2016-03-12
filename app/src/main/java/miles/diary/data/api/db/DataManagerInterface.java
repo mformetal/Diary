@@ -16,7 +16,7 @@ public interface DataManagerInterface {
 
     void close();
 
-    <T extends RealmObject> Observable<List<T>> loadObjects(Class<T> tClass);
+    <T extends RealmObject> Observable<List<T>> getAll(Class<T> tClass);
 
     <T extends RealmObject> Observable<T> getObject(Class<T> tClass, long key);
 
@@ -24,11 +24,15 @@ public interface DataManagerInterface {
 
     <T extends RealmObject> Observable<T> uploadObject(T object);
 
+    <T extends RealmObject> Observable<T> updateObject(DataTransaction<T> dataTransaction);
+
     <T extends RealmObject> Observable<T> uploadObject(DataTransaction<T> dataTransaction);
 
     <T extends RealmObject> Observable<T> deleteObject(T object);
 
-    <T extends RealmObject> Observable<T> updateObject(DataTransaction<T> dataTransaction);
+    <T extends RealmObject> void delete(T object);
+
+    void deleteAll();
 
     boolean isDataValid(RealmResults realmResults);
 

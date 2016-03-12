@@ -2,6 +2,7 @@ package miles.diary.ui.activity;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -37,6 +38,7 @@ import miles.diary.ui.widget.SearchWidget;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.ColorsUtils;
 import miles.diary.util.Logg;
+import rx.functions.Action1;
 
 public class HomeActivity extends BaseActivity implements DataLoadingListener {
 
@@ -76,8 +78,9 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
         });
 
         int color = ContextCompat.getColor(this, R.color.window_background);
+//        int color = Color.WHITE;
         searchWidget.addSearchListener(new TintingSearchListener(root,
-                ColorsUtils.modifyAlpha(color, .8f)) {
+                ColorsUtils.modifyAlpha(color, .7f)) {
             @Override
             public void onSearchShow(int[] position) {
                 super.onSearchShow(position);
@@ -92,16 +95,15 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
 
             @Override
             public void onSearchTextChanged(String text) {
-                dataManager.searchStrings(Entry.class, text, Case.INSENSITIVE, "body", "placeName")
+                addSubscription(dataManager.searchStrings(Entry.class, text, Case.INSENSITIVE, "body", "placeName")
                         .debounce(150, TimeUnit.MILLISECONDS)
-                        .subscribe(new ActivitySubscriber<List<Entry>>(HomeActivity.this) {
+                        .subscribe(new Action1<List<Entry>>() {
                             @Override
-                            public void onNext(List<Entry> entries) {
-                                root.bringChildToFront(recyclerView);
+                            public void call(List<Entry> entries) {
                                 entryAdapter.clear();
                                 entryAdapter.addAll(entries);
                             }
-                        });
+                        }));
             }
         });
     }

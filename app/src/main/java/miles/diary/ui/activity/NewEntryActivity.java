@@ -3,6 +3,7 @@ package miles.diary.ui.activity;
 import android.Manifest;
 import android.animation.ObjectAnimator;
 import android.app.ActivityOptions;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -21,11 +23,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Interpolator;
+import android.widget.Toast;
 import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
+
+import java.util.ArrayList;
+import java.util.Locale;
 
 import butterknife.Bind;
 import butterknife.OnClick;
@@ -60,6 +66,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     public static final String TEMPERATURE = "temperature";
     private final static int RESULT_LOCATION = 1;
     private final static int RESULT_IMAGE = 2;
+    private final static int RESULT_SPEECH = 3;
     private final static int REQUEST_LOCATION_PERMISSION = 3;
 
     private String placeName;
@@ -105,6 +112,27 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                         getLocationData();
                     }
                 });
+
+        bodyInput.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+                intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
+                        getString(R.string.activity_new_entry_speech_prompt));
+                try {
+                    startActivityForResult(intent, RESULT_SPEECH);
+                    return true;
+                } catch (ActivityNotFoundException a) {
+                    Toast.makeText(v.getContext(),
+                            getString(R.string.activity_new_entry_speech_not_supported),
+                            Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            }
+        });
     }
 
     @Override
@@ -121,6 +149,8 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                     Bundle extras = data.getExtras();
                     placeName = extras.getString(NewEntryActivity.PLACE_NAME);
                     placeId = extras.getString(NewEntryActivity.PLACE_ID);
+
+                    setLocationText(placeName);
                 }
                 break;
             case RESULT_IMAGE:
@@ -130,6 +160,14 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                     loadThumbnailFromUri(imageUri);
                 }
                 break;
+            case RESULT_SPEECH: {
+                if (resultCode == RESULT_OK && null != data) {
+                    ArrayList<String> result = data
+                            .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    bodyInput.setText(result.get(0));
+                }
+                break;
+            }
             default:
                 super.onActivityResult(requestCode, resultCode, data);
         }

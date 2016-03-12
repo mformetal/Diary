@@ -89,7 +89,7 @@ public class SearchWidget extends TypefaceEditText {
         listeners.add(searchListener);
     }
 
-    public void callVisibilityListener(int[] position, boolean visible) {
+    private void callVisibilityListener(int[] position, boolean visible) {
         for (SearchListener listener : listeners) {
             if (visible) {
                 listener.onSearchShow(position);
@@ -99,7 +99,7 @@ public class SearchWidget extends TypefaceEditText {
         }
     }
 
-    public void callTextChangedListener(CharSequence charSequence) {
+    private void callTextChangedListener(CharSequence charSequence) {
         for (SearchListener listener: listeners) {
             listener.onSearchTextChanged(charSequence.toString());
         }

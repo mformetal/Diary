@@ -2,12 +2,10 @@ package miles.diary.data.api;
 
 import android.content.IntentSender;
 import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.widget.ArrayAdapter;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -15,6 +13,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.PlaceFilter;
+import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.PlacePhotoMetadata;
 import com.google.android.gms.location.places.PlacePhotoMetadataResult;
@@ -22,21 +21,16 @@ import com.google.android.gms.location.places.PlacePhotoResult;
 import com.google.android.gms.location.places.Places;
 import com.google.gson.Gson;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import miles.diary.R;
 import miles.diary.data.adapter.AutoCompleteAdapter;
-import miles.diary.data.model.google.AutoCompleteItem;
-import miles.diary.data.model.google.LikelyPlace;
-import miles.diary.data.model.google.PlaceInfo;
 import miles.diary.data.model.google.PlaceResponse;
 import miles.diary.data.rx.GeocodeObservable;
 import miles.diary.data.rx.GoogleObservable;
 import miles.diary.data.rx.OkHttpObservable;
 import miles.diary.ui.activity.BaseActivity;
-import miles.diary.ui.activity.LocationActivity;
 import miles.diary.util.Logg;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -109,12 +103,17 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
     }
 
     @SuppressWarnings({"ResourceType"})
-    public Observable<List<LikelyPlace>> getCurrentPlace(PlaceFilter placeFilter) {
+    public Observable<List<PlaceLikelihood>> getCurrentPlace(PlaceFilter placeFilter) {
         return GoogleObservable.execute(Places.PlaceDetectionApi.getCurrentPlace(client, placeFilter))
-                .map(new Func1<PlaceLikelihoodBuffer, List<LikelyPlace>>() {
+                .map(new Func1<PlaceLikelihoodBuffer, List<PlaceLikelihood>>() {
                     @Override
-                    public List<LikelyPlace> call(PlaceLikelihoodBuffer placeLikelihoods) {
-                        return LikelyPlace.fromBuffer(placeLikelihoods);
+                    public List<PlaceLikelihood> call(PlaceLikelihoodBuffer placeLikelihoods) {
+                        List<PlaceLikelihood> list = new ArrayList<PlaceLikelihood>();
+                        for (PlaceLikelihood placeLikelihood : placeLikelihoods) {
+                            list.add(placeLikelihood);
+                        }
+                        placeLikelihoods.release();
+                        return list;
                     }
                 })
                 .subscribeOn(Schedulers.io())
@@ -175,15 +174,15 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Observable<PlaceInfo> getPlaceById(final String placeId) {
+    public Observable<Place> getPlaceById(final String placeId) {
         return GoogleObservable.execute(Places.GeoDataApi.getPlaceById(client, placeId))
-                .map(new Func1<PlaceBuffer, PlaceInfo>() {
+                .map(new Func1<PlaceBuffer, Place>() {
                     @Override
-                    public PlaceInfo call(PlaceBuffer places) {
-                        Place place = places.get(0);
-                        PlaceInfo info = new PlaceInfo(place);
-                        places.release();
-                        return info;
+                    public Place call(PlaceBuffer placeBuffer) {
+                        Place place  = placeBuffer.get(0);
+                        place.freeze();
+                        placeBuffer.release();
+                        return place;
                     }
                 })
                 .subscribeOn(Schedulers.io())

@@ -11,13 +11,13 @@ import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.places.AutocompletePrediction;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.ui.PlacePicker;
 
 import java.util.List;
@@ -28,8 +28,6 @@ import miles.diary.R;
 import miles.diary.data.adapter.AutoCompleteAdapter;
 import miles.diary.data.api.GoogleService;
 import miles.diary.data.model.google.AutoCompleteItem;
-import miles.diary.data.model.google.LikelyPlace;
-import miles.diary.data.model.google.PlaceInfo;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.ui.widget.TypefaceAutoCompleteTextView;
 import miles.diary.ui.widget.TypefaceButton;
@@ -80,9 +78,9 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
                         autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                             @Override
                             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                final AutoCompleteItem item = autoCompleteAdapter.getItem(position);
-                                placeId = String.valueOf(item.placeId);
-                                placeName = String.valueOf(item.description);
+                                final AutocompletePrediction item = autoCompleteAdapter.getItem(position);
+                                placeId = item.getPlaceId();
+                                placeName = item.getPrimaryText(null).toString();
                             }
                         });
 
@@ -181,11 +179,11 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
     private void getPlace() {
         if (placeName == null && placeId == null) {
             googleService.getCurrentPlace(null)
-                    .subscribe(new ActivitySubscriber<List<LikelyPlace>>(this) {
+                    .subscribe(new ActivitySubscriber<List<PlaceLikelihood>>(this) {
                         @Override
-                        public void onNext(List<LikelyPlace> likelyPlaces) {
-                            PlaceInfo placeInfo = likelyPlaces.get(0).getPlaceInfo();
-                            placeName = placeInfo.getName();
+                        public void onNext(List<PlaceLikelihood> likelyPlaces) {
+                            Place placeInfo = likelyPlaces.get(0).getPlace();
+                            placeName = placeInfo.getName().toString();
                             placeId = placeInfo.getId();
                         }
                     });

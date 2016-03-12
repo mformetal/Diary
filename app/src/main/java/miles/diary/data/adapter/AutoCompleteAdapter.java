@@ -16,6 +16,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import miles.diary.data.model.google.AutoCompleteItem;
@@ -24,9 +25,9 @@ import miles.diary.util.Logg;
 /**
  * Created by mbpeele on 3/2/16.
  */
-public class AutoCompleteAdapter extends ArrayAdapter<AutoCompleteItem> implements Filterable {
+public class AutoCompleteAdapter extends ArrayAdapter<AutocompletePrediction> implements Filterable {
 
-    private ArrayList<AutoCompleteItem> data;
+    private List<AutocompletePrediction> data;
     private final GoogleApiClient client;
     private LatLngBounds bounds;
     private AutocompleteFilter filter;
@@ -45,7 +46,7 @@ public class AutoCompleteAdapter extends ArrayAdapter<AutoCompleteItem> implemen
     }
 
     @Override
-    public AutoCompleteItem getItem(int position) {
+    public AutocompletePrediction getItem(int position) {
         return data.get(position);
     }
 
@@ -77,7 +78,7 @@ public class AutoCompleteAdapter extends ArrayAdapter<AutoCompleteItem> implemen
         };
     }
 
-    private ArrayList<AutoCompleteItem> getAutocomplete(CharSequence constraint) {
+    private List<AutocompletePrediction> getAutocomplete(CharSequence constraint) {
         PendingResult<AutocompletePredictionBuffer> results =
                 Places.GeoDataApi
                         .getAutocompletePredictions(client, constraint.toString(), bounds, null);
@@ -93,11 +94,11 @@ public class AutoCompleteAdapter extends ArrayAdapter<AutoCompleteItem> implemen
         }
 
         Iterator<AutocompletePrediction> iterator = autocompletePredictions.iterator();
-        ArrayList resultList = new ArrayList<>(autocompletePredictions.getCount());
+        List<AutocompletePrediction> resultList = new ArrayList<>(autocompletePredictions.getCount());
         while (iterator.hasNext()) {
             AutocompletePrediction prediction = iterator.next();
-            resultList.add(new AutoCompleteItem(prediction.getPlaceId(),
-                    prediction.getPrimaryText(null)));
+            prediction.freeze();
+            resultList.add(prediction);
         }
 
         autocompletePredictions.release();

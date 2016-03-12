@@ -133,7 +133,8 @@ public class DataManager implements DataManagerInterface {
     }
 
     @Override
-    public <T extends RealmObject> Observable<List<T>> searchStrings(Class<T> tClass, String constraint, Case casing, String... fieldNames) {
+    public <T extends RealmObject> Observable<List<T>> searchStrings(Class<T> tClass, String constraint,
+                                                                     Case casing, String... fieldNames) {
         if (fieldNames.length == 0) {
             throw new IllegalArgumentException("Must give some fieldNames as varargs searchStrings param");
         }

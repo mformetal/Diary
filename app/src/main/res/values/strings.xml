@@ -14,6 +14,8 @@
     <string name="activity_location_no_input">Choose a place first!</string>
     <string name="activity_location_not_enabled">Enable Location!</string>
 
+    <string name="activity_new_entry_speech_not_supported">Phone does not support speech-to-text</string>
+    <string name="activity_new_entry_speech_prompt">Speak your thoughts aloud</string>
     <string name="activity_new_entry_location_hint">Add Location</string>
     <string name="activity_new_entry_no_input_error">Your Entry must not be empty</string>
     <string name="activity_new_entry_body_hint">Memorialize your thoughts</string>

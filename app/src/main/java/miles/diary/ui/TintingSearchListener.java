@@ -18,6 +18,7 @@ import java.lang.ref.WeakReference;
 import miles.diary.R;
 import miles.diary.ui.widget.SearchWidget;
 import miles.diary.util.AnimUtils;
+import miles.diary.util.Logg;
 
 /**
  * Created by mbpeele on 3/11/16.
@@ -73,7 +74,8 @@ public abstract class TintingSearchListener implements SearchWidget.SearchListen
 
     @Override
     public void onSearchDismiss(int[] position) {
-        root.bringToFront();
+        tintView.bringToFront();
+        root.invalidate();
 
         float radius = (float) Math.sqrt(Math.pow(root.getHeight(), 2) + Math.pow(root.getWidth(), 2));
         Animator revealAnimator =
@@ -85,6 +87,7 @@ public abstract class TintingSearchListener implements SearchWidget.SearchListen
                 root.removeView(tintView);
             }
         });
+        revealAnimator.setDuration(AnimUtils.longAnim(root.getContext()));
 
         ObjectAnimator alpha = ObjectAnimator.ofFloat(tintView, View.ALPHA, 1f, 0f);
         alpha.setDuration(revealAnimator.getDuration());

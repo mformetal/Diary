@@ -2,6 +2,7 @@ package miles.diary.ui.activity;
 
 import android.Manifest;
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.ActivityOptions;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
@@ -49,7 +50,9 @@ import miles.diary.ui.widget.CircleImageView;
 import miles.diary.ui.widget.TypefaceButton;
 import miles.diary.ui.widget.TypefaceEditText;
 import miles.diary.util.AnimUtils;
+import miles.diary.util.Logg;
 import miles.diary.util.ViewUtils;
+import rx.functions.Action1;
 
 public class NewEntryActivity extends BaseActivity implements View.OnClickListener {
 
@@ -136,9 +139,19 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        googleService.cleanup();
+    protected void onResume() {
+        super.onResume();
+        if (location == null && LocationService.isLocationEnabled(this)) {
+            googleService.getLocation()
+                    .subscribe(new ActivitySubscriber<Location>(this) {
+                        @Override
+                        public void onNext(Location location1) {
+                            location = location1;
+                            getWeather(location);
+                            getPlace(location);
+                        }
+                    });
+        }
     }
 
     @Override
@@ -160,14 +173,13 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                     loadThumbnailFromUri(imageUri);
                 }
                 break;
-            case RESULT_SPEECH: {
-                if (resultCode == RESULT_OK && null != data) {
+            case RESULT_SPEECH:
+                if (resultCode == RESULT_OK && data != null) {
                     ArrayList<String> result = data
                             .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     bodyInput.setText(result.get(0));
                 }
                 break;
-            }
             default:
                 super.onActivityResult(requestCode, resultCode, data);
         }
@@ -282,10 +294,18 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
 
     private void getPlace(Location location1) {
         if (placeName == null && placeId == null) {
+            final ObjectAnimator pulse = ObjectAnimator.ofFloat(locationName, View.SCALE_X, .95f, 1f);
+            pulse.setDuration(AnimUtils.mediumAnim(this));
+            pulse.setRepeatCount(ValueAnimator.INFINITE);
+            pulse.setRepeatMode(ValueAnimator.REVERSE);
+            pulse.start();
+
             googleService.searchNearby(location1, 3)
                     .subscribe(new ActivitySubscriber<PlaceResponse>(this) {
                         @Override
                         public void onNext(PlaceResponse placeResponse) {
+                            pulse.end();
+
                             PlaceResponse.PlaceResult result =
                                     placeResponse.getResults().get(0);
                             placeName = result.getName();
@@ -350,14 +370,6 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                                 }
                             });
                 } else {
-                    LocationService.getLocationAvailabilityUpdate(this, new LocationService.AvailabilityCallback() {
-                        @Override
-                        public void onLocationEnabled(Context context, BroadcastReceiver receiver, Intent intent) {
-                            unregisterReceiver(receiver);
-                            getLocationData();
-                        }
-                    });
-
                     Snackbar.make(root,
                             R.string.activity_location_not_enabled,
                             Snackbar.LENGTH_LONG)

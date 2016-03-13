@@ -32,9 +32,9 @@ public abstract class ActivitySubscriber<T> extends Subscriber<T> {
             return;
         }
 
-        isListening = shouldListen;
-
         activity.addSubscription(this);
+
+        isListening = shouldListen;
 
         softReference = new SoftReference<>(activity);
     }

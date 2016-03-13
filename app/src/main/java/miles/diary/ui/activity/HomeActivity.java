@@ -280,7 +280,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
                 if (entryAdapter.isEmpty()) {
                     onLoadEmpty();
                 }
-                dataManager.delete(entry);
+                addSubscription(dataManager.deleteObject(entry).subscribe());
                 break;
             case EDIT:
                 entryAdapter.clear();

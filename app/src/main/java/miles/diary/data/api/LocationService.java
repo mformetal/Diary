@@ -62,7 +62,7 @@ public class LocationService {
         try {
             locationMode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE);
         } catch (Settings.SettingNotFoundException e) {
-            Logg.log(e, "LOCATION SETTING NOT FOUND");
+            e.printStackTrace();
         }
 
         return locationMode != Settings.Secure.LOCATION_MODE_OFF;

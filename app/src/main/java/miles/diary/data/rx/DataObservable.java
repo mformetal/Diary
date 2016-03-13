@@ -9,11 +9,10 @@ import rx.Observable;
  */
 public class DataObservable {
 
-    public static <T extends RealmObject> Observable<T> delete(final T object,
-                                                               final Realm realm) {
+    public static <T extends RealmObject> Observable<T> delete(final T object, final Realm realm) {
         return Observable.create(new OnSubscribeTransaction<T>(realm) {
             @Override
-            public T execute() {
+            public T commit() {
                 object.removeFromRealm();
                 return null;
             }
@@ -23,7 +22,7 @@ public class DataObservable {
     public static <T extends RealmObject> Observable<T> upload(final T object, final Realm realm) {
         return Observable.create(new OnSubscribeTransaction<T>(realm) {
             @Override
-            public T execute() {
+            public T commit() {
                 return realm.copyToRealm(object);
             }
         });
@@ -33,7 +32,7 @@ public class DataObservable {
                                                                final Realm realm) {
         return Observable.create(new OnSubscribeTransaction<T>(realm) {
             @Override
-            public T execute() {
+            public T commit() {
                 return realm.copyToRealm(dataTransaction.call());
             }
         });
@@ -43,7 +42,7 @@ public class DataObservable {
                                                                final Realm realm) {
         return Observable.create(new OnSubscribeTransaction<T>(realm) {
             @Override
-            public T execute() {
+            public T commit() {
                 return realm.copyToRealmOrUpdate(dataTransaction.call());
             }
         });

@@ -136,7 +136,6 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
                     SimpleLocationListener simpleLocationListener = new SimpleLocationListener() {
                         @Override
                         public void onLocationChanged(Location location) {
-                            Logg.log("ANDROID LOCATION GETS SHIT");
                             locationManager.removeUpdates(this);
                             subscriber.onNext(location);
                         }
@@ -147,7 +146,7 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
 
                 subscriber.onCompleted();
             }
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        });
     }
 
     public Observable<List<Address>> getAddressFromLocation(Location location, int results) {
@@ -179,7 +178,7 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
                 .map(new Func1<PlaceBuffer, Place>() {
                     @Override
                     public Place call(PlaceBuffer placeBuffer) {
-                        Place place  = placeBuffer.get(0);
+                        Place place = placeBuffer.get(0);
                         place.freeze();
                         placeBuffer.release();
                         return place;

@@ -18,25 +18,14 @@ public abstract class OnSubscribeTransaction<T> implements Observable.OnSubscrib
     @Override
     public void call(Subscriber<? super T> subscriber) {
         subscriber.onStart();
-        realm.executeTransactionAsync(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                T result = commit();
-                if (result != null) {
-                    subscriber.onNext(result);
-                }
-            }
-        }, new Realm.Transaction.OnSuccess() {
-            @Override
-            public void onSuccess() {
-                subscriber.onCompleted();
-            }
-        }, new Realm.Transaction.OnError() {
-            @Override
-            public void onError(Throwable error) {
-                subscriber.onError(error);
-            }
-        });
+        realm.beginTransaction();
+        try {
+            subscriber.onNext(commit());
+        } catch (Exception e) {
+            subscriber.onError(e);
+        }
+        realm.commitTransaction();
+        subscriber.onCompleted();
     }
 
     public abstract T commit();

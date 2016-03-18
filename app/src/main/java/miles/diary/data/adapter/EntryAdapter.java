@@ -11,6 +11,8 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 
+import java.util.List;
+
 import butterknife.Bind;
 import io.realm.RealmObject;
 import miles.diary.R;
@@ -28,14 +30,13 @@ import miles.diary.util.TextUtils;
 /**
  * Created by mbpeele on 1/14/16.
  */
-public class EntryAdapter extends BaseRealmAdapter<RecyclerView.ViewHolder> {
+public class EntryAdapter extends BaseRealmAdapter<Entry, RecyclerView.ViewHolder> {
 
     private static final int TYPE_IMAGE = 0;
     private static final int TYPE_TEXT = 1;
     private static final int TYPE_VIDEO = 2;
 
     private Gson gson;
-    private RecyclerView parent;
 
     public EntryAdapter(BaseActivity activity) {
         super(activity);
@@ -74,9 +75,25 @@ public class EntryAdapter extends BaseRealmAdapter<RecyclerView.ViewHolder> {
         }
     }
 
-    @Override
-    public Entry getObject(int item) {
-        return (Entry) getData().get(item);
+    public void addAndSort(Entry entry) {
+        List<Entry> entries = getData();
+        long target = entry.getDateMillis();
+        long diff = Integer.MAX_VALUE;
+        int ndx = 0;
+
+        for (int i = 0; i < entries.size(); i++) {
+            Entry entry1 = entries.get(i);
+            long dataTime = entry1.getDateMillis();
+
+            long timeDiff = Math.abs(target - dataTime);
+            if (timeDiff < diff) {
+                diff = timeDiff;
+                ndx = i;
+            }
+        }
+
+        entries.add(ndx, entry);
+        notifyItemChanged(ndx);
     }
 
     class TextViewHolder extends BindingViewHolder<Entry> {

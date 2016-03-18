@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.realm.Case;
 import io.realm.RealmObject;
+import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import miles.diary.data.rx.DataTransaction;
 import rx.Observable;
@@ -31,8 +32,11 @@ public interface DataManagerInterface {
 
     <T extends RealmObject> Observable<T> deleteObject(T object);
 
-    <T extends RealmObject> Observable<List<T>> searchStrings(Class<T> tClass, String constraint,
-                                                              Case casing, String... fieldNames);
+    <T extends RealmObject> RealmQuery<T> exposeSearch(Class<T> tClass);
+
+    <T extends RealmObject> Observable<List<T>> searchFieldnames(Class<T> tClass, String constraint,
+                                                                 Case casing, boolean useOr,
+                                                                 String... fieldNames);
 
     <T extends RealmObject> void delete(T object);
 

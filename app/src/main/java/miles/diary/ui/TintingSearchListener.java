@@ -74,8 +74,7 @@ public abstract class TintingSearchListener implements SearchWidget.SearchListen
 
     @Override
     public void onSearchDismiss(int[] position) {
-        tintView.bringToFront();
-        root.invalidate();
+        root.bringChildToFront(tintView);
 
         float radius = (float) Math.sqrt(Math.pow(root.getHeight(), 2) + Math.pow(root.getWidth(), 2));
         Animator revealAnimator =

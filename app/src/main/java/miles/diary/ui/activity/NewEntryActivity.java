@@ -1,6 +1,8 @@
 package miles.diary.ui.activity;
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.ActivityOptions;
@@ -69,7 +71,6 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     public static final String TEMPERATURE = "temperature";
     private final static int RESULT_LOCATION = 1;
     private final static int RESULT_IMAGE = 2;
-    private final static int RESULT_SPEECH = 3;
     private final static int REQUEST_LOCATION_PERMISSION = 3;
 
     private String placeName;
@@ -115,27 +116,6 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                         getLocationData();
                     }
                 });
-
-        bodyInput.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-                intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
-                        getString(R.string.activity_new_entry_speech_prompt));
-                try {
-                    startActivityForResult(intent, RESULT_SPEECH);
-                    return true;
-                } catch (ActivityNotFoundException a) {
-                    Toast.makeText(v.getContext(),
-                            getString(R.string.activity_new_entry_speech_not_supported),
-                            Toast.LENGTH_SHORT).show();
-                    return false;
-                }
-            }
-        });
     }
 
     @Override
@@ -171,13 +151,6 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                     imageUri = data.getData();
 
                     loadThumbnailFromUri(imageUri);
-                }
-                break;
-            case RESULT_SPEECH:
-                if (resultCode == RESULT_OK && data != null) {
-                    ArrayList<String> result = data
-                            .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    bodyInput.setText(result.get(0));
                 }
                 break;
             default:
@@ -282,14 +255,15 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     }
 
     private void setLocationText(String name) {
-        Drawable drawable = ContextCompat.getDrawable(
-                NewEntryActivity.this, R.drawable.ic_place_24dp);
-        locationName.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
-        locationName.setText(name);
-
-        ObjectAnimator.ofFloat(locationName, View.SCALE_X, 0f, 1f)
-                .setDuration(AnimUtils.longAnim(this))
-                .start();
+        ObjectAnimator objectAnimator = AnimUtils.visible(locationName);
+        objectAnimator.setStartDelay(400);
+        objectAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                locationName.setText(name);
+            }
+        });
+        objectAnimator.start();
     }
 
     private void getPlace(Location location1) {

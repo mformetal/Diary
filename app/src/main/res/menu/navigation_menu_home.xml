@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/drawer_home"
+            android:icon="@drawable/ic_mode_edit_24dp"
+            android:title="WHAT"/>
+
+        <item
+            android:id="@+id/drawer_favourite"
+            android:icon="@drawable/ic_search_24dp"
+            android:title="TEST"/>
+
+        <item
+            android:id="@+id/drawer_settings"
+            android:icon="@drawable/ic_photo_24dp"
+            android:title="SHIT"/>
+
+    </group>
+</menu>

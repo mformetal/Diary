@@ -13,10 +13,10 @@ import miles.diary.ui.activity.BaseActivity;
 /**
  * Created by mbpeele on 2/3/16.
  */
-public abstract class BaseRealmAdapter<VH extends RecyclerView.ViewHolder>
-        extends RecyclerView.Adapter<VH> implements BaseAdapterInterface {
+public abstract class BaseRealmAdapter<T extends RealmObject, VH extends RecyclerView.ViewHolder>
+        extends RecyclerView.Adapter<VH> implements BaseAdapterInterface<T> {
 
-    protected final List<RealmObject> data;
+    protected final List<T> data;
     protected final BaseActivity host;
     protected final LayoutInflater layoutInflater;
 
@@ -24,6 +24,11 @@ public abstract class BaseRealmAdapter<VH extends RecyclerView.ViewHolder>
         host = activity;
         layoutInflater = LayoutInflater.from(activity);
         data = new ArrayList<>();
+    }
+
+    @Override
+    public T getObject(int item) {
+        return data.get(item);
     }
 
     @Override
@@ -37,7 +42,7 @@ public abstract class BaseRealmAdapter<VH extends RecyclerView.ViewHolder>
     }
 
     @Override
-    public <T extends RealmObject> boolean addData(T object) {
+    public boolean addData(T object) {
         boolean addition = data.add(object);
         if (addition) {
             notifyDataSetChanged();
@@ -47,7 +52,7 @@ public abstract class BaseRealmAdapter<VH extends RecyclerView.ViewHolder>
     }
 
     @Override
-    public boolean addAll(Collection<? extends RealmObject> objects) {
+    public boolean addAll(Collection<T> objects) {
         boolean addition = data.addAll(objects);
         if (addition) {
             notifyDataSetChanged();
@@ -57,7 +62,7 @@ public abstract class BaseRealmAdapter<VH extends RecyclerView.ViewHolder>
     }
 
     @Override
-    public List<RealmObject> getData() { return data; }
+    public List<T> getData() { return data; }
 
     @Override
     public void removeObject(int position) {
@@ -65,7 +70,7 @@ public abstract class BaseRealmAdapter<VH extends RecyclerView.ViewHolder>
     }
 
     @Override
-    public boolean removeObject(RealmObject realmObject) {
+    public boolean removeObject(T realmObject) {
         boolean removal =  data.remove(realmObject);
         if (removal) {
             notifyDataSetChanged();

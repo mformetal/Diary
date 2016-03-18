@@ -1,67 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
+<android.support.v4.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_home_root"
+    android:id="@+id/activity_home_drawer"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="miles.diary.ui.activity.HomeActivity" >
+    android:layout_height="match_parent" >
 
-    <android.support.design.widget.AppBarLayout
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/activity_home_coordinator"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true" >
 
-        <Toolbar
-            android:id="@+id/activity_home_toolbar"
+        <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="?android:attr/actionBarSize"
-            app:layout_scrollFlags="scroll|enterAlways"
-            style="@style/AppTheme.Widget.Toolbar" >
+            android:layout_height="wrap_content" >
 
-            <miles.diary.ui.widget.SearchWidget
-                android:id="@+id/activity_home_search_widget"
+            <Toolbar
+                android:id="@+id/activity_home_toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/activity_home_search_widget_hint"
-                android:visibility="gone" />
+                android:layout_height="?android:attr/actionBarSize"
+                app:layout_scrollFlags="scroll|enterAlways"
+                style="@style/AppTheme.Widget.Toolbar" >
 
-        </Toolbar>
+                <miles.diary.ui.widget.SearchWidget
+                    android:id="@+id/activity_home_search_widget"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/activity_home_search_widget_hint"
+                    android:visibility="gone" />
 
-    </android.support.design.widget.AppBarLayout>
+            </Toolbar>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/activity_home_recycler"
+        </android.support.design.widget.AppBarLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/activity_home_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+        <ProgressBar
+            android:id="@+id/activity_home_loading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_anchor="@id/activity_home_coordinator"
+            app:layout_anchorGravity="center" />
+
+        <ViewStub
+            android:id="@+id/activity_home_stub"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="?android:attr/actionBarSize"
+            android:layout="@layout/no_entries"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            app:layout_anchor="@id/activity_home_coordinator"
+            app:layout_anchorGravity="center" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/activity_home_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            android:src="@drawable/ic_add_24dp"
+            app:layout_behavior="miles.diary.ui.ScrollVisibilityBehavior"
+            app:layout_anchor="@id/activity_home_coordinator"
+            app:layout_anchorGravity="bottom|end" />
+
+    </android.support.design.widget.CoordinatorLayout>
+
+    <android.support.design.widget.NavigationView
+        android:id="@+id/activity_home_navigation_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        android:layout_gravity="start"
+        android:paddingTop="?android:attr/actionBarSize"
+        app:headerLayout="@layout/activity_home_header_layout"
+        app:menu="@menu/navigation_menu_home" />
 
-    <ProgressBar
-        android:id="@+id/activity_home_loading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_anchor="@id/activity_home_root"
-        app:layout_anchorGravity="center" />
-
-    <ViewStub
-        android:id="@+id/activity_home_stub"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="?android:attr/actionBarSize"
-        android:layout="@layout/no_entries"
-        android:layout_marginLeft="40dp"
-        android:layout_marginRight="40dp"
-        app:layout_anchor="@id/activity_home_root"
-        app:layout_anchorGravity="center" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/activity_home_fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_add_24dp"
-        app:layout_behavior="miles.diary.ui.ScrollVisibilityBehavior"
-        app:layout_anchor="@id/activity_home_root"
-        app:layout_anchorGravity="bottom|end" />
-
-</android.support.design.widget.CoordinatorLayout>
+</android.support.v4.widget.DrawerLayout>

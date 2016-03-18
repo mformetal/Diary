@@ -1,5 +1,6 @@
 package miles.diary.ui.activity;
 
+import android.app.ActionBar;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.graphics.Color;
@@ -7,9 +8,14 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,15 +26,26 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.reflect.ClassPath;
+
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
 import io.realm.Case;
+import io.realm.RealmResults;
+import io.realm.Sort;
 import miles.diary.R;
 import miles.diary.data.adapter.EntryAdapter;
 import miles.diary.data.api.db.DataLoadingListener;
 import miles.diary.data.model.realm.Entry;
+import miles.diary.data.model.realm.IRealmInterface;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.data.rx.DataTransaction;
 import miles.diary.ui.PreDrawer;
@@ -39,6 +56,7 @@ import miles.diary.util.AnimUtils;
 import miles.diary.util.ColorsUtils;
 import miles.diary.util.Logg;
 import rx.functions.Action1;
+import rx.functions.Func1;
 
 public class HomeActivity extends BaseActivity implements DataLoadingListener {
 
@@ -47,6 +65,8 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
     @Bind(R.id.activity_home_loading) ProgressBar progressBar;
     @Bind(R.id.activity_home_fab) FloatingActionButton fab;
     @Bind(R.id.activity_home_search_widget) SearchWidget searchWidget;
+    @Bind(R.id.activity_home_drawer) DrawerLayout drawerLayout;
+    @Bind(R.id.activity_home_navigation_view) NavigationView navigationView;
 
     private final static int RESULT_CODE_NEW_ENTRY = 1;
     public final static int RESULT_CODE_ENTRY = 2;
@@ -62,6 +82,17 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
         runEnterAnimation();
 
         setActionBar(toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_place_24dp);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                } else {
+                    drawerLayout.openDrawer(GravityCompat.START);
+                }
+            }
+        });
 
         fetchData();
 
@@ -77,35 +108,9 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
             }
         });
 
-        int color = ContextCompat.getColor(this, R.color.window_background);
-//        int color = Color.WHITE;
-        searchWidget.addSearchListener(new TintingSearchListener(root,
-                ColorsUtils.modifyAlpha(color, .7f)) {
-            @Override
-            public void onSearchShow(int[] position) {
-                super.onSearchShow(position);
-                fab.animate().alpha(.4f).setDuration(350);
-            }
+        addSearchListener();
 
-            @Override
-            public void onSearchDismiss(int[] position) {
-                super.onSearchDismiss(position);
-                fab.animate().alpha(1f).setDuration(350);
-            }
-
-            @Override
-            public void onSearchTextChanged(String text) {
-                addSubscription(dataManager.searchStrings(Entry.class, text, Case.INSENSITIVE, "body", "placeName")
-                        .debounce(150, TimeUnit.MILLISECONDS)
-                        .subscribe(new Action1<List<Entry>>() {
-                            @Override
-                            public void call(List<Entry> entries) {
-                                entryAdapter.clear();
-                                entryAdapter.addAll(entries);
-                            }
-                        }));
-            }
-        });
+        drawerLayout.openDrawer(GravityCompat.START);
     }
 
     @Override
@@ -157,7 +162,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
                     }).subscribe(new ActivitySubscriber<Entry>(this) {
                         @Override
                         public void onNext(Entry entry) {
-                            entryAdapter.addData(entry);
+                            entryAdapter.addAndSort(entry);
 
                             if (emptyView != null) {
                                 emptyView.setVisibility(View.GONE);
@@ -219,8 +224,57 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
         showLoading();
     }
 
+    private void addSearchListener() {
+        int color = ContextCompat.getColor(this, R.color.window_background);
+        SearchWidget.SearchListener searchListener = new TintingSearchListener(root,
+                ColorsUtils.modifyAlpha(color, .7f)) {
+            @Override
+            public void onSearchShow(int[] position) {
+                super.onSearchShow(position);
+                fab.animate().alpha(.4f).setDuration(350);
+            }
+
+            @Override
+            public void onSearchDismiss(int[] position) {
+                super.onSearchDismiss(position);
+                fab.animate().alpha(1f).setDuration(350);
+            }
+
+            @Override
+            public void onSearchTextChanged(String text) {
+                addSubscription(dataManager.searchFieldnames(Entry.class, text, Case.INSENSITIVE, true, "body", "placeName")
+                        .debounce(150, TimeUnit.MILLISECONDS)
+                        .subscribe(new Action1<List<Entry>>() {
+                            @Override
+                            public void call(List<Entry> entries) {
+                                root.bringChildToFront(recyclerView);
+                                entryAdapter.clear();
+                                entryAdapter.addAll(entries);
+                            }
+                        }));
+            }
+        };
+
+        searchWidget.addSearchListener(searchListener);
+    }
+
     private void fetchData() {
-        dataManager.getAll(Entry.class)
+        dataManager.exposeSearch(Entry.class)
+                .findAllSortedAsync("dateMillis", Sort.DESCENDING)
+                .asObservable()
+                .filter(new Func1<RealmResults<Entry>, Boolean>() {
+                    @Override
+                    public Boolean call(RealmResults<Entry> ts) {
+                        return dataManager.isDataValid(ts);
+                    }
+                })
+                .map(new Func1<RealmResults<Entry>, List<Entry>>() {
+                    @Override
+                    public List<Entry> call(RealmResults<Entry> ts) {
+                        return ImmutableList.copyOf(ts);
+                    }
+                })
+                .first()
                 .subscribe(new ActivitySubscriber<List<Entry>>(this, true) {
                     @Override
                     public void onNext(List<Entry> entries) {

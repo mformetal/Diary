@@ -17,6 +17,7 @@ import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import miles.diary.data.error.NoInternetException;
 import miles.diary.data.error.NoRealmObjectKeyException;
+import miles.diary.data.model.realm.Entry;
 import miles.diary.data.model.realm.IRealmInterface;
 import miles.diary.data.rx.DataObservable;
 import miles.diary.data.rx.DataTransaction;
@@ -48,7 +49,7 @@ public class DataManager implements DataManagerInterface {
 
     @Override
     public <T extends RealmObject> Observable<List<T>> getAll(Class<T> tClass) {
-        return realm.where(tClass)
+        return exposeSearch(tClass)
                 .findAllAsync()
                 .asObservable()
                 .filter(new Func1<RealmResults<T>, Boolean>() {
@@ -74,7 +75,7 @@ public class DataManager implements DataManagerInterface {
             try {
                 String classKey = (String) fieldName.get(null);
 
-                return realm.where(tClass)
+                return exposeSearch(tClass)
                         .equalTo(classKey, key)
                         .findFirst()
                         .asObservable();
@@ -94,7 +95,7 @@ public class DataManager implements DataManagerInterface {
             try {
                 String classKey = (String) fieldName.get(null);
 
-                return realm.where(tClass)
+                return exposeSearch(tClass)
                         .equalTo(classKey, key)
                         .findFirst();
             } catch (IllegalAccessException e) {
@@ -133,17 +134,27 @@ public class DataManager implements DataManagerInterface {
     }
 
     @Override
-    public <T extends RealmObject> Observable<List<T>> searchStrings(Class<T> tClass, String constraint,
-                                                                     Case casing, String... fieldNames) {
+    public <T extends RealmObject> RealmQuery<T> exposeSearch(Class<T> tClass) {
+        return realm.where(tClass);
+    }
+
+    @Override
+    public <T extends RealmObject> Observable<List<T>> searchFieldnames(Class<T> tClass, String constraint,
+                                                                        Case casing, boolean useOr,
+                                                                        String... fieldNames) {
         if (fieldNames.length == 0) {
-            throw new IllegalArgumentException("Must give some fieldNames as varargs searchStrings param");
+            throw new IllegalArgumentException("Must give some fieldNames as varargs searchFieldNames param");
         }
 
-        RealmQuery<T> query =  realm.where(tClass);
+        RealmQuery<T> query = exposeSearch(tClass);
 
         query.beginGroup();
         for (String fieldName: fieldNames) {
-            query.contains(fieldName, constraint, casing).or();
+            query.contains(fieldName, constraint, casing);
+
+            if (useOr) {
+                query.or();
+            }
         }
         query.endGroup();
 

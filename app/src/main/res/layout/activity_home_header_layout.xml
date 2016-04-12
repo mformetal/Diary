@@ -1,25 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <miles.diary.ui.widget.CircleImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:src="@drawable/ic_person_add_24dp"
-        app:civ_border_color="@color/accent"
-        app:civ_border_width="2dp" />
+    android:layout_height="match_parent"
+    android:background="@color/accent" >
 
     <miles.diary.ui.widget.TypefaceTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Your Profile"
+        android:layout_gravity="center"
+        android:text="@string/app_name"
         android:layout_marginTop="@dimen/half_activity_vertical_margin"
-        android:textSize="@dimen/large_text_size" />
+        android:textSize="@dimen/logo_text_size" />
 
-</LinearLayout>
+</FrameLayout>

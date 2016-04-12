@@ -6,7 +6,7 @@ import android.content.DialogInterface;
 /**
  * Created by mbpeele on 3/8/16.
  */
-public abstract class BaseDialogFragment extends DialogFragment {
+public abstract class DismissingDialogFragment extends DialogFragment {
 
     private OnDismissListener listener;
 
@@ -24,6 +24,6 @@ public abstract class BaseDialogFragment extends DialogFragment {
     }
 
     public interface OnDismissListener {
-        void onDismiss(BaseDialogFragment fragment);
+        void onDismiss(DismissingDialogFragment fragment);
     }
 }

@@ -29,6 +29,7 @@ public class Entry extends RealmObject implements IRealmInterface {
     private long dateMillis;
     @Required
     private String body;
+
     private String uri;
     private String placeName;
     private String placeId;

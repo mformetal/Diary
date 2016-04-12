@@ -1,14 +1,12 @@
-package miles.diary.data.api.db;
+package miles.diary.data.api;
 
 import android.app.Application;
 
 import com.google.common.collect.ImmutableList;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
+import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Objects;
 
 import io.realm.Case;
 import io.realm.Realm;
@@ -17,11 +15,10 @@ import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import miles.diary.data.error.NoInternetException;
 import miles.diary.data.error.NoRealmObjectKeyException;
-import miles.diary.data.model.realm.Entry;
 import miles.diary.data.model.realm.IRealmInterface;
+import miles.diary.data.model.realm.Profile;
 import miles.diary.data.rx.DataObservable;
 import miles.diary.data.rx.DataTransaction;
-import miles.diary.util.Logg;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -48,6 +45,13 @@ public class DataManager implements DataManagerInterface {
     }
 
     @Override
+    public Observable<Profile> getProfile() {
+        return exposeSearch(Profile.class)
+                .findFirstAsync()
+                .asObservable();
+    }
+
+    @Override
     public <T extends RealmObject> Observable<List<T>> getAll(Class<T> tClass) {
         return exposeSearch(tClass)
                 .findAllAsync()
@@ -70,7 +74,7 @@ public class DataManager implements DataManagerInterface {
     @Override
     public <T extends RealmObject> Observable<T> getObject(Class<T> tClass, long key) {
         try {
-            Field fieldName = tClass.getDeclaredField(IRealmInterface.CLASS_KEY);
+            Field fieldName = tClass.getDeclaredField(IRealmInterface.KEY);
 
             try {
                 String classKey = (String) fieldName.get(null);
@@ -90,7 +94,7 @@ public class DataManager implements DataManagerInterface {
     @Override
     public <T extends RealmObject> T get(Class<T> tClass, long key) {
         try {
-            Field fieldName = tClass.getDeclaredField(IRealmInterface.CLASS_KEY);
+            Field fieldName = tClass.getDeclaredField(IRealmInterface.KEY);
 
             try {
                 String classKey = (String) fieldName.get(null);

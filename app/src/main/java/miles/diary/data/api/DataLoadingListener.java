@@ -1,4 +1,4 @@
-package miles.diary.data.api.db;
+package miles.diary.data.api;
 
 /**
  * Created by mbpeele on 3/2/16.

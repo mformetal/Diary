@@ -1,9 +1,7 @@
 package miles.diary.ui.activity;
 
-import android.app.ActionBar;
 import android.app.ActivityOptions;
 import android.content.Intent;
-import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,10 +10,8 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,14 +22,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.reflect.ClassPath;
-
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -43,9 +31,8 @@ import io.realm.RealmResults;
 import io.realm.Sort;
 import miles.diary.R;
 import miles.diary.data.adapter.EntryAdapter;
-import miles.diary.data.api.db.DataLoadingListener;
+import miles.diary.data.api.DataLoadingListener;
 import miles.diary.data.model.realm.Entry;
-import miles.diary.data.model.realm.IRealmInterface;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.data.rx.DataTransaction;
 import miles.diary.ui.PreDrawer;
@@ -82,7 +69,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
         runEnterAnimation();
 
         setActionBar(toolbar);
-        toolbar.setNavigationIcon(R.drawable.ic_place_24dp);
+        toolbar.setNavigationIcon(R.drawable.ic_menu_24dp);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -93,6 +80,13 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
                 }
             }
         });
+
+        addNavigationViewClickListener();
+
+        if (datastore.isFirstTimeUser()) {
+            drawerLayout.openDrawer(GravityCompat.START);
+            datastore.setFirstTimeUser(false);
+        }
 
         fetchData();
 
@@ -109,8 +103,6 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
         });
 
         addSearchListener();
-
-        drawerLayout.openDrawer(GravityCompat.START);
     }
 
     @Override
@@ -224,6 +216,26 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
         showLoading();
     }
 
+    private void addNavigationViewClickListener() {
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.navigation_menu_home_calendar:
+                        Logg.log("FAVORITE CLICK");
+                        break;
+                    case R.id.navigation_menu_home_map:
+                        startActivity(new Intent(HomeActivity.this, MapActivity.class));
+                        break;
+                    case R.id.navigation_menu_home_ideas:
+                        Logg.log("SETTINGS CLICK");
+                        break;
+                }
+                return false;
+            }
+        });
+    }
+
     private void addSearchListener() {
         int color = ContextCompat.getColor(this, R.color.window_background);
         SearchWidget.SearchListener searchListener = new TintingSearchListener(root,
@@ -266,12 +278,6 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
                     @Override
                     public Boolean call(RealmResults<Entry> ts) {
                         return dataManager.isDataValid(ts);
-                    }
-                })
-                .map(new Func1<RealmResults<Entry>, List<Entry>>() {
-                    @Override
-                    public List<Entry> call(RealmResults<Entry> ts) {
-                        return ImmutableList.copyOf(ts);
                     }
                 })
                 .first()

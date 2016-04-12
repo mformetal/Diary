@@ -52,7 +52,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="?android:attr/actionBarSize"
-            android:layout="@layout/no_entries"
+            android:layout="@layout/activity_home_no_entries_stub"
             android:layout_marginLeft="40dp"
             android:layout_marginRight="40dp"
             app:layout_anchor="@id/activity_home_coordinator"
@@ -75,8 +75,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:paddingTop="?android:attr/actionBarSize"
-        app:headerLayout="@layout/activity_home_header_layout"
         app:menu="@menu/navigation_menu_home" />
 
 </android.support.v4.widget.DrawerLayout>

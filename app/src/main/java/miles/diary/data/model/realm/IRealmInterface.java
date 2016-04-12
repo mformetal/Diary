@@ -5,5 +5,5 @@ package miles.diary.data.model.realm;
  */
 public interface IRealmInterface {
 
-    String CLASS_KEY = "KEY";
+    String KEY = "KEY";
 }

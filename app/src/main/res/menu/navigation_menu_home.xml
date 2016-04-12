@@ -5,19 +5,20 @@
         android:checkableBehavior="single">
 
         <item
-            android:id="@+id/drawer_home"
-            android:icon="@drawable/ic_mode_edit_24dp"
-            android:title="WHAT"/>
+            android:id="@+id/navigation_menu_home_map"
+            android:icon="@drawable/ic_world_24dp"
+            android:title="@string/menu_home_map"/>
 
         <item
-            android:id="@+id/drawer_favourite"
-            android:icon="@drawable/ic_search_24dp"
-            android:title="TEST"/>
+            android:id="@+id/navigation_menu_home_calendar"
+            android:icon="@drawable/ic_calendar_24dp"
+            android:title="@string/menu_home_calendar"/>
 
         <item
-            android:id="@+id/drawer_settings"
-            android:icon="@drawable/ic_photo_24dp"
-            android:title="SHIT"/>
+            android:id="@+id/navigation_menu_home_ideas"
+            android:icon="@drawable/ic_lightbulb_outline_24dp"
+            android:title="@string/menu_home_prompts" />
 
     </group>
+
 </menu>

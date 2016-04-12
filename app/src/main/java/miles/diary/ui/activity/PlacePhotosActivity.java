@@ -3,9 +3,7 @@ package miles.diary.ui.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
-import android.widget.ProgressBar;
 
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.PlacePhotoMetadataBuffer;
 import com.google.android.gms.location.places.PlacePhotoMetadataResult;
 
@@ -14,11 +12,9 @@ import miles.diary.R;
 import miles.diary.data.adapter.PlacePhotosAdapter;
 import miles.diary.data.api.GoogleService;
 import miles.diary.data.rx.ActivitySubscriber;
-import miles.diary.ui.fragment.BaseDialogFragment;
+import miles.diary.ui.fragment.DismissingDialogFragment;
 import miles.diary.ui.fragment.ConfirmationDialog;
 import miles.diary.ui.widget.TypefaceTextView;
-import miles.diary.util.AnimUtils;
-import miles.diary.util.Logg;
 import rx.functions.Action1;
 
 /**
@@ -85,9 +81,9 @@ public class PlacePhotosActivity extends BaseActivity implements GoogleService.G
     private void onErrorOrEmpty() {
         ConfirmationDialog dialog =
                 ConfirmationDialog.newInstance(getString(R.string.activity_place_photos_empty));
-        dialog.setDismissListener(new BaseDialogFragment.OnDismissListener() {
+        dialog.setDismissListener(new DismissingDialogFragment.OnDismissListener() {
             @Override
-            public void onDismiss(BaseDialogFragment fragment) {
+            public void onDismiss(DismissingDialogFragment fragment) {
                 finish();
             }
         });

@@ -1,4 +1,6 @@
-package miles.diary.data.api.db;
+package miles.diary.data.api;
+
+import android.util.Pair;
 
 import java.util.List;
 
@@ -6,17 +8,20 @@ import io.realm.Case;
 import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
+import miles.diary.data.model.realm.Profile;
 import miles.diary.data.rx.DataTransaction;
 import rx.Observable;
 
 /**
  * Created by mbpeele on 3/2/16.
  */
-public interface DataManagerInterface {
+interface DataManagerInterface {
 
     void init();
 
     void close();
+
+    Observable<Profile> getProfile();
 
     <T extends RealmObject> Observable<List<T>> getAll(Class<T> tClass);
 

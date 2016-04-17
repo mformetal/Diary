@@ -3,6 +3,8 @@ package miles.diary.data.model.realm;
 import android.location.Location;
 import android.net.Uri;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.Date;
 
 import io.realm.RealmObject;
@@ -44,6 +46,23 @@ public class Entry extends RealmObject implements IRealmInterface {
     public Entry(Date date) {
         super();
         setDate(date).setDateMillis(date.getTime());
+    }
+
+    public boolean hasImageUri() {
+        return uri != null;
+    }
+
+    public boolean hasLocation() {
+        return latitude != null && longitude != null;
+    }
+
+    public LatLng getLatLng() {
+        if (hasLocation()) {
+            return new LatLng(latitude, longitude);
+        } else {
+            throw new NullPointerException("Attempt to get the LatLng of an Entry that does not " +
+                    "have location data");
+        }
     }
 
     public static Entry construct(String body, Uri uri, String placeName, String placeId,

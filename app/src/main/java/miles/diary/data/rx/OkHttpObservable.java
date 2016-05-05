@@ -22,7 +22,7 @@ public class OkHttpObservable<T> {
     private final Class<T> clazz;
     private final Gson gson;
 
-    public OkHttpObservable(Builder<T> builder) {
+    private OkHttpObservable(Builder<T> builder) {
         url = builder.url;
         clazz = builder.tClass;
         gson = builder.gson;
@@ -53,8 +53,8 @@ public class OkHttpObservable<T> {
             }});
     }
 
-    public static <L> Builder<L> builder(Class<L> lClass) {
-        return new Builder<>(lClass);
+    public static <L> Builder<L> builder() {
+        return new Builder<>();
     }
 
     public static class Builder<T> {
@@ -63,8 +63,9 @@ public class OkHttpObservable<T> {
         private Class<T> tClass;
         private Gson gson;
 
-        public Builder(Class<T> tClass) {
+        public Builder<T> target(Class<T> tClass) {
             this.tClass = tClass;
+            return this;
         }
 
         public Builder<T> url(String url) {

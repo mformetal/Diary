@@ -2,7 +2,6 @@ package miles.diary.data.rx;
 
 import java.lang.ref.SoftReference;
 
-import miles.diary.data.api.DataLoadingListener;
 import miles.diary.ui.activity.BaseActivity;
 import rx.Subscriber;
 

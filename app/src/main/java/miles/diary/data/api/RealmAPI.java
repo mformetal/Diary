@@ -16,13 +16,11 @@ import rx.Single;
 /**
  * Created by mbpeele on 3/2/16.
  */
-interface DataManager {
+interface RealmAPI {
 
     void init();
 
     void close();
-
-    Observable<Profile> getProfile();
 
     <T extends RealmObject> Observable<List<T>> getAll(Class<T> tClass);
 

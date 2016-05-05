@@ -1,48 +1,38 @@
 package miles.diary.data.api;
 
-import android.app.Application;
 import android.content.Context;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-
-import java.io.IOException;
-import java.io.Reader;
 
 import miles.diary.R;
-import miles.diary.data.model.weather.Weather;
 import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.data.rx.OkHttpObservable;
-import miles.diary.util.Logg;
+import miles.diary.util.URLFormatter;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import rx.Observable;
-import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 /**
  * Created by mbpeele on 2/4/16.
  */
-public class WeatherService {
+public class Weather {
 
     private OkHttpClient client;
-    private String baseUrl, apiKey;
+    private Context context;
     private Gson gson;
 
-    public WeatherService(Context context) {
+    public Weather(Context cxt) {
+        context = cxt;
         client = new OkHttpClient();
-        apiKey = context.getResources().getString(R.string.weather_api_key);
-        baseUrl = context.getResources().getString(R.string.weather_base);
         gson = new Gson();
     }
 
     public Observable<WeatherResponse> getWeather(final Double latitude, final Double longitude) {
-        String url = baseUrl + "data/2.5/weather?" +
-                "lat=" + latitude + "&lon=" + longitude + "&APPID=" + apiKey;
+        String url = URLFormatter.weather(context, latitude, longitude);
 
-        OkHttpObservable<WeatherResponse> okHttpObservable = OkHttpObservable.builder(WeatherResponse.class)
+        OkHttpObservable<WeatherResponse> okHttpObservable = OkHttpObservable.<WeatherResponse>builder()
+                .target(WeatherResponse.class)
                 .url(url)
                 .gson(gson)
                 .build();

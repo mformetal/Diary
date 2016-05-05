@@ -18,8 +18,12 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.Bind;
+import miles.diary.DiaryApplication;
 import miles.diary.R;
+import miles.diary.data.api.RealmImpl;
 import miles.diary.data.model.realm.Entry;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.ui.fragment.ConfirmationDialog;
@@ -29,6 +33,9 @@ import miles.diary.ui.fragment.DismissingDialogFragment;
  * Created by mbpeele on 3/13/16.
  */
 public class MapActivity extends BaseActivity implements OnMapReadyCallback {
+
+    @Inject
+    RealmImpl dataManagerImpl;
 
     @Bind(R.id.activity_map_toolbar)
     Toolbar toolbar;
@@ -44,6 +51,11 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.activity_map_fragment);
         mapFragment.getMapAsync(this);
+    }
+
+    @Override
+    public void inject(DiaryApplication diaryApplication) {
+        diaryApplication.getContextComponent().inject(this);
     }
 
     @Override

@@ -25,30 +25,27 @@ import rx.functions.Func1;
 /**
  * Created by mbpeele on 3/2/16.
  */
-public class DataManagerImpl implements DataManager {
+public class RealmImpl implements RealmAPI {
 
     private Application application;
     private Realm realm;
 
-    public DataManagerImpl(Application application) {
+    public RealmImpl(Application application) {
         this.application = application;
     }
 
     @Override
     public void init() {
-        realm = Realm.getDefaultInstance();
+        if (realm == null) {
+            realm = Realm.getDefaultInstance();
+        }
     }
 
     @Override
     public void close() {
-        realm.close();
-    }
-
-    @Override
-    public Observable<Profile> getProfile() {
-        return exposeSearch(Profile.class)
-                .findFirstAsync()
-                .asObservable();
+        if (!realm.isClosed()) {
+            realm.close();
+        }
     }
 
     @Override

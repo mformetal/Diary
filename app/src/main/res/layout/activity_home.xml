@@ -44,7 +44,6 @@
             android:id="@+id/activity_home_loading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_anchor="@id/activity_home_coordinator"
             app:layout_anchorGravity="center" />
 
         <ViewStub
@@ -55,7 +54,6 @@
             android:layout="@layout/activity_home_no_entries_stub"
             android:layout_marginLeft="40dp"
             android:layout_marginRight="40dp"
-            app:layout_anchor="@id/activity_home_coordinator"
             app:layout_anchorGravity="center" />
 
         <android.support.design.widget.FloatingActionButton
@@ -65,7 +63,7 @@
             android:layout_margin="@dimen/fab_margin"
             android:src="@drawable/ic_add_24dp"
             app:layout_behavior="miles.diary.ui.ScrollVisibilityBehavior"
-            app:layout_anchor="@id/activity_home_coordinator"
+            app:layout_anchor="@id/activity_home_recycler"
             app:layout_anchorGravity="bottom|end" />
 
     </android.support.design.widget.CoordinatorLayout>

@@ -15,6 +15,7 @@ import android.widget.ImageView;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.AutocompletePrediction;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceLikelihood;
@@ -22,12 +23,14 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.Bind;
 import butterknife.OnClick;
+import miles.diary.DiaryApplication;
 import miles.diary.R;
 import miles.diary.data.adapter.AutoCompleteAdapter;
-import miles.diary.data.api.GoogleService;
-import miles.diary.data.model.google.AutoCompleteItem;
+import miles.diary.data.api.Google;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.ui.widget.TypefaceAutoCompleteTextView;
 import miles.diary.ui.widget.TypefaceButton;
@@ -42,11 +45,14 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
     private final static int REQUEST_LOCATION_PERMISSION = 1;
     private final static int REQUEST_PLACE_PICKER = 2;
 
+    @Inject
+    GoogleApiClient.Builder googleApiClientBuilder;
+
     @Bind(R.id.activity_location_pos_button) TypefaceButton posButton;
     @Bind(R.id.activity_location_autocomplete) TypefaceAutoCompleteTextView autoCompleteTextView;
     @Bind(R.id.activity_location_image) ImageView mapIcon;
 
-    private GoogleService googleService;
+    private Google googleService;
     private String placeName;
     private String placeId;
 
@@ -69,7 +75,7 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
                     }
                 }
 
-                googleService = new GoogleService(this, googleApiClientBuilder, new GoogleService.GoogleServiceCallback() {
+                googleService = new Google(this, googleApiClientBuilder, new Google.GoogleServiceCallback() {
                     @Override
                     public void onConnected(Bundle bundle) {
                         final AutoCompleteAdapter autoCompleteAdapter = googleService.getAutoCompleteAdapter();
@@ -93,6 +99,11 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
         } else {
             ActivityCompat.requestPermissions(this, permissions, REQUEST_LOCATION_PERMISSION);
         }
+    }
+
+    @Override
+    public void inject(DiaryApplication diaryApplication) {
+        diaryApplication.getContextComponent().inject(this);
     }
 
     @Override

@@ -33,6 +33,7 @@ import miles.diary.ui.activity.BaseActivity;
 import miles.diary.util.LocationUtils;
 import miles.diary.util.Logg;
 import miles.diary.util.SimpleLocationListener;
+import miles.diary.util.URLFormatter;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import rx.Observable;
@@ -44,7 +45,7 @@ import rx.schedulers.Schedulers;
 /**
  * Created by mbpeele on 2/21/16.
  */
-public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
+public class Google implements GoogleApiClient.ConnectionCallbacks,
     GoogleApiClient.OnConnectionFailedListener {
 
     private final GoogleApiClient client;
@@ -55,8 +56,8 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
 
     private static int FAILED_CODE = 5;
 
-    public GoogleService(final BaseActivity activity1, GoogleApiClient.Builder builder,
-                         GoogleServiceCallback googleServiceCallback) {
+    public Google(final BaseActivity activity1, GoogleApiClient.Builder builder,
+                  GoogleServiceCallback googleServiceCallback) {
         activity = activity1;
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
@@ -84,17 +85,10 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
     }
 
     public Observable<PlaceResponse> searchNearby(Location location, float radius) {
-        String url = activity.getString(R.string.maps_url) + "maps/api/place/nearbysearch/json?" + "location=" +
-                location.getLatitude() + ',' + location.getLongitude() + "&radius=" + radius + "&key=" +
-                activity.getString(R.string.google_web_api_key);
+        String url = URLFormatter.nearbySearch(activity, location, radius);
 
-//        OkHttpObservable<PlaceResponse> okHttpObservable =
-//                new OkHttpObservable.Builder<>(PlaceResponse.class)
-//                        .url(url)
-//                        .gson(gson)
-//                        .build();
-
-        OkHttpObservable<PlaceResponse> okHttpObservable = OkHttpObservable.builder(PlaceResponse.class)
+        OkHttpObservable<PlaceResponse> okHttpObservable = OkHttpObservable.<PlaceResponse>builder()
+                .target(PlaceResponse.class)
                 .url(url)
                 .gson(gson)
                 .build();

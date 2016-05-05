@@ -24,14 +24,19 @@ import android.view.animation.Interpolator;
 import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
+
+import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.OnClick;
+import miles.diary.DiaryApplication;
 import miles.diary.R;
+import miles.diary.data.api.RealmImpl;
 import miles.diary.util.LocationUtils;
-import miles.diary.data.api.GoogleService;
-import miles.diary.data.api.WeatherService;
+import miles.diary.data.api.Google;
+import miles.diary.data.api.Weather;
 import miles.diary.data.model.google.PlaceResponse;
 import miles.diary.data.model.realm.Entry;
 import miles.diary.data.model.weather.WeatherResponse;
@@ -45,6 +50,11 @@ import miles.diary.util.AnimUtils;
 import miles.diary.util.ViewUtils;
 
 public class NewEntryActivity extends BaseActivity implements View.OnClickListener {
+
+    @Inject
+    RealmImpl dataManagerImpl;
+    @Inject
+    GoogleApiClient.Builder googleApiClientBuilder;
 
     @Bind(R.id.fragment_entry_toolbar) Toolbar toolbar;
     @Bind(R.id.activity_new_entry_body) TypefaceEditText bodyInput;
@@ -65,9 +75,9 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     private String placeId;
     private String temperature;
     private Uri imageUri;
-    private WeatherResponse weather;
-    private GoogleService googleService;
-    private WeatherService weatherService;
+    private WeatherResponse weatherResponse;
+    private Google google;
+    private Weather weather;
     private Location location;
 
     @Override
@@ -95,10 +105,10 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
 
         ViewUtils.mutate(locationName, ContextCompat.getColor(this, R.color.accent));
 
-        weatherService = new WeatherService(this);
+        weather = new Weather(this);
 
-        googleService = new GoogleService(this, googleApiClientBuilder,
-                new GoogleService.GoogleServiceCallback() {
+        google = new Google(this, googleApiClientBuilder,
+                new Google.GoogleServiceCallback() {
                     @Override
                     public void onConnected(Bundle bundle) {
                         getLocationData();
@@ -107,10 +117,15 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     }
 
     @Override
+    public void inject(DiaryApplication diaryApplication) {
+
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         if (location == null && LocationUtils.isLocationEnabled(this)) {
-            googleService.getLocation()
+            google.getLocation()
                     .subscribe(new ActivitySubscriber<Location>(this) {
                         @Override
                         public void onNext(Location location1) {
@@ -164,8 +179,8 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                     result.putExtra(PLACE_NAME, placeName);
                     result.putExtra(PLACE_ID, placeId);
                     result.putExtra(LOCATION, location);
-                    if (weather != null) {
-                        result.putExtra(TEMPERATURE, new Gson().toJson(weather, WeatherResponse.class));
+                    if (weatherResponse != null) {
+                        result.putExtra(TEMPERATURE, new Gson().toJson(weatherResponse, WeatherResponse.class));
                     }
                     setResult(RESULT_OK, result);
                     finishAfterTransition();
@@ -230,8 +245,8 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
 
             String entryWeather = entry.getWeather();
             if (entryWeather != null) {
-                weather = new Gson().fromJson(entryWeather, WeatherResponse.class);
-                temperature = weather.getTwoLineTemperatureString();
+                weatherResponse = new Gson().fromJson(entryWeather, WeatherResponse.class);
+                temperature = weatherResponse.getTwoLineTemperatureString();
             }
 
             placeName = entry.getPlaceName();
@@ -262,7 +277,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
             pulse.setRepeatMode(ValueAnimator.REVERSE);
             pulse.start();
 
-            googleService.searchNearby(location1, 3)
+            google.searchNearby(location1, 3)
                     .subscribe(new ActivitySubscriber<PlaceResponse>(this) {
                         @Override
                         public void onNext(PlaceResponse placeResponse) {
@@ -283,11 +298,11 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
 
     private void getWeather(Location location) {
         if (temperature == null) {
-            weatherService.getWeather(location.getLatitude(), location.getLongitude())
+            weather.getWeather(location.getLatitude(), location.getLongitude())
                     .subscribe(new ActivitySubscriber<WeatherResponse>(this) {
                         @Override
                         public void onNext(WeatherResponse weatherResponse) {
-                            weather = weatherResponse;
+                            NewEntryActivity.this.weatherResponse = weatherResponse;
                             temperature = weatherResponse.getTwoLineTemperatureString();
                         }
                     });
@@ -322,7 +337,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
         if (hasPermissions(permissions)) {
             if (hasConnection()) {
                 if (LocationUtils.isLocationEnabled(this)) {
-                    googleService.getLocation()
+                    google.getLocation()
                             .subscribe(new ActivitySubscriber<Location>(this) {
                                 @Override
                                 public void onNext(Location location1) {

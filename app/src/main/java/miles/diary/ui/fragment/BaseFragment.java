@@ -30,8 +30,7 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        ((DiaryApplication) context.getApplicationContext()).getComponent().inject(this);
-
+        inject((DiaryApplication) context.getApplicationContext());
     }
 
     @Override
@@ -47,4 +46,6 @@ public abstract class BaseFragment extends Fragment {
     }
 
     protected abstract int getLayoutId();
+
+    public abstract void inject(DiaryApplication diaryApplication);
 }

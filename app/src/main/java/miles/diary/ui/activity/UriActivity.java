@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
+import miles.diary.DiaryApplication;
 import miles.diary.R;
 import miles.diary.ui.PaletteWindows;
 import miles.diary.ui.transition.ScalingImageTransition;
@@ -87,6 +88,11 @@ public class UriActivity extends BaseActivity {
                     }
                 })
                 .into(imageView);
+    }
+
+    @Override
+    public void inject(DiaryApplication diaryApplication) {
+
     }
 
     @Override

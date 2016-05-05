@@ -4,13 +4,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.PlacePhotoMetadataBuffer;
 import com.google.android.gms.location.places.PlacePhotoMetadataResult;
 
+import javax.inject.Inject;
+
 import butterknife.Bind;
+import miles.diary.DiaryApplication;
 import miles.diary.R;
 import miles.diary.data.adapter.PlacePhotosAdapter;
-import miles.diary.data.api.GoogleService;
+import miles.diary.data.api.Google;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.ui.fragment.DismissingDialogFragment;
 import miles.diary.ui.fragment.ConfirmationDialog;
@@ -20,10 +24,13 @@ import rx.functions.Action1;
 /**
  * Created by mbpeele on 3/6/16.
  */
-public class PlacePhotosActivity extends BaseActivity implements GoogleService.GoogleServiceCallback {
+public class PlacePhotosActivity extends BaseActivity implements Google.GoogleServiceCallback {
 
     public static final String ID = "placeId";
     public static final String NAME = "placeName";
+
+    @Inject
+    GoogleApiClient.Builder googleApiClientBuilder;
 
     @Bind(R.id.activity_place_name_view)
     TypefaceTextView nameView;
@@ -31,7 +38,7 @@ public class PlacePhotosActivity extends BaseActivity implements GoogleService.G
     ViewPager pager;
 
     private PlacePhotosAdapter placePhotosAdapter;
-    private GoogleService googleService;
+    private Google googleService;
     private String id;
 
     @Override
@@ -47,7 +54,12 @@ public class PlacePhotosActivity extends BaseActivity implements GoogleService.G
             nameView.setText(name);
         }
 
-        googleService = new GoogleService(this, googleApiClientBuilder, this);
+        googleService = new Google(this, googleApiClientBuilder, this);
+    }
+
+    @Override
+    public void inject(DiaryApplication diaryApplication) {
+        diaryApplication.getContextComponent().inject(this);
     }
 
     @Override

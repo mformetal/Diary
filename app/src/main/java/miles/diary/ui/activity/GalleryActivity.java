@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 
 import butterknife.Bind;
+import miles.diary.DiaryApplication;
 import miles.diary.R;
 import miles.diary.data.adapter.GalleryAdapter;
 import miles.diary.ui.SpacingDecoration;
@@ -65,6 +66,11 @@ public class GalleryActivity extends BaseActivity implements LoaderManager.Loade
                 setupGallery();
             }
         }
+    }
+
+    @Override
+    public void inject(DiaryApplication diaryApplication) {
+
     }
 
     @Override

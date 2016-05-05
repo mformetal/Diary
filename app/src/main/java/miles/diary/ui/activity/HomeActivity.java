@@ -22,16 +22,21 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
 
 import butterknife.Bind;
 import io.realm.Case;
 import io.realm.RealmResults;
 import io.realm.Sort;
+import miles.diary.DiaryApplication;
 import miles.diary.R;
 import miles.diary.data.adapter.EntryAdapter;
-import miles.diary.data.api.DataLoadingListener;
+import miles.diary.data.api.RealmImpl;
 import miles.diary.data.model.realm.Entry;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.data.rx.DataTransaction;
@@ -41,11 +46,18 @@ import miles.diary.ui.transition.FabContainerTransition;
 import miles.diary.ui.widget.SearchWidget;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.ColorsUtils;
+import miles.diary.util.DataLoadingListener;
+import miles.diary.util.DataStore;
 import miles.diary.util.Logg;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
 public class HomeActivity extends BaseActivity implements DataLoadingListener {
+
+    @Inject
+    DataStore datastore;
+    @Inject
+    RealmImpl dataManagerImpl;
 
     @Bind(R.id.activity_home_recycler) RecyclerView recyclerView;
     @Bind(R.id.activity_home_toolbar) Toolbar toolbar;
@@ -103,6 +115,11 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
         });
 
         addSearchListener();
+    }
+
+    @Override
+    public void inject(DiaryApplication diaryApplication) {
+        diaryApplication.getContextComponent().inject(this);
     }
 
     @Override

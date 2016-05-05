@@ -32,9 +32,13 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.google.gson.Gson;
 
+import javax.inject.Inject;
+
 import butterknife.Bind;
 import butterknife.OnClick;
+import miles.diary.DiaryApplication;
 import miles.diary.R;
+import miles.diary.data.api.RealmImpl;
 import miles.diary.data.model.realm.Entry;
 import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.data.rx.ActivitySubscriber;
@@ -65,11 +69,8 @@ public class EntryActivity extends TransitionActivity {
         DELETE
     }
 
-    public static Intent newIntent(Context context, Entry entry) {
-        Intent intent = new Intent(context, EntryActivity.class);
-        intent.putExtra(EntryActivity.INTENT_KEY, entry.getDateMillis());
-        return intent;
-    }
+    @Inject
+    RealmImpl dataManagerImpl;
 
     @Bind(R.id.activity_entry_place_photos)
     FloatingActionButton photosFab;
@@ -89,6 +90,12 @@ public class EntryActivity extends TransitionActivity {
     private Entry entry;
     private boolean dataChanged;
 
+    public static Intent newIntent(Context context, Entry entry) {
+        Intent intent = new Intent(context, EntryActivity.class);
+        intent.putExtra(EntryActivity.INTENT_KEY, entry.getDateMillis());
+        return intent;
+    }
+
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +113,11 @@ public class EntryActivity extends TransitionActivity {
                         updateView(entry);
                     }
                 });
+    }
+
+    @Override
+    public void inject(DiaryApplication diaryApplication) {
+        diaryApplication.getContextComponent().inject(this);
     }
 
     @Override

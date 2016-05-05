@@ -11,16 +11,14 @@ import android.widget.ProgressBar;
 
 import com.google.android.gms.location.places.PlacePhotoMetadata;
 import com.google.android.gms.location.places.PlacePhotoMetadataBuffer;
-import com.google.android.gms.location.places.PlacePhotoMetadataResult;
 import com.google.android.gms.location.places.PlacePhotoResult;
 
 import miles.diary.R;
-import miles.diary.data.api.GoogleService;
+import miles.diary.data.api.Google;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.ui.PreDrawer;
 import miles.diary.ui.activity.BaseActivity;
 import miles.diary.util.AnimUtils;
-import miles.diary.util.Logg;
 
 /**
  * Created by mbpeele on 3/6/16.
@@ -29,10 +27,10 @@ public class PlacePhotosAdapter extends PagerAdapter {
 
     private PlacePhotoMetadataBuffer buffer;
     private final BaseActivity activity;
-    private final GoogleService service;
+    private final Google service;
     private final LayoutInflater inflater;
 
-    public PlacePhotosAdapter(GoogleService googleService, BaseActivity baseActivity) {
+    public PlacePhotosAdapter(Google googleService, BaseActivity baseActivity) {
         super();
         service = googleService;
         activity = baseActivity;

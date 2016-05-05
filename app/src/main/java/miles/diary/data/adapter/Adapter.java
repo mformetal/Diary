@@ -7,7 +7,7 @@ import io.realm.RealmObject;
 /**
  * Created by mbpeele on 3/11/16.
  */
-public interface BaseAdapterInterface<T> {
+interface Adapter<T> {
 
     Collection<?> getData();
 

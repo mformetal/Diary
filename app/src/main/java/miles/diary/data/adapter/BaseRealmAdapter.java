@@ -14,7 +14,7 @@ import miles.diary.ui.activity.BaseActivity;
  * Created by mbpeele on 2/3/16.
  */
 public abstract class BaseRealmAdapter<T extends RealmObject, VH extends RecyclerView.ViewHolder>
-        extends RecyclerView.Adapter<VH> implements BaseAdapterInterface<T> {
+        extends RecyclerView.Adapter<VH> implements Adapter<T> {
 
     protected final List<T> data;
     protected final BaseActivity host;

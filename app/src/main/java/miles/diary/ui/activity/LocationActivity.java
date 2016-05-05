@@ -72,7 +72,7 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
                 googleService = new GoogleService(this, googleApiClientBuilder, new GoogleService.GoogleServiceCallback() {
                     @Override
                     public void onConnected(Bundle bundle) {
-                        AutoCompleteAdapter autoCompleteAdapter = googleService.getAutoCompleteAdapter();
+                        final AutoCompleteAdapter autoCompleteAdapter = googleService.getAutoCompleteAdapter();
                         autoCompleteTextView.setAdapter(autoCompleteAdapter);
 
                         autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

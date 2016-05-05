@@ -27,11 +27,12 @@ import java.util.List;
 import miles.diary.R;
 import miles.diary.data.adapter.AutoCompleteAdapter;
 import miles.diary.data.model.google.PlaceResponse;
-import miles.diary.data.rx.GeocodeObservable;
 import miles.diary.data.rx.GoogleObservable;
 import miles.diary.data.rx.OkHttpObservable;
 import miles.diary.ui.activity.BaseActivity;
+import miles.diary.util.LocationUtils;
 import miles.diary.util.Logg;
+import miles.diary.util.SimpleLocationListener;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import rx.Observable;
@@ -64,12 +65,9 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
         httpClient.addInterceptor(logging);
         okHttpClient = httpClient.build();
 
-        okHttpClient = new OkHttpClient();
-
         gson = new Gson();
 
-        client = builder
-                .addConnectionCallbacks(this)
+        client = builder.addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
         client.connect();
@@ -82,7 +80,7 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
     }
 
     public AutoCompleteAdapter getAutoCompleteAdapter() {
-        return new AutoCompleteAdapter(activity, R.layout.autocomplete_adapter, client, null, null);
+        return new AutoCompleteAdapter(activity, R.layout.autocomplete_adapter, client, null);
     }
 
     public Observable<PlaceResponse> searchNearby(Location location, float radius) {
@@ -90,11 +88,16 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
                 location.getLatitude() + ',' + location.getLongitude() + "&radius=" + radius + "&key=" +
                 activity.getString(R.string.google_web_api_key);
 
-        OkHttpObservable<PlaceResponse> okHttpObservable =
-                new OkHttpObservable.Builder<>(PlaceResponse.class)
-                        .url(url)
-                        .gson(gson)
-                        .build();
+//        OkHttpObservable<PlaceResponse> okHttpObservable =
+//                new OkHttpObservable.Builder<>(PlaceResponse.class)
+//                        .url(url)
+//                        .gson(gson)
+//                        .build();
+
+        OkHttpObservable<PlaceResponse> okHttpObservable = OkHttpObservable.builder(PlaceResponse.class)
+                .url(url)
+                .gson(gson)
+                .build();
 
         return okHttpObservable.execute(okHttpClient)
                 .retry(1)
@@ -131,7 +134,7 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
                 if (location != null) {
                     subscriber.onNext(location);
                 } else {
-                    final LocationManager locationManager = LocationService.getLocationManager(activity);
+                    final LocationManager locationManager = LocationUtils.getLocationManager(activity);
 
                     SimpleLocationListener simpleLocationListener = new SimpleLocationListener() {
                         @Override
@@ -141,7 +144,7 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
                         }
                     };
 
-                    LocationService.getLocationUpdates(activity, simpleLocationListener);
+                    LocationUtils.getLocationUpdates(activity, simpleLocationListener);
                 }
 
                 subscriber.onCompleted();
@@ -150,7 +153,7 @@ public class GoogleService implements GoogleApiClient.ConnectionCallbacks,
     }
 
     public Observable<List<Address>> getAddressFromLocation(Location location, int results) {
-        return GeocodeObservable.geocode(activity, location, results)
+        return LocationUtils.geocode(activity, location, results)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }

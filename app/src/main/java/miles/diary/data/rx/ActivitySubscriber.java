@@ -12,7 +12,6 @@ import rx.Subscriber;
 public abstract class ActivitySubscriber<T> extends Subscriber<T> {
 
     private SoftReference<BaseActivity> softReference;
-    private boolean isListening;
 
     public ActivitySubscriber(BaseActivity activity) {
         if (activity == null) {
@@ -25,27 +24,9 @@ public abstract class ActivitySubscriber<T> extends Subscriber<T> {
         softReference = new SoftReference<>(activity);
     }
 
-    public ActivitySubscriber(BaseActivity activity, boolean shouldListen) {
-        if (activity == null) {
-            onError(new NullPointerException("Activity subscriber is null"));
-            return;
-        }
-
-        activity.addSubscription(this);
-
-        isListening = shouldListen;
-
-        softReference = new SoftReference<>(activity);
-    }
-
     @Override
     public void onCompleted() {
         removeSelf();
-
-        BaseActivity activity = softReference.get();
-        if (isListening && activity != null) {
-            ((DataLoadingListener) activity).onLoadComplete();
-        }
     }
 
     @Override
@@ -53,19 +34,10 @@ public abstract class ActivitySubscriber<T> extends Subscriber<T> {
         removeSelf();
 
         e.printStackTrace();
-
-        BaseActivity activity = softReference.get();
-        if (isListening && activity != null) {
-            ((DataLoadingListener) activity).onLoadError(e);
-        }
     }
 
     @Override
     public void onStart() {
-        BaseActivity activity = softReference.get();
-        if (isListening && activity != null) {
-            ((DataLoadingListener) activity).onLoadStart();
-        }
     }
 
     private void removeSelf() {

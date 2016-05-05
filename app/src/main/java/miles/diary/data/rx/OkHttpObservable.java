@@ -18,17 +18,17 @@ import rx.Subscriber;
  */
 public class OkHttpObservable<T> {
 
-    private String url;
-    private Class<T> clazz;
-    private Gson gson;
+    private final String url;
+    private final Class<T> clazz;
+    private final Gson gson;
 
-    private OkHttpObservable(Builder builder) {
-        this.url = builder.url;
-        this.clazz = builder.clazz;
-        this.gson = builder.gson;
+    public OkHttpObservable(Builder<T> builder) {
+        url = builder.url;
+        clazz = builder.tClass;
+        gson = builder.gson;
     }
 
-    public Observable<T> execute(OkHttpClient client) {
+    public Observable<T> execute(final OkHttpClient client) {
         return Observable.create(new Observable.OnSubscribe<T>() {
             @Override
             public void call(Subscriber<? super T> subscriber) {
@@ -53,14 +53,18 @@ public class OkHttpObservable<T> {
             }});
     }
 
+    public static <L> Builder<L> builder(Class<L> lClass) {
+        return new Builder<>(lClass);
+    }
+
     public static class Builder<T> {
 
-        public String url;
-        public Class clazz;
-        public Gson gson;
+        private String url;
+        private Class<T> tClass;
+        private Gson gson;
 
-        public Builder(Class<T> clazz) {
-            this.clazz = clazz;
+        public Builder(Class<T> tClass) {
+            this.tClass = tClass;
         }
 
         public Builder<T> url(String url) {

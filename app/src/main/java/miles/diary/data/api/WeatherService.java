@@ -29,21 +29,22 @@ public class WeatherService {
 
     private OkHttpClient client;
     private String baseUrl, apiKey;
+    private Gson gson;
 
     public WeatherService(Context context) {
         client = new OkHttpClient();
         apiKey = context.getResources().getString(R.string.weather_api_key);
         baseUrl = context.getResources().getString(R.string.weather_base);
+        gson = new Gson();
     }
 
     public Observable<WeatherResponse> getWeather(final Double latitude, final Double longitude) {
         String url = baseUrl + "data/2.5/weather?" +
                 "lat=" + latitude + "&lon=" + longitude + "&APPID=" + apiKey;
 
-        OkHttpObservable<WeatherResponse> okHttpObservable =
-                new OkHttpObservable.Builder<>(WeatherResponse.class)
+        OkHttpObservable<WeatherResponse> okHttpObservable = OkHttpObservable.builder(WeatherResponse.class)
                 .url(url)
-                .gson(new Gson())
+                .gson(gson)
                 .build();
 
         return okHttpObservable.execute(client)

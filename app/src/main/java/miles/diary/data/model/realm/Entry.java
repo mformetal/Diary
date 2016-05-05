@@ -11,18 +11,8 @@ import java.util.Date;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-import lombok.experimental.Builder;
-import miles.diary.util.TextUtils;
 
-@EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
-@Data
-public class Entry extends RealmObject implements IRealmInterface, ClusterItem {
+public class Entry extends RealmObject implements RealmModel, ClusterItem {
 
     public final static String KEY = "dateMillis";
 
@@ -46,7 +36,8 @@ public class Entry extends RealmObject implements IRealmInterface, ClusterItem {
 
     public Entry(Date date) {
         super();
-        setDate(date).setDateMillis(date.getTime());
+        setDate(date);
+        setDateMillis(date.getTime());
     }
 
     @Override
@@ -67,6 +58,80 @@ public class Entry extends RealmObject implements IRealmInterface, ClusterItem {
         return latitude != null && longitude != null;
     }
 
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+
+        setDateMillis(date.getTime());
+    }
+
+    public long getDateMillis() {
+        return dateMillis;
+    }
+
+    public void setDateMillis(long dateMillis) {
+        this.dateMillis = dateMillis;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
+    public String getPlaceName() {
+        return placeName;
+    }
+
+    public void setPlaceName(String placeName) {
+        this.placeName = placeName;
+    }
+
+    public String getPlaceId() {
+        return placeId;
+    }
+
+    public void setPlaceId(String placeId) {
+        this.placeId = placeId;
+    }
+
+    public String getWeather() {
+        return weather;
+    }
+
+    public void setWeather(String weather) {
+        this.weather = weather;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
     public static Entry construct(String body, Uri uri, String placeName, String placeId,
                                   String weather, Location location) {
         String uriString = null;
@@ -81,14 +146,15 @@ public class Entry extends RealmObject implements IRealmInterface, ClusterItem {
             longitude = location.getLongitude();
         }
 
-        return new Entry(new Date())
-                .setBody(body)
-                .setUri(uriString)
-                .setPlaceName(placeName)
-                .setPlaceId(placeId)
-                .setWeather(weather)
-                .setLatitude(latitude)
-                .setLongitude(longitude);
+        Entry entry = new Entry(new Date());
+        entry.setBody(body);
+        entry.setUri(uriString);
+        entry.setWeather(weather);
+        entry.setPlaceId(placeId);
+        entry.setPlaceName(placeName);
+        entry.setLatitude(latitude);
+        entry.setLongitude(longitude);
+        return entry;
     }
 
     public static Entry update(Entry entry, String body, Uri uri, String placeName, String placeId) {
@@ -96,7 +162,8 @@ public class Entry extends RealmObject implements IRealmInterface, ClusterItem {
         if (uri != null) {
             entry.setUri(uri.toString());
         }
-        return entry.setPlaceName(placeName)
-                .setPlaceId(placeId);
+        entry.setPlaceName(placeName);
+        entry.setPlaceId(placeId);
+        return entry;
     }
 }

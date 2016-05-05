@@ -10,7 +10,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import miles.diary.data.api.DataManager;
+import miles.diary.data.api.DataManagerImpl;
 import miles.diary.util.DataStore;
 
 /**
@@ -28,12 +28,6 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    public DataStore getDataStore() {
-        return new DataStore(mApplication);
-    }
-
-    @Provides
-    @Singleton
     public GoogleApiClient.Builder getGoogleApiClientBuilder() {
         return new GoogleApiClient.Builder(mApplication)
                 .addApi(Places.GEO_DATA_API)
@@ -43,7 +37,13 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    public DataManager getDataManager() {
-        return new DataManager(mApplication);
+    public DataStore getDataStore() {
+        return new DataStore(mApplication);
+    }
+
+    @Provides
+    @Singleton
+    public DataManagerImpl getDataManager() {
+        return new DataManagerImpl(mApplication);
     }
 }

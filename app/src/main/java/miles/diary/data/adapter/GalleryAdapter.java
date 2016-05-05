@@ -24,6 +24,7 @@ import com.bumptech.glide.Glide;
 import java.io.File;
 
 import butterknife.Bind;
+import butterknife.ButterKnife;
 import miles.diary.R;
 import miles.diary.data.model.weather.Weather;
 import miles.diary.data.model.weather.WeatherResponse;
@@ -78,6 +79,11 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
 
         public GalleryViewHolder(View itemView) {
             super(itemView);
+        }
+
+        @Override
+        public void bindViews(View itemView) {
+            ButterKnife.bind(this, itemView);
         }
 
         @Override

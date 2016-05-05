@@ -1,30 +1,21 @@
 package miles.diary.ui.activity;
 
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
-import android.util.Pair;
 import android.view.MenuItem;
 import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.GroundOverlayOptions;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -33,9 +24,6 @@ import miles.diary.data.model.realm.Entry;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.ui.fragment.ConfirmationDialog;
 import miles.diary.ui.fragment.DismissingDialogFragment;
-import miles.diary.util.Logg;
-import rx.Observable;
-import rx.functions.Func1;
 
 /**
  * Created by mbpeele on 3/13/16.
@@ -68,8 +56,8 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
-        dataManager.getAll(Entry.class)
+    public void onMapReady(final GoogleMap googleMap) {
+        dataManagerImpl.getAll(Entry.class)
                 .subscribe(new ActivitySubscriber<List<Entry>>(this) {
                     @Override
                     public void onNext(List<Entry> entries) {
@@ -95,7 +83,7 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
         dialog.show(getFragmentManager(), CONFIRMATION_DIALOG);
     }
 
-    private void createInfoWindows(GoogleMap googleMap, List<Entry> entries) {
+    private void createInfoWindows(final GoogleMap googleMap, List<Entry> entries) {
         boolean hasLocation = false;
 
         LatLngBounds.Builder builder = new LatLngBounds.Builder();

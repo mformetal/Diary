@@ -29,15 +29,13 @@ public class AutoCompleteAdapter extends ArrayAdapter<AutocompletePrediction> im
 
     private List<AutocompletePrediction> data;
     private final GoogleApiClient client;
-    private LatLngBounds bounds;
-    private AutocompleteFilter filter;
+    private final LatLngBounds bounds;
 
     public AutoCompleteAdapter(Context context, int resource, GoogleApiClient googleApiClient,
-                               LatLngBounds latLngBounds, AutocompleteFilter autocompleteFilter) {
+                               LatLngBounds latLngBounds) {
         super(context, resource);
         client = googleApiClient;
         bounds = latLngBounds;
-        filter = autocompleteFilter;
     }
 
     @Override
@@ -53,7 +51,6 @@ public class AutoCompleteAdapter extends ArrayAdapter<AutocompletePrediction> im
     @Override
     public Filter getFilter() {
         return new Filter() {
-
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
                 FilterResults results = new FilterResults();

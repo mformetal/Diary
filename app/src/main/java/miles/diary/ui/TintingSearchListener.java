@@ -29,7 +29,7 @@ public abstract class TintingSearchListener implements SearchWidget.SearchListen
     private View tintView;
     private Interpolator interpolator;
 
-    public TintingSearchListener(ViewGroup viewGroup, int color) {
+    public TintingSearchListener(ViewGroup viewGroup, final int color) {
         root = viewGroup;
 
         if (root.getWidth() == 0 || root.getHeight() == 0) {

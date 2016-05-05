@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import butterknife.ButterKnife;
 import miles.diary.DiaryApplication;
 import miles.diary.R;
-import miles.diary.data.api.DataManager;
+import miles.diary.data.api.DataManagerImpl;
 import miles.diary.util.DataStore;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
@@ -32,7 +32,8 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     @Inject DataStore datastore;
     @Inject GoogleApiClient.Builder googleApiClientBuilder;
-    @Inject DataManager dataManager;
+    @Inject
+    DataManagerImpl dataManagerImpl;
 
     private CompositeSubscription compositeSubscription;
     protected ViewGroup root;
@@ -44,7 +45,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         ((DiaryApplication) getApplication()).getComponent().inject(this);
 
-        dataManager.init();
+        dataManagerImpl.init();
 
         compositeSubscription = new CompositeSubscription();
     }
@@ -59,7 +60,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        dataManager.close();
+        dataManagerImpl.close();
         compositeSubscription.unsubscribe();
         ButterKnife.unbind(this);
     }

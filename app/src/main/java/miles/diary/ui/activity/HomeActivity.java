@@ -146,7 +146,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
                     final String weather = bundle.getString(NewEntryActivity.TEMPERATURE);
                     final Location location = bundle.getParcelable(NewEntryActivity.LOCATION);
 
-                    dataManager.uploadObject(new DataTransaction<Entry>() {
+                    dataManagerImpl.uploadObject(new DataTransaction<Entry>() {
                         @Override
                         public Entry call() {
                             return Entry.construct(body, uri, placeName, placeId, weather, location);
@@ -171,7 +171,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
                     if (action != null) {
                         long id = bundle.getLong(EntryActivity.INTENT_ACTION, -1);
                         if (id != -1) {
-                            Entry entry = dataManager.get(Entry.class, id);
+                            Entry entry = dataManagerImpl.get(Entry.class, id);
                             executeAction(action, entry);
                         }
                     }
@@ -254,7 +254,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
 
             @Override
             public void onSearchTextChanged(String text) {
-                addSubscription(dataManager.searchFieldnames(Entry.class, text, Case.INSENSITIVE, true, "body", "placeName")
+                addSubscription(dataManagerImpl.searchFieldnames(Entry.class, text, Case.INSENSITIVE, true, "body", "placeName")
                         .debounce(150, TimeUnit.MILLISECONDS)
                         .subscribe(new Action1<List<Entry>>() {
                             @Override
@@ -271,23 +271,38 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
     }
 
     private void fetchData() {
-        dataManager.exposeSearch(Entry.class)
+        dataManagerImpl.exposeSearch(Entry.class)
                 .findAllSortedAsync("dateMillis", Sort.DESCENDING)
                 .asObservable()
                 .filter(new Func1<RealmResults<Entry>, Boolean>() {
                     @Override
                     public Boolean call(RealmResults<Entry> ts) {
-                        return dataManager.isDataValid(ts);
+                        return dataManagerImpl.isDataValid(ts);
                     }
                 })
                 .first()
-                .subscribe(new ActivitySubscriber<List<Entry>>(this, true) {
+                .subscribe(new ActivitySubscriber<List<Entry>>(this) {
                     @Override
                     public void onNext(List<Entry> entries) {
                         entryAdapter.addAll(entries);
                         if (entries.isEmpty()) {
                             onLoadEmpty();
                         }
+                    }
+
+                    @Override
+                    public void onStart() {
+                        onLoadStart();
+                    }
+
+                    @Override
+                    public void onCompleted() {
+                        onLoadComplete();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        onLoadError(e);
                     }
                 });
     }
@@ -340,7 +355,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
                 if (entryAdapter.isEmpty()) {
                     onLoadEmpty();
                 }
-                addSubscription(dataManager.deleteObject(entry).subscribe());
+                addSubscription(dataManagerImpl.deleteObject(entry).subscribe());
                 break;
             case EDIT:
                 entryAdapter.clear();

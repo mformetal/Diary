@@ -6,16 +6,11 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.ActivityOptions;
-import android.content.ActivityNotFoundException;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.speech.RecognizerIntent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -26,20 +21,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Interpolator;
-import android.widget.Toast;
 import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
-
-import java.util.ArrayList;
-import java.util.Locale;
 
 import butterknife.Bind;
 import butterknife.OnClick;
 import miles.diary.R;
-import miles.diary.data.api.LocationService;
+import miles.diary.util.LocationUtils;
 import miles.diary.data.api.GoogleService;
 import miles.diary.data.api.WeatherService;
 import miles.diary.data.model.google.PlaceResponse;
@@ -52,9 +42,7 @@ import miles.diary.ui.widget.CircleImageView;
 import miles.diary.ui.widget.TypefaceButton;
 import miles.diary.ui.widget.TypefaceEditText;
 import miles.diary.util.AnimUtils;
-import miles.diary.util.Logg;
 import miles.diary.util.ViewUtils;
-import rx.functions.Action1;
 
 public class NewEntryActivity extends BaseActivity implements View.OnClickListener {
 
@@ -95,7 +83,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
         if (bundle != null) {
             long id =  bundle.getLong(EntryActivity.INTENT_KEY, -1L);
             if (id != -1L) {
-                dataManager.getObject(Entry.class, id)
+                dataManagerImpl.getObject(Entry.class, id)
                         .subscribe(new ActivitySubscriber<Entry>(this) {
                             @Override
                             public void onNext(Entry entry) {
@@ -121,7 +109,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     @Override
     protected void onResume() {
         super.onResume();
-        if (location == null && LocationService.isLocationEnabled(this)) {
+        if (location == null && LocationUtils.isLocationEnabled(this)) {
             googleService.getLocation()
                     .subscribe(new ActivitySubscriber<Location>(this) {
                         @Override
@@ -254,7 +242,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
         }
     }
 
-    private void setLocationText(String name) {
+    private void setLocationText(final String name) {
         ObjectAnimator objectAnimator = AnimUtils.visible(locationName);
         objectAnimator.setStartDelay(400);
         objectAnimator.addListener(new AnimatorListenerAdapter() {
@@ -333,7 +321,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                 Manifest.permission.ACCESS_FINE_LOCATION};
         if (hasPermissions(permissions)) {
             if (hasConnection()) {
-                if (LocationService.isLocationEnabled(this)) {
+                if (LocationUtils.isLocationEnabled(this)) {
                     googleService.getLocation()
                             .subscribe(new ActivitySubscriber<Location>(this) {
                                 @Override

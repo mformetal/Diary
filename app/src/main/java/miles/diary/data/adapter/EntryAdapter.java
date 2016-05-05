@@ -14,6 +14,7 @@ import com.google.gson.Gson;
 import java.util.List;
 
 import butterknife.Bind;
+import butterknife.ButterKnife;
 import io.realm.RealmObject;
 import miles.diary.R;
 import miles.diary.data.model.realm.Entry;
@@ -108,6 +109,11 @@ public class EntryAdapter extends BaseRealmAdapter<Entry, RecyclerView.ViewHolde
         }
 
         @Override
+        public void bindViews(View itemView) {
+            ButterKnife.bind(this, itemView);
+        }
+
+        @Override
         public void bind(final Entry entry) {
             ((View) body.getParent()).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -148,6 +154,11 @@ public class EntryAdapter extends BaseRealmAdapter<Entry, RecyclerView.ViewHolde
 
         public ImageViewHolder(View itemView) {
             super(itemView);
+        }
+
+        @Override
+        public void bindViews(View itemView) {
+            ButterKnife.bind(this, itemView);
         }
 
         @Override

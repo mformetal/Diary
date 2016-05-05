@@ -16,10 +16,10 @@ import rx.subscriptions.Subscriptions;
  */
 public class GoogleObservable {
 
-    public static <T extends Result> Observable<T> execute(PendingResult<T> result) {
+    public static <T extends Result> Observable<T> execute(final PendingResult<T> result) {
         return Observable.create(new Observable.OnSubscribe<T>() {
             @Override
-            public void call(Subscriber<? super T> subscriber) {
+            public void call(final Subscriber<? super T> subscriber) {
                 final boolean[] complete = {false};
 
                 subscriber.onStart();

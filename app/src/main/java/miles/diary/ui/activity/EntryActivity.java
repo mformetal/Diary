@@ -1,13 +1,11 @@
 package miles.diary.ui.activity;
 
-import android.animation.Animator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -51,7 +49,6 @@ import miles.diary.ui.widget.TypefaceTextView;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.TextUtils;
 import miles.diary.util.ViewUtils;
-import uk.co.senab.photoview.PhotoViewAttacher;
 
 /**
  * Created by mbpeele on 2/8/16.
@@ -101,7 +98,7 @@ public class EntryActivity extends TransitionActivity {
         setActionBar(toolbar);
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
-        dataManager.getObject(Entry.class, getIntent().getLongExtra(INTENT_KEY, -1))
+        dataManagerImpl.getObject(Entry.class, getIntent().getLongExtra(INTENT_KEY, -1))
                 .subscribe(new ActivitySubscriber<Entry>(this) {
                     @Override
                     public void onNext(Entry entry1) {
@@ -167,7 +164,7 @@ public class EntryActivity extends TransitionActivity {
                     final String placeName = bundle.getString(NewEntryActivity.PLACE_NAME);
                     final String placeId = bundle.getString(NewEntryActivity.PLACE_ID);
 
-                    dataManager.updateObject(new DataTransaction<Entry>() {
+                    dataManagerImpl.updateObject(new DataTransaction<Entry>() {
                         @Override
                         public Entry call() {
                             return Entry.update(entry, body, uri, placeName, placeId);

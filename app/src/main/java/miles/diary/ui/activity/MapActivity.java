@@ -1,16 +1,27 @@
 package miles.diary.ui.activity;
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.util.Pair;
 import android.view.MenuItem;
 import android.widget.Toolbar;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
@@ -87,32 +98,30 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
     private void createInfoWindows(GoogleMap googleMap, List<Entry> entries) {
         boolean hasLocation = false;
 
-        Entry mostRecent = null;
-        MarkerOptions mostRecentMarkerOptions = null;
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
         for (Entry entry: entries) {
             if (entry.hasLocation()) {
                 hasLocation = true;
 
-                // Do something different with entries that have images?
-                if (entry.hasImageUri()) {
-                } else {
-                }
+                builder.include(entry.getPosition());
 
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(entry.getLatLng());
+                final MarkerOptions markerOptions = new MarkerOptions();
                 markerOptions.title(entry.getBody());
-                googleMap.addMarker(markerOptions);
-
-                if (mostRecent == null) {
-                    mostRecent = entry;
-                    mostRecentMarkerOptions = markerOptions;
+                markerOptions.position(entry.getPosition());
+                if (entry.hasImageUri()) {
+                    Glide.with(this)
+                            .load(entry.getUri())
+                            .asBitmap()
+                            .into(new SimpleTarget<Bitmap>() {
+                                @Override
+                                public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                                    markerOptions.icon(BitmapDescriptorFactory.fromBitmap(resource));
+                                    googleMap.addMarker(markerOptions);
+                                }
+                            });
                 } else {
-                    int compare = entry.getDate().compareTo(mostRecent.getDate());
-                    if (compare > 0) { // This Entry's Date is greater than mostRecent's date
-                        mostRecent = entry;
-                        mostRecentMarkerOptions = markerOptions;
-                    }
+                    googleMap.addMarker(markerOptions);
                 }
             }
         }
@@ -120,13 +129,7 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
         if (!hasLocation) {
             onLoadEmpty();
         } else {
-            CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(mostRecentMarkerOptions.getPosition())
-                    .zoom(17)
-                    .bearing(45)
-                    .tilt(45)
-                    .build();
-            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 500));
         }
     }
 }

@@ -3,6 +3,8 @@
     <dimen name="activity_vertical_margin">20dp</dimen>
     <dimen name="activity_horizontal_margin">20dp</dimen>
 
+    <dimen name="marker_entry_view_size">50dp</dimen>
+
     <dimen name="action_bar_margin">68dp</dimen>
 
     <dimen name="adapter_image_dimens">75dp</dimen>

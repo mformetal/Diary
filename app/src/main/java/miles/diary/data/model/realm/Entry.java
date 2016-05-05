@@ -4,6 +4,7 @@ import android.location.Location;
 import android.net.Uri;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterItem;
 
 import java.util.Date;
 
@@ -21,7 +22,7 @@ import miles.diary.util.TextUtils;
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
 @Data
-public class Entry extends RealmObject implements IRealmInterface {
+public class Entry extends RealmObject implements IRealmInterface, ClusterItem {
 
     public final static String KEY = "dateMillis";
 
@@ -48,21 +49,22 @@ public class Entry extends RealmObject implements IRealmInterface {
         setDate(date).setDateMillis(date.getTime());
     }
 
-    public boolean hasImageUri() {
-        return uri != null;
-    }
-
-    public boolean hasLocation() {
-        return latitude != null && longitude != null;
-    }
-
-    public LatLng getLatLng() {
+    @Override
+    public LatLng getPosition() {
         if (hasLocation()) {
             return new LatLng(latitude, longitude);
         } else {
             throw new NullPointerException("Attempt to get the LatLng of an Entry that does not " +
                     "have location data");
         }
+    }
+
+    public boolean hasImageUri() {
+        return uri != null;
+    }
+
+    public boolean hasLocation() {
+        return latitude != null && longitude != null;
     }
 
     public static Entry construct(String body, Uri uri, String placeName, String placeId,

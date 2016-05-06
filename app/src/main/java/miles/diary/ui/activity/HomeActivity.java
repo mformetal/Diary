@@ -12,6 +12,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -148,33 +149,28 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
+    protected void onActivityResult(final int requestCode, int resultCode, final Intent data) {
         switch (requestCode) {
             case RESULT_CODE_NEW_ENTRY:
                 if (resultCode == RESULT_OK) {
-                    Bundle bundle = data.getExtras();
-                    final String body = bundle.getString(NewEntryActivity.BODY);
-                    final Uri uri = bundle.getParcelable(NewEntryActivity.URI);
-                    final String placeName = bundle.getString(NewEntryActivity.PLACE_NAME);
-                    final String placeId = bundle.getString(NewEntryActivity.PLACE_ID);
-                    final String weather = bundle.getString(NewEntryActivity.TEMPERATURE);
-                    final Location location = bundle.getParcelable(NewEntryActivity.LOCATION);
+                    final Bundle bundle = data.getExtras();
+                    repository.uploadObject(Entry.fromBundle(bundle))
+                            .subscribe(new ActivitySubscriber<Entry>(this) {
+                                @Override
+                                public void onNext(Entry entry) {
+                                    entryAdapter.addAndSort(entry);
 
-                    repository.uploadObject(new DataTransaction<Entry>() {
-                        @Override
-                        public Entry call() {
-                            return Entry.construct(body, uri, placeName, placeId, weather, location);
-                        }
-                    }).subscribe(new ActivitySubscriber<Entry>(this) {
-                        @Override
-                        public void onNext(Entry entry) {
-                            entryAdapter.addAndSort(entry);
+                                    LinearLayoutManager linearLayoutManager =
+                                            (LinearLayoutManager) recyclerView.getLayoutManager();
+                                    if (linearLayoutManager.findFirstCompletelyVisibleItemPosition() == 0) {
+                                        linearLayoutManager.scrollToPosition(0);
+                                    }
 
-                            if (emptyView != null) {
-                                emptyView.setVisibility(View.GONE);
-                            }
-                        }
-                    });
+                                    if (emptyView != null) {
+                                        emptyView.setVisibility(View.GONE);
+                                    }
+                                }
+                            });
                 }
                 break;
             case RESULT_CODE_ENTRY:
@@ -236,13 +232,11 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
             public boolean onNavigationItemSelected(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.navigation_menu_home_calendar:
-                        Logg.log("FAVORITE CLICK");
                         break;
                     case R.id.navigation_menu_home_map:
                         startActivity(new Intent(HomeActivity.this, MapActivity.class));
                         break;
                     case R.id.navigation_menu_home_ideas:
-                        Logg.log("SETTINGS CLICK");
                         break;
                 }
                 return false;

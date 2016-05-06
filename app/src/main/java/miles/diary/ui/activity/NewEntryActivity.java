@@ -93,13 +93,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
         if (bundle != null) {
             long id =  bundle.getLong(EntryActivity.INTENT_KEY, -1L);
             if (id != -1L) {
-                repository.getObject(Entry.class, id)
-                        .subscribe(new ActivitySubscriber<Entry>(this) {
-                            @Override
-                            public void onNext(Entry entry) {
-                                updateViews(entry);
-                            }
-                        });
+                updateViews(repository.get(Entry.class, id));
             }
         }
 

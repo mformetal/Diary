@@ -96,23 +96,18 @@ public class EntryActivity extends TransitionActivity {
         return intent;
     }
 
-    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_entry);
 
         setActionBar(toolbar);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getActionBar() != null) {
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
-        repository.getObject(Entry.class, getIntent().getLongExtra(INTENT_KEY, -1))
-                .subscribe(new ActivitySubscriber<Entry>(this) {
-                    @Override
-                    public void onNext(Entry entry1) {
-                        entry = entry1;
-                        updateView(entry);
-                    }
-                });
+        entry = repository.get(Entry.class, getIntent().getLongExtra(INTENT_KEY, -1));
+        updateView(entry);
     }
 
     @Override
@@ -179,7 +174,7 @@ public class EntryActivity extends TransitionActivity {
                     repository.updateObject(new DataTransaction<Entry>() {
                         @Override
                         public Entry call() {
-                            return Entry.update(entry, body, uri, placeName, placeId);
+                            return entry.update(body, uri, placeName, placeId);
                         }
                     }).subscribe(new ActivitySubscriber<Entry>(this) {
                         @Override

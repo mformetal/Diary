@@ -51,9 +51,6 @@ public class LocationUtils {
         boolean isGpsEnabled = locationManager.isProviderEnabled(GPS);
         boolean isNetworkEnabled = locationManager.isProviderEnabled(NETWORK);
 
-        Looper.prepare();
-        Looper.loop();
-
         if (isGpsEnabled) {
             locationManager.requestLocationUpdates(GPS, 0, 0, locationListener);
         } else if (isNetworkEnabled) {

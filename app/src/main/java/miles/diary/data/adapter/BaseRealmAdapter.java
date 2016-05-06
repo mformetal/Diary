@@ -52,6 +52,12 @@ public abstract class BaseRealmAdapter<T extends RealmObject, VH extends Recycle
     }
 
     @Override
+    public void addAtPosition(T object, int position) {
+        data.add(position, object);
+        notifyItemInserted(position);
+    }
+
+    @Override
     public boolean addAll(Collection<T> objects) {
         boolean addition = data.addAll(objects);
         if (addition) {

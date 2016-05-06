@@ -2,6 +2,7 @@ package miles.diary.data.model.realm;
 
 import android.location.Location;
 import android.net.Uri;
+import android.os.Bundle;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
@@ -11,6 +12,7 @@ import java.util.Date;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
+import miles.diary.ui.activity.NewEntryActivity;
 
 public class Entry extends RealmObject implements RealmModel, ClusterItem {
 
@@ -34,10 +36,16 @@ public class Entry extends RealmObject implements RealmModel, ClusterItem {
         super();
     }
 
-    public Entry(Date date) {
-        super();
-        setDate(date);
-        setDateMillis(date.getTime());
+    private Entry(EntryBuilder builder) {
+        date = builder.date;
+        dateMillis = date.getTime();
+        body = builder.body;
+        uri = builder.uri;
+        placeName = builder.placeName;
+        placeId = builder.placeId;
+        weather = builder.weather;
+        longitude = builder.longitude;
+        latitude = builder.latitude;
     }
 
     @Override
@@ -116,54 +124,96 @@ public class Entry extends RealmObject implements RealmModel, ClusterItem {
         this.weather = weather;
     }
 
-    public Double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
-    }
-
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
-    }
-
-    public static Entry construct(String body, Uri uri, String placeName, String placeId,
-                                  String weather, Location location) {
-        String uriString = null;
+    public Entry update(String body, Uri uri, String placeName, String placeId) {
+        setBody(body);
         if (uri != null) {
-            uriString = uri.toString();
+            setUri(uri.toString());
         }
-
-        Double latitude = null;
-        Double longitude = null;
-        if (location != null) {
-            latitude = location.getLatitude();
-            longitude = location.getLongitude();
-        }
-
-        Entry entry = new Entry(new Date());
-        entry.setBody(body);
-        entry.setUri(uriString);
-        entry.setWeather(weather);
-        entry.setPlaceId(placeId);
-        entry.setPlaceName(placeName);
-        entry.setLatitude(latitude);
-        entry.setLongitude(longitude);
-        return entry;
+        setPlaceName(placeName);
+        setPlaceId(placeId);
+        return this;
     }
 
-    public static Entry update(Entry entry, String body, Uri uri, String placeName, String placeId) {
-        entry.setBody(body);
-        if (uri != null) {
-            entry.setUri(uri.toString());
+    public static Entry fromBundle(Bundle bundle) {
+        final String body = bundle.getString(NewEntryActivity.BODY);
+        final Uri uri = bundle.getParcelable(NewEntryActivity.URI);
+        final String placeName = bundle.getString(NewEntryActivity.PLACE_NAME);
+        final String placeId = bundle.getString(NewEntryActivity.PLACE_ID);
+        final String weather = bundle.getString(NewEntryActivity.TEMPERATURE);
+        final Location location = bundle.getParcelable(NewEntryActivity.LOCATION);
+
+        return Entry.builder()
+                .setBody(body)
+                .setDate()
+                .setUri(uri)
+                .setPlaceId(placeId)
+                .setPlaceName(placeName)
+                .setWeather(weather)
+                .setLocation(location)
+                .createEntry();
+    }
+
+    public static EntryBuilder builder() {
+        return new EntryBuilder();
+    }
+
+    public static class EntryBuilder {
+
+        private String body;
+        private String uri;
+        private String placeName;
+        private String placeId;
+        private Double latitude;
+        private Double longitude;
+        private String weather;
+        private Date date;
+
+        private EntryBuilder() {
+
         }
-        entry.setPlaceName(placeName);
-        entry.setPlaceId(placeId);
-        return entry;
+
+        public EntryBuilder setBody(String body) {
+            this.body = body;
+            return this;
+        }
+
+        public EntryBuilder setUri(Uri uri) {
+            if (uri != null) {
+                this.uri = uri.toString();
+            }
+            return this;
+        }
+
+        public EntryBuilder setDate() {
+            date = new Date();
+            return this;
+        }
+
+        public EntryBuilder setPlaceName(String placeName) {
+            this.placeName = placeName;
+            return this;
+        }
+
+        public EntryBuilder setPlaceId(String placeId) {
+            this.placeId = placeId;
+            return this;
+        }
+
+        public EntryBuilder setLocation(Location location) {
+            if (location != null) {
+                latitude = location.getLatitude();
+                longitude = location.getLongitude();
+            }
+            return this;
+        }
+
+        public EntryBuilder setWeather(String weather) {
+            this.weather = weather;
+            return this;
+        }
+
+        public Entry createEntry() {
+            return new Entry(this);
+        }
     }
 }

@@ -12,5 +12,5 @@ public class Profile extends RealmObject implements RealmModel {
     private String name;
     private String uri;
 
-    
+
 }

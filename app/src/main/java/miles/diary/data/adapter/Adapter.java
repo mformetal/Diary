@@ -17,6 +17,8 @@ interface Adapter<T> {
 
     boolean addData(T object);
 
+    void addAtPosition(T object, int position);
+
     boolean addAll(Collection<T> objects);
 
     boolean removeObject(T object);

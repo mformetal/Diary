@@ -93,8 +93,7 @@ public class EntryAdapter extends BaseRealmAdapter<Entry, RecyclerView.ViewHolde
             }
         }
 
-        entries.add(ndx, entry);
-        notifyItemChanged(ndx);
+        addAtPosition(entry, ndx);
     }
 
     class TextViewHolder extends BindingViewHolder<Entry> {

@@ -25,7 +25,7 @@ import rx.functions.Func1;
 /**
  * Created by mbpeele on 3/2/16.
  */
-public class RealmImpl implements Repository {
+public class RepositoryImpl implements Repository {
 
     private Realm realm;
 

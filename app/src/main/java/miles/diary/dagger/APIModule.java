@@ -12,7 +12,7 @@ import dagger.Module;
 import dagger.Provides;
 import miles.diary.DiaryApplication;
 import miles.diary.data.api.Repository;
-import miles.diary.data.api.RealmImpl;
+import miles.diary.data.api.RepositoryImpl;
 import miles.diary.data.api.Weather;
 import miles.diary.util.SimpleLifecycleCallbacks;
 
@@ -54,7 +54,7 @@ public class ApiModule {
     @Provides
     @Singleton
     public Repository provideRealmImpl() {
-        repository = new RealmImpl();
+        repository = new RepositoryImpl();
         repository.open();
         return repository;
     }

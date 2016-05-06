@@ -2,6 +2,7 @@ package miles.diary.data.rx;
 
 import io.realm.Realm;
 import io.realm.RealmObject;
+import miles.diary.util.Logg;
 import rx.Observable;
 import rx.Single;
 import rx.SingleSubscriber;

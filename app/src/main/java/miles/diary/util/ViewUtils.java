@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import miles.diary.R;
 import miles.diary.ui.PreDrawer;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
@@ -27,6 +28,7 @@ public class ViewUtils {
     private static final Rect RECT = new Rect();
 
     private static int actionBarSize = -1;
+    private static int statusBarSize = -1;
 
     private ViewUtils() {}
 
@@ -85,11 +87,26 @@ public class ViewUtils {
     public static int getActionBarSize(Context context) {
         if (actionBarSize < 0) {
             TypedValue value = new TypedValue();
-            context.getTheme().resolveAttribute(android.R.attr.actionBarSize, value, true);
-            actionBarSize = TypedValue.complexToDimensionPixelSize(value.data, context
-                    .getResources().getDisplayMetrics());
+            if (context.getTheme().resolveAttribute(android.R.attr.actionBarSize, value, true)) {
+                actionBarSize = TypedValue.complexToDimensionPixelSize(value.data,
+                        context.getResources().getDisplayMetrics());
+            } else {
+                actionBarSize = context.getResources().getDimensionPixelSize(R.dimen.action_bar_size);
+            }
         }
+
         return actionBarSize;
+    }
+
+    public static int getStatusBarHeight(Context context) {
+        if (statusBarSize < 0) {
+            int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+            if (resourceId > 0) {
+                statusBarSize = context.getResources().getDimensionPixelSize(resourceId);
+            }
+        }
+
+        return statusBarSize;
     }
 
     public static float displayHeight(Context context) {

@@ -6,6 +6,7 @@
     <dimen name="marker_entry_view_size">50dp</dimen>
 
     <dimen name="action_bar_margin">68dp</dimen>
+    <dimen name="action_bar_size">48dp</dimen>
 
     <dimen name="adapter_image_dimens">75dp</dimen>
     <dimen name="adapter_entry_margin">7dp</dimen>

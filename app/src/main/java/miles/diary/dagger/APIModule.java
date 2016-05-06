@@ -1,8 +1,6 @@
 package miles.diary.dagger;
 
 import android.app.Activity;
-import android.app.Application;
-import android.os.Bundle;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -13,10 +11,9 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import miles.diary.DiaryApplication;
+import miles.diary.data.api.Repository;
 import miles.diary.data.api.RealmImpl;
 import miles.diary.data.api.Weather;
-import miles.diary.util.DataStore;
-import miles.diary.util.Logg;
 import miles.diary.util.SimpleLifecycleCallbacks;
 
 /**
@@ -27,7 +24,7 @@ import miles.diary.util.SimpleLifecycleCallbacks;
 public class ApiModule {
 
     private DiaryApplication mApplication;
-    private RealmImpl realm;
+    private Repository repository;
 
     public ApiModule(DiaryApplication application) {
         mApplication = application;
@@ -35,12 +32,12 @@ public class ApiModule {
         mApplication.registerActivityLifecycleCallbacks(new SimpleLifecycleCallbacks() {
             @Override
             public void onActivityResumed(Activity activity) {
-                realm.init();
+                repository.open();
             }
 
             @Override
-            public void onActivityStopped(Activity activity) {
-                realm.close();
+            public void onActivityPaused(Activity activity) {
+                repository.close();
             }
         });
     }
@@ -56,10 +53,10 @@ public class ApiModule {
 
     @Provides
     @Singleton
-    public RealmImpl provideRealmImpl() {
-        realm = new RealmImpl(mApplication);
-        realm.init();
-        return realm;
+    public Repository provideRealmImpl() {
+        repository = new RealmImpl();
+        repository.open();
+        return repository;
     }
 
     @Provides

@@ -38,7 +38,7 @@ import butterknife.Bind;
 import butterknife.OnClick;
 import miles.diary.DiaryApplication;
 import miles.diary.R;
-import miles.diary.data.api.RealmImpl;
+import miles.diary.data.api.Repository;
 import miles.diary.data.model.realm.Entry;
 import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.data.rx.ActivitySubscriber;
@@ -70,7 +70,7 @@ public class EntryActivity extends TransitionActivity {
     }
 
     @Inject
-    RealmImpl dataManagerImpl;
+    Repository repository;
 
     @Bind(R.id.activity_entry_place_photos)
     FloatingActionButton photosFab;
@@ -105,7 +105,7 @@ public class EntryActivity extends TransitionActivity {
         setActionBar(toolbar);
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
-        dataManagerImpl.getObject(Entry.class, getIntent().getLongExtra(INTENT_KEY, -1))
+        repository.getObject(Entry.class, getIntent().getLongExtra(INTENT_KEY, -1))
                 .subscribe(new ActivitySubscriber<Entry>(this) {
                     @Override
                     public void onNext(Entry entry1) {
@@ -176,7 +176,7 @@ public class EntryActivity extends TransitionActivity {
                     final String placeName = bundle.getString(NewEntryActivity.PLACE_NAME);
                     final String placeId = bundle.getString(NewEntryActivity.PLACE_ID);
 
-                    dataManagerImpl.updateObject(new DataTransaction<Entry>() {
+                    repository.updateObject(new DataTransaction<Entry>() {
                         @Override
                         public Entry call() {
                             return Entry.update(entry, body, uri, placeName, placeId);

@@ -13,15 +13,10 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Toolbar;
 
-import com.google.android.gms.common.api.GoogleApiClient;
-
-import javax.inject.Inject;
-
 import butterknife.ButterKnife;
 import miles.diary.DiaryApplication;
 import miles.diary.R;
-import miles.diary.data.api.RealmImpl;
-import miles.diary.util.DataStore;
+import miles.diary.data.api.Repository;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
 
@@ -59,6 +54,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     public abstract void inject(DiaryApplication diaryApplication);
+
 
     public void addSubscription(Subscription subscription) {
         compositeSubscription.add(subscription);

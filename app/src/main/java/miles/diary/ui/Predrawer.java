@@ -10,6 +10,10 @@ import java.lang.ref.SoftReference;
  */
 public class PreDrawer {
 
+    private PreDrawer() {
+
+    }
+
     public static <T extends View> void addPreDrawer(final T view, final OnPreDrawListener<T> listener) {
         final SoftReference<T> softReference = new SoftReference<>(view);
 

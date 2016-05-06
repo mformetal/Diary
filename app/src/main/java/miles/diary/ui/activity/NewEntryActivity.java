@@ -33,7 +33,7 @@ import butterknife.Bind;
 import butterknife.OnClick;
 import miles.diary.DiaryApplication;
 import miles.diary.R;
-import miles.diary.data.api.RealmImpl;
+import miles.diary.data.api.Repository;
 import miles.diary.util.LocationUtils;
 import miles.diary.data.api.Google;
 import miles.diary.data.api.Weather;
@@ -52,7 +52,7 @@ import miles.diary.util.ViewUtils;
 public class NewEntryActivity extends BaseActivity implements View.OnClickListener {
 
     @Inject
-    RealmImpl dataManagerImpl;
+    Repository repository;
     @Inject
     GoogleApiClient.Builder googleApiClientBuilder;
 
@@ -93,7 +93,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
         if (bundle != null) {
             long id =  bundle.getLong(EntryActivity.INTENT_KEY, -1L);
             if (id != -1L) {
-                dataManagerImpl.getObject(Entry.class, id)
+                repository.getObject(Entry.class, id)
                         .subscribe(new ActivitySubscriber<Entry>(this) {
                             @Override
                             public void onNext(Entry entry) {
@@ -118,7 +118,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
 
     @Override
     public void inject(DiaryApplication diaryApplication) {
-
+        diaryApplication.getContextComponent().inject(this);
     }
 
     @Override

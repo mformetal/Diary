@@ -15,9 +15,9 @@ import io.realm.RealmResults;
 import miles.diary.data.error.NoInternetException;
 import miles.diary.data.error.NoRealmObjectKeyException;
 import miles.diary.data.model.realm.RealmModel;
-import miles.diary.data.model.realm.Profile;
 import miles.diary.data.rx.DataObservable;
 import miles.diary.data.rx.DataTransaction;
+import miles.diary.util.Logg;
 import rx.Observable;
 import rx.Single;
 import rx.functions.Func1;
@@ -25,20 +25,13 @@ import rx.functions.Func1;
 /**
  * Created by mbpeele on 3/2/16.
  */
-public class RealmImpl implements RealmAPI {
+public class RealmImpl implements Repository {
 
-    private Application application;
     private Realm realm;
 
-    public RealmImpl(Application application) {
-        this.application = application;
-    }
-
     @Override
-    public void init() {
-        if (realm == null) {
-            realm = Realm.getDefaultInstance();
-        }
+    public void open() {
+        realm = Realm.getDefaultInstance();
     }
 
     @Override

@@ -23,7 +23,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import miles.diary.DiaryApplication;
 import miles.diary.R;
-import miles.diary.data.api.RealmImpl;
+import miles.diary.data.api.Repository;
 import miles.diary.data.model.realm.Entry;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.ui.fragment.ConfirmationDialog;
@@ -35,7 +35,7 @@ import miles.diary.ui.fragment.DismissingDialogFragment;
 public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
     @Inject
-    RealmImpl dataManagerImpl;
+    Repository repository;
 
     @Bind(R.id.activity_map_toolbar)
     Toolbar toolbar;
@@ -69,7 +69,7 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
     @Override
     public void onMapReady(final GoogleMap googleMap) {
-        dataManagerImpl.getAll(Entry.class)
+        repository.getAll(Entry.class)
                 .subscribe(new ActivitySubscriber<List<Entry>>(this) {
                     @Override
                     public void onNext(List<Entry> entries) {

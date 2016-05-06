@@ -22,8 +22,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
-import com.google.android.gms.common.api.GoogleApiClient;
-
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -36,7 +34,7 @@ import io.realm.Sort;
 import miles.diary.DiaryApplication;
 import miles.diary.R;
 import miles.diary.data.adapter.EntryAdapter;
-import miles.diary.data.api.RealmImpl;
+import miles.diary.data.api.Repository;
 import miles.diary.data.model.realm.Entry;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.data.rx.DataTransaction;
@@ -49,7 +47,6 @@ import miles.diary.util.ColorsUtils;
 import miles.diary.util.DataLoadingListener;
 import miles.diary.util.DataStore;
 import miles.diary.util.Logg;
-import rx.functions.Action1;
 import rx.functions.Func1;
 
 public class HomeActivity extends BaseActivity implements DataLoadingListener {
@@ -57,7 +54,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
     @Inject
     DataStore datastore;
     @Inject
-    RealmImpl dataManagerImpl;
+    Repository repository;
 
     @Bind(R.id.activity_home_recycler) RecyclerView recyclerView;
     @Bind(R.id.activity_home_toolbar) Toolbar toolbar;
@@ -163,7 +160,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
                     final String weather = bundle.getString(NewEntryActivity.TEMPERATURE);
                     final Location location = bundle.getParcelable(NewEntryActivity.LOCATION);
 
-                    dataManagerImpl.uploadObject(new DataTransaction<Entry>() {
+                    repository.uploadObject(new DataTransaction<Entry>() {
                         @Override
                         public Entry call() {
                             return Entry.construct(body, uri, placeName, placeId, weather, location);
@@ -188,7 +185,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
                     if (action != null) {
                         long id = bundle.getLong(EntryActivity.INTENT_ACTION, -1);
                         if (id != -1) {
-                            Entry entry = dataManagerImpl.get(Entry.class, id);
+                            Entry entry = repository.get(Entry.class, id);
                             executeAction(action, entry);
                         }
                     }
@@ -255,8 +252,8 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
 
     private void addSearchListener() {
         int color = ContextCompat.getColor(this, R.color.window_background);
-        SearchWidget.SearchListener searchListener = new TintingSearchListener(root,
-                ColorsUtils.modifyAlpha(color, .7f)) {
+        color = ColorsUtils.modifyAlpha(color, .7f);
+        SearchWidget.SearchListener searchListener = new TintingSearchListener(root, color) {
             @Override
             public void onSearchShow(int[] position) {
                 super.onSearchShow(position);
@@ -271,16 +268,16 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
 
             @Override
             public void onSearchTextChanged(String text) {
-                addSubscription(dataManagerImpl.searchFieldnames(Entry.class, text, Case.INSENSITIVE, true, "body", "placeName")
+                repository.searchFieldnames(Entry.class, text, Case.INSENSITIVE, true, "body", "placeName")
                         .debounce(150, TimeUnit.MILLISECONDS)
-                        .subscribe(new Action1<List<Entry>>() {
+                        .subscribe(new ActivitySubscriber<List<Entry>>(HomeActivity.this) {
                             @Override
-                            public void call(List<Entry> entries) {
+                            public void onNext(List<Entry> entries) {
                                 root.bringChildToFront(recyclerView);
                                 entryAdapter.clear();
                                 entryAdapter.addAll(entries);
                             }
-                        }));
+                        });
             }
         };
 
@@ -288,13 +285,13 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
     }
 
     private void fetchData() {
-        dataManagerImpl.exposeSearch(Entry.class)
+        repository.exposeSearch(Entry.class)
                 .findAllSortedAsync("dateMillis", Sort.DESCENDING)
                 .asObservable()
                 .filter(new Func1<RealmResults<Entry>, Boolean>() {
                     @Override
                     public Boolean call(RealmResults<Entry> ts) {
-                        return dataManagerImpl.isDataValid(ts);
+                        return repository.isDataValid(ts);
                     }
                 })
                 .first()
@@ -372,7 +369,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
                 if (entryAdapter.isEmpty()) {
                     onLoadEmpty();
                 }
-                addSubscription(dataManagerImpl.deleteObject(entry).subscribe());
+                addSubscription(repository.deleteObject(entry).subscribe());
                 break;
             case EDIT:
                 entryAdapter.clear();

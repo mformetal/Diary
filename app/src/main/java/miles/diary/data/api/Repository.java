@@ -16,9 +16,9 @@ import rx.Single;
 /**
  * Created by mbpeele on 3/2/16.
  */
-interface RealmAPI {
+public interface Repository {
 
-    void init();
+    void open();
 
     void close();
 

@@ -145,9 +145,27 @@ public class GalleryActivity extends BaseActivity implements LoaderManager.Loade
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String[] projection = new String[] { MediaStore.Images.Media.DATA };
-        return new CursorLoader(this, MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                projection, null, null, MediaStore.Images.ImageColumns.DATE_TAKEN);
+        String[] projection = {
+                MediaStore.Files.FileColumns._ID,
+                MediaStore.Files.FileColumns.DATA,
+                MediaStore.Files.FileColumns.DATE_ADDED,
+                MediaStore.Files.FileColumns.MEDIA_TYPE,
+                MediaStore.Files.FileColumns.MIME_TYPE,
+                MediaStore.Files.FileColumns.TITLE
+        };
+
+        String selection = MediaStore.Files.FileColumns.MEDIA_TYPE + "="
+                + MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
+
+        Uri queryUri = MediaStore.Files.getContentUri("external");
+
+        return new CursorLoader(this,
+                queryUri,
+                projection,
+                selection,
+                null, // Selection args (none).
+                MediaStore.Files.FileColumns.DATE_ADDED + " DESC" // Sort order.
+        );
     }
 
     @Override

@@ -15,7 +15,7 @@ interface Adapter<T> {
 
     boolean isEmpty();
 
-    boolean addData(T object);
+    boolean addObject(T object);
 
     void addAtPosition(T object, int position);
 
@@ -25,7 +25,7 @@ interface Adapter<T> {
 
     void removeObject(int position);
 
-    boolean isDataValid(T realmObject);
+    boolean isObjectValid(T realmObject);
 
     void clear();
 }

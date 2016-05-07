@@ -42,7 +42,7 @@ public abstract class BaseRealmAdapter<T extends RealmObject, VH extends Recycle
     }
 
     @Override
-    public boolean addData(T object) {
+    public boolean addObject(T object) {
         boolean addition = data.add(object);
         if (addition) {
             notifyDataSetChanged();
@@ -73,6 +73,7 @@ public abstract class BaseRealmAdapter<T extends RealmObject, VH extends Recycle
     @Override
     public void removeObject(int position) {
         data.remove(position);
+        notifyItemRemoved(position);
     }
 
     @Override
@@ -86,7 +87,7 @@ public abstract class BaseRealmAdapter<T extends RealmObject, VH extends Recycle
     }
 
     @Override
-    public boolean isDataValid(RealmObject realmObject) {
+    public boolean isObjectValid(RealmObject realmObject) {
         return realmObject.isValid();
     }
 

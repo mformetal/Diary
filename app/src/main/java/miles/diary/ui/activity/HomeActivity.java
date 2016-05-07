@@ -30,6 +30,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import io.realm.Case;
+import io.realm.RealmObject;
 import io.realm.RealmResults;
 import io.realm.Sort;
 import miles.diary.DiaryApplication;
@@ -370,8 +371,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
                 addSubscription(repository.deleteObject(entry).subscribe());
                 break;
             case EDIT:
-                entryAdapter.clear();
-                fetchData();
+                entryAdapter.update(entry);
                 break;
         }
     }

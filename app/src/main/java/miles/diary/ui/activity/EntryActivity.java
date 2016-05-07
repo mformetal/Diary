@@ -36,6 +36,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.OnClick;
+import icepick.State;
 import miles.diary.DiaryApplication;
 import miles.diary.R;
 import miles.diary.data.api.Repository;
@@ -51,6 +52,7 @@ import miles.diary.ui.widget.RoundedImageView;
 import miles.diary.ui.widget.TypefaceIconTextView;
 import miles.diary.ui.widget.TypefaceTextView;
 import miles.diary.util.AnimUtils;
+import miles.diary.util.Logg;
 import miles.diary.util.TextUtils;
 import miles.diary.util.ViewUtils;
 
@@ -87,7 +89,7 @@ public class EntryActivity extends TransitionActivity {
     TypefaceIconTextView weather;
 
     private Entry entry;
-    private boolean dataChanged;
+    @State boolean dataChanged;
 
     public static Intent newIntent(Context context, Entry entry) {
         Intent intent = new Intent(context, EntryActivity.class);
@@ -117,6 +119,7 @@ public class EntryActivity extends TransitionActivity {
     @Override
     public void onBackPressed() {
         if (dataChanged) {
+            Logg.log("DATA CHANGED");
             setResultAction(Action.EDIT);
         } else {
             super.onBackPressed();
@@ -283,7 +286,7 @@ public class EntryActivity extends TransitionActivity {
         }
 
         if (entry.getUri() != null) {
-            postponeEnterTransition();
+            image.setVisibility(View.VISIBLE);
 
             Glide.with(this)
                     .fromString()
@@ -293,6 +296,7 @@ public class EntryActivity extends TransitionActivity {
                     .listener(new RequestListener<String, Bitmap>() {
                         @Override
                         public boolean onException(Exception e, String model, Target<Bitmap> target, boolean isFirstResource) {
+                            Logg.log(e);
                             return false;
                         }
 
@@ -303,9 +307,6 @@ public class EntryActivity extends TransitionActivity {
                                     .maximumColorCount(3)
                                     .clearFilters()
                                     .generate(new PaletteWindows(EntryActivity.this, resource));
-
-                            startPostponedEnterTransition();
-                            image.setVisibility(View.VISIBLE);
                             return false;
                         }
                     })

@@ -6,11 +6,20 @@ import io.realm.annotations.PrimaryKey;
 /**
  * Created by mbpeele on 3/27/16.
  */
-public class Profile extends RealmObject implements RealmModel {
+public class Profile extends RealmObject implements RealmModel<Profile> {
 
     @PrimaryKey
     private String name;
     private String uri;
 
 
+    @Override
+    public String getPrimaryKey() {
+        return name;
+    }
+
+    @Override
+    public boolean isEqualTo(Profile object) {
+        return false;
+    }
 }

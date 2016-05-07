@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -94,6 +95,18 @@ public class EntryAdapter extends BaseRealmAdapter<Entry, RecyclerView.ViewHolde
         }
 
         addAtPosition(entry, ndx);
+    }
+
+    public void update(Entry entry) {
+        List<Entry> entries = getData();
+        for (int i = 0; i < entries.size(); i++) {
+            Entry entry1 = entries.get(i);
+            if (entry.isEqualTo(entry1)) {
+                removeObject(i);
+                addAtPosition(entry, i);
+                break;
+            }
+        }
     }
 
     class TextViewHolder extends BindingViewHolder<Entry> {

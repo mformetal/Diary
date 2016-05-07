@@ -189,6 +189,24 @@ public class AnimUtils {
     public final static ViewPropertyAnimation.Animator REVEAL = new ViewPropertyAnimation.Animator() {
         @Override
         public void animate(View view) {
+            if (view.isAttachedToWindow()) {
+                doAnimation(view);
+            } else {
+                view.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                    @Override
+                    public void onViewAttachedToWindow(View v) {
+                        doAnimation(v);
+                    }
+
+                    @Override
+                    public void onViewDetachedFromWindow(View v) {
+
+                    }
+                });
+            }
+        }
+
+        private void doAnimation(View view) {
             if (view.getWidth() == 0 || view.getHeight() == 0) {
                 PreDrawer.addPreDrawer(view, new PreDrawer.OnPreDrawListener<View>() {
                     @Override

@@ -15,6 +15,13 @@ buildscript {
     }
 }
 
+allprojects {
+    repositories {
+        jcenter()
+        maven {url "https://clojars.org/repo/"}
+    }
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }

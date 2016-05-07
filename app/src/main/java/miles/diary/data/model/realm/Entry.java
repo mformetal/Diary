@@ -8,13 +8,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 
 import java.util.Date;
+import java.util.Objects;
 
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
 import miles.diary.ui.activity.NewEntryActivity;
 
-public class Entry extends RealmObject implements RealmModel, ClusterItem {
+public class Entry extends RealmObject implements RealmModel<Entry>, ClusterItem {
 
     public final static String KEY = "dateMillis";
 
@@ -34,11 +35,11 @@ public class Entry extends RealmObject implements RealmModel, ClusterItem {
 
     public Entry() {
         super();
+        date = new Date();
+        dateMillis = date.getTime();
     }
 
     private Entry(EntryBuilder builder) {
-        date = builder.date;
-        dateMillis = date.getTime();
         body = builder.body;
         uri = builder.uri;
         placeName = builder.placeName;
@@ -58,30 +59,30 @@ public class Entry extends RealmObject implements RealmModel, ClusterItem {
         }
     }
 
-    public boolean hasImageUri() {
-        return uri != null;
+    @Override
+    public Long getPrimaryKey() {
+        return dateMillis;
     }
 
-    public boolean hasLocation() {
-        return latitude != null && longitude != null;
+    @Override
+    public boolean isEqualTo(Entry object) {
+        return Objects.equals(getPrimaryKey(), object.getPrimaryKey());
     }
 
     public Date getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
-
-        setDateMillis(date.getTime());
-    }
-
     public long getDateMillis() {
         return dateMillis;
     }
 
-    public void setDateMillis(long dateMillis) {
-        this.dateMillis = dateMillis;
+    public boolean hasImageUri() {
+        return uri != null;
+    }
+
+    public boolean hasLocation() {
+        return latitude != null && longitude != null;
     }
 
     public String getBody() {
@@ -144,7 +145,6 @@ public class Entry extends RealmObject implements RealmModel, ClusterItem {
 
         return Entry.builder()
                 .setBody(body)
-                .setDate()
                 .setUri(uri)
                 .setPlaceId(placeId)
                 .setPlaceName(placeName)
@@ -166,7 +166,6 @@ public class Entry extends RealmObject implements RealmModel, ClusterItem {
         private Double latitude;
         private Double longitude;
         private String weather;
-        private Date date;
 
         private EntryBuilder() {
 
@@ -181,11 +180,6 @@ public class Entry extends RealmObject implements RealmModel, ClusterItem {
             if (uri != null) {
                 this.uri = uri.toString();
             }
-            return this;
-        }
-
-        public EntryBuilder setDate() {
-            date = new Date();
             return this;
         }
 

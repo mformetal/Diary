@@ -35,7 +35,9 @@ import miles.diary.ui.activity.EntryActivity;
 import miles.diary.ui.activity.GalleryActivity;
 import miles.diary.ui.activity.HomeActivity;
 import miles.diary.ui.activity.UriActivity;
+import miles.diary.util.FileUtils;
 import miles.diary.util.Logg;
+import miles.diary.util.UriType;
 
 /**
  * Created by mbpeele on 3/7/16.

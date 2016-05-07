@@ -46,6 +46,7 @@ import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.data.rx.DataTransaction;
 import miles.diary.ui.PaletteWindows;
 import miles.diary.ui.TypefacerSpan;
+import miles.diary.ui.ZoomController;
 import miles.diary.ui.transition.RoundedImageViewTransition;
 import miles.diary.ui.transition.SimpleTransitionListener;
 import miles.diary.ui.widget.RoundedImageView;
@@ -219,7 +220,7 @@ public class EntryActivity extends TransitionActivity {
                 @Override
                 public void onTransitionEnd(Transition transition) {
                     AnimUtils.visible(toolbar).start();
-                    ViewUtils.setZoomControls(image);
+                    new ZoomController(image);
                 }
             });
 

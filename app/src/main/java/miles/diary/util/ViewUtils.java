@@ -81,9 +81,6 @@ public class ViewUtils {
         }
     }
 
-    public static void setZoomControls(ImageView imageView) {
-    }
-
     public static int getActionBarSize(Context context) {
         if (actionBarSize < 0) {
             TypedValue value = new TypedValue();

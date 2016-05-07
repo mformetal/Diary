@@ -10,6 +10,7 @@ import miles.diary.ui.activity.LocationActivity;
 import miles.diary.ui.activity.MapActivity;
 import miles.diary.ui.activity.NewEntryActivity;
 import miles.diary.ui.activity.PlacePhotosActivity;
+import miles.diary.ui.activity.UriActivity;
 import miles.diary.ui.fragment.BaseFragment;
 
 @Singleton
@@ -27,5 +28,7 @@ public interface ContextComponent {
     void inject(NewEntryActivity newEntryActivity);
 
     void inject(PlacePhotosActivity activity);
+
+    void inject(UriActivity activity);
 
 }

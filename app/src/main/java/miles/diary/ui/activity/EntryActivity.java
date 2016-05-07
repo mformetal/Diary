@@ -286,6 +286,8 @@ public class EntryActivity extends TransitionActivity {
         }
 
         if (entry.getUri() != null) {
+            postponeEnterTransition();
+
             image.setVisibility(View.VISIBLE);
 
             Glide.with(this)
@@ -307,6 +309,8 @@ public class EntryActivity extends TransitionActivity {
                                     .maximumColorCount(3)
                                     .clearFilters()
                                     .generate(new PaletteWindows(EntryActivity.this, resource));
+
+                            startPostponedEnterTransition();
                             return false;
                         }
                     })

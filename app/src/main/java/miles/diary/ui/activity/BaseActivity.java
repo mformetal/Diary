@@ -74,7 +74,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         Snackbar.make(root, getString(R.string.error_no_internet), Snackbar.LENGTH_SHORT).show();
     }
 
-    public boolean hasPermissions(String[] permissions) {
+    public boolean hasPermissions(String... permissions) {
         for (String permission: permissions) {
             if (ActivityCompat.checkSelfPermission(this, permission)
                     != PackageManager.PERMISSION_GRANTED) {

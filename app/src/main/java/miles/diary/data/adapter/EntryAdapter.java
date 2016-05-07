@@ -79,22 +79,26 @@ public class EntryAdapter extends BaseRealmAdapter<Entry, RecyclerView.ViewHolde
 
     public void addAndSort(Entry entry) {
         List<Entry> entries = getData();
-        long target = entry.getDateMillis();
-        long diff = Integer.MAX_VALUE;
-        int ndx = 0;
+        if (entries.isEmpty()) {
+            addObject(entry);
+        } else {
+            long target = entry.getDateMillis();
+            long diff = Integer.MAX_VALUE;
+            int ndx = 0;
 
-        for (int i = 0; i < entries.size(); i++) {
-            Entry entry1 = entries.get(i);
-            long dataTime = entry1.getDateMillis();
+            for (int i = 0; i < entries.size(); i++) {
+                Entry entry1 = entries.get(i);
+                long dataTime = entry1.getDateMillis();
 
-            long timeDiff = Math.abs(target - dataTime);
-            if (timeDiff < diff) {
-                diff = timeDiff;
-                ndx = i;
+                long timeDiff = Math.abs(target - dataTime);
+                if (timeDiff < diff) {
+                    diff = timeDiff;
+                    ndx = i;
+                }
             }
-        }
 
-        addAtPosition(entry, ndx);
+            addAtPosition(entry, ndx);
+        }
     }
 
     public void update(Entry entry) {

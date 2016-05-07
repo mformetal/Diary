@@ -27,6 +27,8 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
 
+import java.security.Permission;
+
 import javax.inject.Inject;
 
 import butterknife.Bind;
@@ -118,7 +120,10 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     @Override
     protected void onResume() {
         super.onResume();
-        if (location == null && LocationUtils.isLocationEnabled(this)) {
+        if (location == null
+                && LocationUtils.isLocationEnabled(this)
+                 && hasPermissions(Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION)) {
             google.getLocation()
                     .subscribe(new ActivitySubscriber<Location>(this) {
                         @Override

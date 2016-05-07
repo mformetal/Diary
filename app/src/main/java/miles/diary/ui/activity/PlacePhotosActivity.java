@@ -63,6 +63,12 @@ public class PlacePhotosActivity extends BaseActivity implements Google.GoogleSe
     }
 
     @Override
+    protected void onDestroy() {
+        placePhotosAdapter.release();
+        super.onDestroy();
+    }
+
+    @Override
     public void onConnected(Bundle bundle) {
         placePhotosAdapter = new PlacePhotosAdapter(googleService, this);
         pager.setOffscreenPageLimit(2);

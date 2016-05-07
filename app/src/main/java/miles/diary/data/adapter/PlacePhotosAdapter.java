@@ -115,4 +115,10 @@ public class PlacePhotosAdapter extends PagerAdapter {
         buffer = placePhotoMetadataBuffer;
         notifyDataSetChanged();
     }
+
+    public void release() {
+        if (buffer != null) {
+            buffer.release();
+        }
+    }
 }

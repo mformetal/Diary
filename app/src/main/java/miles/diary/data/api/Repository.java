@@ -34,15 +34,13 @@ public interface Repository {
 
     <T extends RealmObject> Observable<T> uploadObject(DataTransaction<T> dataTransaction);
 
-    <T extends RealmObject> Single<T> deleteObject(T object);
+    <T extends RealmObject> Single<Void> deleteObject(T object);
 
     <T extends RealmObject> RealmQuery<T> exposeSearch(Class<T> tClass);
 
     <T extends RealmObject> Observable<List<T>> searchFieldnames(Class<T> tClass, String constraint,
                                                                  Case casing, boolean useOr,
                                                                  String... fieldNames);
-
-    <T extends RealmObject> void delete(T object);
 
     void deleteAll();
 

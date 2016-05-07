@@ -8,11 +8,11 @@ import rx.Subscriber;
 /**
  * Created by mbpeele on 3/3/16.
  */
-public abstract class OnSubscribeRealm<T> implements Observable.OnSubscribe<T> {
+public abstract class RealmObservableSubscription<T> implements Observable.OnSubscribe<T> {
 
     private final Realm realm;
 
-    public OnSubscribeRealm(Realm realm) {
+    public RealmObservableSubscription(Realm realm) {
         this.realm = realm;
     }
 

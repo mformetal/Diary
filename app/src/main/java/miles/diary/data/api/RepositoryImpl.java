@@ -119,7 +119,7 @@ public class RepositoryImpl implements Repository {
     }
 
     @Override
-    public <T extends RealmObject> Single<T> deleteObject(T object) {
+    public <T extends RealmObject> Single<Void> deleteObject(T object) {
         if (hasConnection()) {
             return DataObservable.delete(object, realm);
         } else {
@@ -167,11 +167,6 @@ public class RepositoryImpl implements Repository {
                     }
                 })
                 .first();
-    }
-
-    @Override
-    public <T extends RealmObject> void delete(T object) {
-        object.removeFromRealm();
     }
 
     @Override

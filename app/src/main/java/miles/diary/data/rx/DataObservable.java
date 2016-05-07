@@ -2,7 +2,6 @@ package miles.diary.data.rx;
 
 import io.realm.Realm;
 import io.realm.RealmObject;
-import miles.diary.util.Logg;
 import rx.Observable;
 import rx.Single;
 import rx.SingleSubscriber;
@@ -12,17 +11,18 @@ import rx.SingleSubscriber;
  */
 public class DataObservable {
 
-    public static <T extends RealmObject> Single<T> delete(final T object, final Realm realm) {
-        return Single.create(new Single.OnSubscribe<T>() {
+    public static <T extends RealmObject> Single<Void> delete(final T object, final Realm realm) {
+        return Single.create(new RealmSingleSubscription(realm) {
             @Override
-            public void call(SingleSubscriber<? super T> singleSubscriber) {
+            public Void commit() {
                 object.deleteFromRealm();
+                return null;
             }
         });
     }
 
     public static <T extends RealmObject> Observable<T> upload(final T object, final Realm realm) {
-        return Observable.create(new OnSubscribeRealm<T>(realm) {
+        return Observable.create(new RealmObservableSubscription<T>(realm) {
             @Override
             public T commit() {
                 return realm.copyToRealm(object);
@@ -32,7 +32,7 @@ public class DataObservable {
 
     public static <T extends RealmObject> Observable<T> upload(final DataTransaction<T> dataTransaction,
                                                                final Realm realm) {
-        return Observable.create(new OnSubscribeRealm<T>(realm) {
+        return Observable.create(new RealmObservableSubscription<T>(realm) {
             @Override
             public T commit() {
                 return realm.copyToRealm(dataTransaction.call());
@@ -42,7 +42,7 @@ public class DataObservable {
 
     public static <T extends RealmObject> Observable<T> update(final DataTransaction<T> dataTransaction,
                                                                final Realm realm) {
-        return Observable.create(new OnSubscribeRealm<T>(realm) {
+        return Observable.create(new RealmObservableSubscription<T>(realm) {
             @Override
             public T commit() {
                 return realm.copyToRealmOrUpdate(dataTransaction.call());

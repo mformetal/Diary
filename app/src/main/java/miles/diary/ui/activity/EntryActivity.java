@@ -65,7 +65,6 @@ public class EntryActivity extends TransitionActivity {
 
     public enum Action {
         EDIT,
-        FAVORITE,
         DELETE
     }
 

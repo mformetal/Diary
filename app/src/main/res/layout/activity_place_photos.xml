@@ -21,7 +21,7 @@
         android:textSize="@dimen/logo_text_size"
         android:layout_margin="@dimen/activity_vertical_margin"
         android:maxLines="1"
-        app:layout_anchor="@id/activity_place_photos_root"
+        app:layout_anchor="@id/activity_place_photos_pager"
         app:layout_anchorGravity="top"
         tools:text="PLACE NAME" />
 

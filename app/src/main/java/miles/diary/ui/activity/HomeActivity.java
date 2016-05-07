@@ -346,13 +346,17 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
 
     private void dismissLoading() {
         if (progressBar.getVisibility() != View.GONE) {
-            AnimUtils.gone(progressBar).setDuration(AnimUtils.longAnim(this)).start();
+            AnimUtils.gone(progressBar)
+                    .setDuration(AnimUtils.longAnim(this))
+                    .start();
         }
     }
 
     private void showLoading() {
         if (progressBar.getVisibility() != View.VISIBLE) {
-            AnimUtils.visible(progressBar).setDuration(AnimUtils.longAnim(this)).start();
+            AnimUtils.visible(progressBar)
+                    .setDuration(AnimUtils.longAnim(this))
+                    .start();
         }
     }
 
@@ -368,8 +372,6 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
             case EDIT:
                 entryAdapter.clear();
                 fetchData();
-                break;
-            case FAVORITE:
                 break;
         }
     }

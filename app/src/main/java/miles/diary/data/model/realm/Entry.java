@@ -41,6 +41,7 @@ public class Entry extends RealmObject implements RealmModel<Entry>, ClusterItem
      */
     public Entry() {
         super();
+        // DON'T PUT ANYTHING HERE FOR THE LOVE OF ALL THAT IS HOLY
     }
 
     /**

@@ -8,6 +8,7 @@ import android.animation.ValueAnimator;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.graphics.Color;
+import android.location.Address;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,9 +26,12 @@ import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.gson.Gson;
 
 import java.security.Permission;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -36,6 +40,7 @@ import butterknife.OnClick;
 import miles.diary.DiaryApplication;
 import miles.diary.R;
 import miles.diary.data.api.Repository;
+import miles.diary.data.model.google.CopiedPlace;
 import miles.diary.util.LocationUtils;
 import miles.diary.data.api.Google;
 import miles.diary.data.api.Weather;
@@ -49,7 +54,10 @@ import miles.diary.ui.widget.CircleImageView;
 import miles.diary.ui.widget.TypefaceButton;
 import miles.diary.ui.widget.TypefaceEditText;
 import miles.diary.util.AnimUtils;
+import miles.diary.util.Logg;
 import miles.diary.util.ViewUtils;
+import rx.Observable;
+import rx.functions.Func1;
 
 public class NewEntryActivity extends BaseActivity implements View.OnClickListener {
 
@@ -250,7 +258,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
 
             placeName = entry.getPlaceName();
             placeId = entry.getPlaceId();
-            if (entry.getPlaceName() != null) {
+            if (placeName != null) {
                 setLocationText(placeName);
             }
         }
@@ -268,7 +276,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
         objectAnimator.start();
     }
 
-    private void getPlace(Location location1) {
+    private void getPlace(final Location location1) {
         if (placeName == null && placeId == null) {
             final ObjectAnimator pulse = ObjectAnimator.ofFloat(locationName, View.SCALE_X, .95f, 1f);
             pulse.setDuration(AnimUtils.mediumAnim(this));
@@ -276,20 +284,34 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
             pulse.setRepeatMode(ValueAnimator.REVERSE);
             pulse.start();
 
-            google.searchNearby(location1, 3)
-                    .subscribe(new ActivitySubscriber<PlaceResponse>(this) {
+            google.getCurrentPlace(null)
+                    .subscribe(new ActivitySubscriber<List<CopiedPlace>>(this) {
                         @Override
-                        public void onNext(PlaceResponse placeResponse) {
+                        public void onNext(List<CopiedPlace> copiedPlaces) {
                             pulse.end();
 
-                            PlaceResponse.PlaceResult result =
-                                    placeResponse.getResults().get(0);
-                            placeName = result.getName();
-                            placeId = result.getId();
+                            CopiedPlace copiedPlace = copiedPlaces.get(0);
+                            placeName = copiedPlace.getName();
+                            placeId = copiedPlace.getId();
 
                             setLocationText(placeName);
                         }
                     });
+
+//            google.searchNearby(location1, 3)
+//                    .subscribe(new ActivitySubscriber<PlaceResponse>(this) {
+//                        @Override
+//                        public void onNext(PlaceResponse placeResponse) {
+//                            pulse.end();
+//
+//                            PlaceResponse.PlaceResult result =
+//                                    placeResponse.getResults().get(0);
+//                            placeName = result.getName();
+//                            placeId = result.getId();
+//
+//                            setLocationText(placeName);
+//                        }
+//                    });
         } else {
             setLocationText(placeName);
         }

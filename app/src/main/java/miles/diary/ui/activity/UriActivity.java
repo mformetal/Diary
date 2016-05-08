@@ -5,14 +5,19 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.TransactionTooLargeException;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.graphics.Palette;
+import android.transition.Transition;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.load.resource.gif.GifDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
@@ -21,8 +26,10 @@ import icepick.State;
 import miles.diary.DiaryApplication;
 import miles.diary.R;
 import miles.diary.ui.PaletteWindows;
+import miles.diary.ui.PreDrawer;
 import miles.diary.ui.ZoomController;
 import miles.diary.ui.transition.ScalingImageTransition;
+import miles.diary.ui.transition.SimpleTransitionListener;
 import miles.diary.util.FileUtils;
 import miles.diary.util.Logg;
 import miles.diary.util.UriType;
@@ -110,8 +117,34 @@ public class UriActivity extends BaseActivity {
 
 
     private void loadGif() {
+        postponeEnterTransition();
+
         Glide.with(this)
                 .load(uri)
+                .asBitmap()
+                .listener(new RequestListener<Uri, Bitmap>() {
+                    @Override
+                    public boolean onException(Exception e, Uri model, Target<Bitmap> target, boolean isFirstResource) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(final Bitmap resource, Uri model, Target<Bitmap> target,
+                                                   boolean isFromMemoryCache, boolean isFirstResource) {
+                        getWindow().getSharedElementEnterTransition().addListener(new SimpleTransitionListener() {
+                            @Override
+                            public void onTransitionEnd(Transition transition) {
+                                Glide.with(UriActivity.this)
+                                        .load(uri)
+                                        .override(resource.getWidth(), resource.getHeight())
+                                        .into(imageView);
+                            }
+                        });
+
+                        startPostponedEnterTransition();
+                        return false;
+                    }
+                })
                 .into(imageView);
     }
 

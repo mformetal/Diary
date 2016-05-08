@@ -31,6 +31,7 @@ import miles.diary.DiaryApplication;
 import miles.diary.R;
 import miles.diary.data.adapter.AutoCompleteAdapter;
 import miles.diary.data.api.Google;
+import miles.diary.data.model.google.CopiedPlace;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.ui.widget.TypefaceAutoCompleteTextView;
 import miles.diary.ui.widget.TypefaceButton;
@@ -190,12 +191,12 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
     private void getPlace() {
         if (placeName == null && placeId == null) {
             googleService.getCurrentPlace(null)
-                    .subscribe(new ActivitySubscriber<List<PlaceLikelihood>>(this) {
+                    .subscribe(new ActivitySubscriber<List<CopiedPlace>>(this) {
                         @Override
-                        public void onNext(List<PlaceLikelihood> likelyPlaces) {
-                            Place placeInfo = likelyPlaces.get(0).getPlace();
-                            placeName = placeInfo.getName().toString();
-                            placeId = placeInfo.getId();
+                        public void onNext(List<CopiedPlace> copiedPlaces) {
+                            CopiedPlace copiedPlace = copiedPlaces.get(0);
+                            placeName = copiedPlace.getName().toString();
+                            placeId = copiedPlace.getId();
                         }
                     });
         }

@@ -15,9 +15,8 @@ import java.util.List;
 
 import miles.diary.R;
 import miles.diary.ui.CancelDetector;
-import miles.diary.ui.SimpleTextWatcher;
+import miles.diary.util.SimpleTextWatcher;
 import miles.diary.util.AnimUtils;
-import miles.diary.util.Logg;
 
 /**
  * Created by mbpeele on 3/11/16.

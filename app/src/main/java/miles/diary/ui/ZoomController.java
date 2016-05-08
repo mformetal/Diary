@@ -12,27 +12,8 @@ import uk.co.senab.photoview.PhotoViewAttacher;
 /**
  * Created by mbpeele on 5/7/16.
  */
-public class ZoomController implements View.OnAttachStateChangeListener {
-
-    private PhotoViewAttacher photoViewAttacher;
+public class ZoomController {
 
     public ZoomController(ImageView imageView) {
-        if (imageView.isAttachedToWindow()) {
-            photoViewAttacher = new PhotoViewAttacher(imageView);
-        }
-
-        imageView.addOnAttachStateChangeListener(this);
-    }
-
-    @Override
-    public void onViewAttachedToWindow(View v) {
-        if (photoViewAttacher == null) {
-            photoViewAttacher = new PhotoViewAttacher((ImageView) v);
-        }
-    }
-
-    @Override
-    public void onViewDetachedFromWindow(View v) {
-        photoViewAttacher = null;
     }
 }

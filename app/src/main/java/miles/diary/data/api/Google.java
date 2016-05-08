@@ -26,6 +26,7 @@ import java.util.List;
 
 import miles.diary.R;
 import miles.diary.data.adapter.AutoCompleteAdapter;
+import miles.diary.data.model.google.CopiedPlace;
 import miles.diary.data.model.google.PlaceResponse;
 import miles.diary.data.rx.GoogleObservable;
 import miles.diary.data.rx.OkHttpObservable;
@@ -62,9 +63,9 @@ public class Google implements GoogleApiClient.ConnectionCallbacks,
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        httpClient.addInterceptor(logging);
-        okHttpClient = httpClient.build();
+        okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(logging)
+                .build();
 
         gson = new Gson();
 
@@ -100,14 +101,14 @@ public class Google implements GoogleApiClient.ConnectionCallbacks,
     }
 
     @SuppressWarnings({"ResourceType"})
-    public Observable<List<PlaceLikelihood>> getCurrentPlace(PlaceFilter placeFilter) {
+    public Observable<List<CopiedPlace>> getCurrentPlace(final PlaceFilter placeFilter) {
         return GoogleObservable.execute(Places.PlaceDetectionApi.getCurrentPlace(client, placeFilter))
-                .map(new Func1<PlaceLikelihoodBuffer, List<PlaceLikelihood>>() {
+                .map(new Func1<PlaceLikelihoodBuffer, List<CopiedPlace>>() {
                     @Override
-                    public List<PlaceLikelihood> call(PlaceLikelihoodBuffer placeLikelihoods) {
-                        List<PlaceLikelihood> list = new ArrayList<PlaceLikelihood>();
+                    public List<CopiedPlace> call(PlaceLikelihoodBuffer placeLikelihoods) {
+                        List<CopiedPlace> list = new ArrayList<>();
                         for (PlaceLikelihood placeLikelihood : placeLikelihoods) {
-                            list.add(placeLikelihood);
+                            list.add(new CopiedPlace(placeLikelihood.getPlace()));
                         }
                         placeLikelihoods.release();
                         return list;

@@ -10,6 +10,7 @@ import com.google.android.gms.location.places.PlacePhotoMetadataResult;
 import javax.inject.Inject;
 
 import butterknife.Bind;
+import icepick.State;
 import miles.diary.DiaryApplication;
 import miles.diary.R;
 import miles.diary.data.adapter.PlacePhotosAdapter;
@@ -37,7 +38,7 @@ public class PlacePhotosActivity extends BaseActivity implements Google.GoogleCa
     Google google;
 
     private PlacePhotosAdapter placePhotosAdapter;
-    private String id;
+    @State String id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

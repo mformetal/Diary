@@ -24,6 +24,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.OnClick;
+import icepick.State;
 import miles.diary.DiaryApplication;
 import miles.diary.R;
 import miles.diary.data.adapter.AutoCompleteAdapter;
@@ -51,8 +52,8 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
     @Inject
     Google google;
 
-    private String placeName;
-    private String placeId;
+    @State String placeName;
+    @State String placeId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

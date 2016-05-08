@@ -32,6 +32,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.OnClick;
+import icepick.State;
 import miles.diary.DiaryApplication;
 import miles.diary.R;
 import miles.diary.data.api.Repository;
@@ -74,12 +75,12 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     private final static int RESULT_IMAGE = 2;
     private final static int REQUEST_LOCATION_PERMISSION = 3;
 
-    private String placeName;
-    private String placeId;
-    private String temperature;
-    private Uri imageUri;
-    private WeatherResponse weatherResponse;
-    private Location location;
+    @State String placeName;
+    @State String placeId;
+    @State String temperature;
+    @State Uri imageUri;
+    @State WeatherResponse weatherResponse;
+    @State Location location;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -117,23 +118,9 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     @Override
     protected void onResume() {
         super.onResume();
-        if (location == null && LocationUtils.isLocationEnabled(this)
-                && hasPermissions(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)) {
-            google.connect(new Google.GoogleCallback() {
-                @Override
-                public void onConnected(Bundle bundle) {
-                    getLocationData();
-                }
-            });
-            google.getLocation()
-                    .subscribe(new ActivitySubscriber<Location>(this) {
-                        @Override
-                        public void onNext(Location location1) {
-                            location = location1;
-                            getWeather(location);
-                            getPlace(location);
-                        }
-                    });
+        google.connect(null);
+        if (location == null) {
+            getLocationData();
         }
     }
 
@@ -363,6 +350,8 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                             })
                             .show();
                 }
+            } else {
+                noInternet();
             }
         } else {
             ActivityCompat.requestPermissions(this, permissions, REQUEST_LOCATION_PERMISSION);

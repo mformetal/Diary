@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 
 import butterknife.Bind;
+import icepick.State;
 import miles.diary.DiaryApplication;
 import miles.diary.R;
 import miles.diary.data.adapter.GalleryAdapter;
@@ -47,7 +48,7 @@ public class GalleryActivity extends BaseActivity implements LoaderManager.Loade
     RecyclerView recyclerView;
 
     private GalleryAdapter adapter;
-    private File cameraFile;
+    @State File cameraFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

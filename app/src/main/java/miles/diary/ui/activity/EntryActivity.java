@@ -114,7 +114,7 @@ public class EntryActivity extends TransitionActivity {
 
     @Override
     public void inject(DiaryApplication diaryApplication) {
-        diaryApplication.getContextComponent().inject(this);
+        diaryApplication.getApplicationComponent().inject(this);
     }
 
     @Override

@@ -7,27 +7,19 @@ import com.google.android.gms.location.places.Place;
  */
 public class CopiedPlace {
 
-    private String name;
-    private String id;
+    private final String name;
+    private final String id;
 
     public CopiedPlace(Place place) {
-        setName(place.getName().toString());
-        setId(place.getId());
+        name = place.getName().toString();
+        id = place.getId();
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getId() {
         return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 }

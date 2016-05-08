@@ -7,17 +7,16 @@ import com.joanzapata.iconify.fonts.WeathericonsModule;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
-import miles.diary.dagger.ApiModule;
-import miles.diary.dagger.ContextComponent;
-import miles.diary.dagger.DaggerContextComponent;
-import miles.diary.dagger.PersistenceModule;
+import miles.diary.dagger.components.ApplicationComponent;
+import miles.diary.dagger.components.DaggerApplicationComponent;
+import miles.diary.dagger.modules.ApplicationModule;
 
 /**
  * Created by mbpeele on 1/14/16.
  */
 public class DiaryApplication extends Application {
 
-    private ContextComponent component;
+    private ApplicationComponent applicationComponent;
 
     @Override
     public void onCreate() {
@@ -30,11 +29,11 @@ public class DiaryApplication extends Application {
                 .build();
         Realm.setDefaultConfiguration(realmConfiguration);
 
-        component = DaggerContextComponent.builder()
-                .apiModule(new ApiModule(this))
-                .persistenceModule(new PersistenceModule(this))
+        applicationComponent = DaggerApplicationComponent.builder()
+                .applicationModule(new ApplicationModule(this))
                 .build();
     }
 
-    public ContextComponent getContextComponent() { return component; }
+    public ApplicationComponent getApplicationComponent() { return applicationComponent; }
+
 }

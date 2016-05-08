@@ -1,5 +1,6 @@
 package miles.diary.data.api;
 
+import android.app.Activity;
 import android.content.IntentSender;
 import android.location.Address;
 import android.location.Location;
@@ -24,6 +25,8 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Singleton;
+
 import miles.diary.R;
 import miles.diary.data.adapter.AutoCompleteAdapter;
 import miles.diary.data.model.google.CopiedPlace;
@@ -46,21 +49,19 @@ import rx.schedulers.Schedulers;
 /**
  * Created by mbpeele on 2/21/16.
  */
+@Singleton
 public class Google implements GoogleApiClient.ConnectionCallbacks,
     GoogleApiClient.OnConnectionFailedListener {
 
     private final GoogleApiClient client;
-    private final BaseActivity activity;
-    private GoogleServiceCallback callback;
+    private BaseActivity activity;
+    private GoogleCallback googleCallback;
     private OkHttpClient okHttpClient;
     private Gson gson;
 
     private static int FAILED_CODE = 5;
 
-    public Google(final BaseActivity activity1, GoogleApiClient.Builder builder,
-                  GoogleServiceCallback googleServiceCallback) {
-        activity = activity1;
-
+    public Google(GoogleApiClient.Builder builder) {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
         okHttpClient = new OkHttpClient.Builder()
@@ -72,12 +73,18 @@ public class Google implements GoogleApiClient.ConnectionCallbacks,
         client = builder.addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
-        client.connect();
-
-        callback = googleServiceCallback;
     }
 
-    public void cleanup() {
+    public void setActivity(BaseActivity activity) {
+        this.activity = activity;
+    }
+
+    public void connect(GoogleCallback googleCallback) {
+        this.googleCallback = googleCallback;
+        client.connect();
+    }
+
+    public void disconnect() {
         client.disconnect();
     }
 
@@ -193,8 +200,8 @@ public class Google implements GoogleApiClient.ConnectionCallbacks,
     @Override
     public void onConnected(Bundle bundle) {
         if (checkActivity()) {
-            if (callback != null) {
-                callback.onConnected(bundle);
+            if (googleCallback != null) {
+                googleCallback.onConnected(bundle);
             }
         }
     }
@@ -219,7 +226,7 @@ public class Google implements GoogleApiClient.ConnectionCallbacks,
         }
     }
 
-    public interface GoogleServiceCallback {
+    public interface GoogleCallback {
 
         void onConnected(Bundle bundle);
     }

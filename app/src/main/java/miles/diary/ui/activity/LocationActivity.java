@@ -15,10 +15,7 @@ import android.widget.ImageView;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.places.AutocompletePrediction;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.ui.PlacePicker;
 
 import java.util.List;
@@ -31,6 +28,7 @@ import miles.diary.DiaryApplication;
 import miles.diary.R;
 import miles.diary.data.adapter.AutoCompleteAdapter;
 import miles.diary.data.api.Google;
+import miles.diary.data.model.google.AutoCompleteItem;
 import miles.diary.data.model.google.CopiedPlace;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.ui.widget.TypefaceAutoCompleteTextView;
@@ -46,14 +44,13 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
     private final static int REQUEST_LOCATION_PERMISSION = 1;
     private final static int REQUEST_PLACE_PICKER = 2;
 
-    @Inject
-    GoogleApiClient.Builder googleApiClientBuilder;
-
     @Bind(R.id.activity_location_pos_button) TypefaceButton posButton;
     @Bind(R.id.activity_location_autocomplete) TypefaceAutoCompleteTextView autoCompleteTextView;
     @Bind(R.id.activity_location_image) ImageView mapIcon;
 
-    private Google googleService;
+    @Inject
+    Google google;
+
     private String placeName;
     private String placeId;
 
@@ -76,18 +73,19 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
                     }
                 }
 
-                googleService = new Google(this, googleApiClientBuilder, new Google.GoogleServiceCallback() {
+                google.setActivity(this);
+                google.connect(new Google.GoogleCallback() {
                     @Override
                     public void onConnected(Bundle bundle) {
-                        final AutoCompleteAdapter autoCompleteAdapter = googleService.getAutoCompleteAdapter();
+                        final AutoCompleteAdapter autoCompleteAdapter = google.getAutoCompleteAdapter();
                         autoCompleteTextView.setAdapter(autoCompleteAdapter);
 
                         autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                             @Override
                             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                final AutocompletePrediction item = autoCompleteAdapter.getItem(position);
-                                placeId = item.getPlaceId();
-                                placeName = item.getPrimaryText(null).toString();
+                                final AutoCompleteItem item = autoCompleteAdapter.getItem(position);
+                                placeId = item.placeId;
+                                placeName = item.primaryText;
                             }
                         });
 
@@ -104,7 +102,7 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
 
     @Override
     public void inject(DiaryApplication diaryApplication) {
-        diaryApplication.getContextComponent().inject(this);
+        diaryApplication.getApplicationComponent().inject(this);
     }
 
     @Override
@@ -190,7 +188,7 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
 
     private void getPlace() {
         if (placeName == null && placeId == null) {
-            googleService.getCurrentPlace(null)
+            google.getCurrentPlace(null)
                     .subscribe(new ActivitySubscriber<List<CopiedPlace>>(this) {
                         @Override
                         public void onNext(List<CopiedPlace> copiedPlaces) {

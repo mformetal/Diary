@@ -7,6 +7,8 @@ import com.google.common.collect.ImmutableList;
 import java.lang.reflect.Field;
 import java.util.List;
 
+import javax.inject.Singleton;
+
 import io.realm.Case;
 import io.realm.Realm;
 import io.realm.RealmObject;
@@ -25,6 +27,7 @@ import rx.functions.Func1;
 /**
  * Created by mbpeele on 3/2/16.
  */
+@Singleton
 public class RepositoryImpl implements Repository {
 
     private Realm realm;

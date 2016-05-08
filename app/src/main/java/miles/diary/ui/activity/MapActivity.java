@@ -55,7 +55,7 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
     @Override
     public void inject(DiaryApplication diaryApplication) {
-        diaryApplication.getContextComponent().inject(this);
+        diaryApplication.getApplicationComponent().inject(this);
     }
 
     @Override

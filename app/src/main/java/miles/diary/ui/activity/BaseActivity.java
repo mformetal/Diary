@@ -16,7 +16,8 @@ import android.widget.Toolbar;
 import butterknife.ButterKnife;
 import miles.diary.DiaryApplication;
 import miles.diary.R;
-import miles.diary.data.api.Repository;
+import miles.diary.dagger.components.ApplicationComponent;
+import miles.diary.dagger.modules.ActivityModule;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
 
@@ -55,6 +56,9 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     public abstract void inject(DiaryApplication diaryApplication);
 
+    protected ActivityModule getActivityModule() {
+        return new ActivityModule(this);
+    }
 
     public void addSubscription(Subscription subscription) {
         compositeSubscription.add(subscription);

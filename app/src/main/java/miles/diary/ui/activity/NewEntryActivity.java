@@ -8,7 +8,6 @@ import android.animation.ValueAnimator;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.graphics.Color;
-import android.location.Address;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,12 +24,8 @@ import android.view.animation.Interpolator;
 import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.gson.Gson;
 
-import java.security.Permission;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -44,7 +39,6 @@ import miles.diary.data.model.google.CopiedPlace;
 import miles.diary.util.LocationUtils;
 import miles.diary.data.api.Google;
 import miles.diary.data.api.Weather;
-import miles.diary.data.model.google.PlaceResponse;
 import miles.diary.data.model.realm.Entry;
 import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.data.rx.ActivitySubscriber;
@@ -54,17 +48,16 @@ import miles.diary.ui.widget.CircleImageView;
 import miles.diary.ui.widget.TypefaceButton;
 import miles.diary.ui.widget.TypefaceEditText;
 import miles.diary.util.AnimUtils;
-import miles.diary.util.Logg;
 import miles.diary.util.ViewUtils;
-import rx.Observable;
-import rx.functions.Func1;
 
 public class NewEntryActivity extends BaseActivity implements View.OnClickListener {
 
     @Inject
     Repository repository;
     @Inject
-    GoogleApiClient.Builder googleApiClientBuilder;
+    Google google;
+    @Inject
+    Weather weather;
 
     @Bind(R.id.fragment_entry_toolbar) Toolbar toolbar;
     @Bind(R.id.activity_new_entry_body) TypefaceEditText bodyInput;
@@ -86,8 +79,6 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     private String temperature;
     private Uri imageUri;
     private WeatherResponse weatherResponse;
-    private Google google;
-    private Weather weather;
     private Location location;
 
     @Override
@@ -109,20 +100,18 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
 
         ViewUtils.mutate(locationName, ContextCompat.getColor(this, R.color.accent));
 
-        weather = new Weather(this);
-
-        google = new Google(this, googleApiClientBuilder,
-                new Google.GoogleServiceCallback() {
-                    @Override
-                    public void onConnected(Bundle bundle) {
-                        getLocationData();
-                    }
-                });
+        google.setActivity(this);
+        google.connect(new Google.GoogleCallback() {
+            @Override
+            public void onConnected(Bundle bundle) {
+                getLocationData();
+            }
+        });
     }
 
     @Override
     public void inject(DiaryApplication diaryApplication) {
-        diaryApplication.getContextComponent().inject(this);
+        diaryApplication.getApplicationComponent().inject(this);
     }
 
     @Override
@@ -297,21 +286,6 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                             setLocationText(placeName);
                         }
                     });
-
-//            google.searchNearby(location1, 3)
-//                    .subscribe(new ActivitySubscriber<PlaceResponse>(this) {
-//                        @Override
-//                        public void onNext(PlaceResponse placeResponse) {
-//                            pulse.end();
-//
-//                            PlaceResponse.PlaceResult result =
-//                                    placeResponse.getResults().get(0);
-//                            placeName = result.getName();
-//                            placeId = result.getId();
-//
-//                            setLocationText(placeName);
-//                        }
-//                    });
         } else {
             setLocationText(placeName);
         }

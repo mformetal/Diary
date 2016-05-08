@@ -2,8 +2,6 @@ package miles.diary.ui.activity;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
-import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -12,7 +10,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,7 +27,6 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import io.realm.Case;
-import io.realm.RealmObject;
 import io.realm.RealmResults;
 import io.realm.Sort;
 import miles.diary.DiaryApplication;
@@ -39,7 +35,6 @@ import miles.diary.data.adapter.EntryAdapter;
 import miles.diary.data.api.Repository;
 import miles.diary.data.model.realm.Entry;
 import miles.diary.data.rx.ActivitySubscriber;
-import miles.diary.data.rx.DataTransaction;
 import miles.diary.ui.PreDrawer;
 import miles.diary.ui.TintingSearchListener;
 import miles.diary.ui.transition.FabContainerTransition;
@@ -118,7 +113,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
 
     @Override
     public void inject(DiaryApplication diaryApplication) {
-        diaryApplication.getContextComponent().inject(this);
+        diaryApplication.getApplicationComponent().inject(this);
     }
 
     @Override

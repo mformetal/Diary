@@ -19,8 +19,8 @@ public class DataStore {
 
     private final static String SHARED_PREFS_KEY = "prefs";
 
-    public DataStore(Application application) {
-        preferences = application.getSharedPreferences(SHARED_PREFS_KEY, Context.MODE_PRIVATE);
+    public DataStore(Context context) {
+        preferences = context.getSharedPreferences(SHARED_PREFS_KEY, Context.MODE_PRIVATE);
     }
 
     private SharedPreferences.Editor getEditor() {

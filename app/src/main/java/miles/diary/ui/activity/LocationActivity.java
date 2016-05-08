@@ -39,7 +39,7 @@ import miles.diary.util.Logg;
 /**
  * Created by mbpeele on 2/6/16.
  */
-public class LocationActivity extends TransitionActivity implements View.OnClickListener {
+public class LocationActivity extends TransitionActivity implements View.OnClickListener, Google.GoogleCallback {
 
     private final static int REQUEST_LOCATION_PERMISSION = 1;
     private final static int REQUEST_PLACE_PICKER = 2;
@@ -74,24 +74,7 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
                 }
 
                 google.setActivity(this);
-                google.connect(new Google.GoogleCallback() {
-                    @Override
-                    public void onConnected(Bundle bundle) {
-                        final AutoCompleteAdapter autoCompleteAdapter = google.getAutoCompleteAdapter();
-                        autoCompleteTextView.setAdapter(autoCompleteAdapter);
-
-                        autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                final AutoCompleteItem item = autoCompleteAdapter.getItem(position);
-                                placeId = item.placeId;
-                                placeName = item.primaryText;
-                            }
-                        });
-
-                        getPlace();
-                    }
-                });
+                google.connect(this);
             } else {
                 noInternet();
             }
@@ -103,6 +86,35 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
     @Override
     public void inject(DiaryApplication diaryApplication) {
         diaryApplication.getApplicationComponent().inject(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        google.connect(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        google.disconnect();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        final AutoCompleteAdapter autoCompleteAdapter = google.getAutoCompleteAdapter();
+        autoCompleteTextView.setAdapter(autoCompleteAdapter);
+
+        autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                final AutoCompleteItem item = autoCompleteAdapter.getItem(position);
+                placeId = item.placeId;
+                placeName = item.primaryText;
+            }
+        });
+
+        getPlace();
     }
 
     @Override

@@ -62,6 +62,18 @@ public class PlacePhotosActivity extends BaseActivity implements Google.GoogleCa
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        google.connect(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        google.disconnect();
+    }
+
+    @Override
     protected void onDestroy() {
         placePhotosAdapter.release();
         super.onDestroy();

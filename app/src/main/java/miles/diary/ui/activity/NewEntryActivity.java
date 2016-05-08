@@ -117,10 +117,14 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     @Override
     protected void onResume() {
         super.onResume();
-        if (location == null
-                && LocationUtils.isLocationEnabled(this)
-                 && hasPermissions(Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.ACCESS_FINE_LOCATION)) {
+        if (location == null && LocationUtils.isLocationEnabled(this)
+                && hasPermissions(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            google.connect(new Google.GoogleCallback() {
+                @Override
+                public void onConnected(Bundle bundle) {
+                    getLocationData();
+                }
+            });
             google.getLocation()
                     .subscribe(new ActivitySubscriber<Location>(this) {
                         @Override
@@ -131,6 +135,12 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                         }
                     });
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        google.disconnect();
     }
 
     @Override

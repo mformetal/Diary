@@ -88,13 +88,6 @@ public class ApplicationModule {
     @Provides
     @Singleton
     Google provideGoogle() {
-        return new Google(getGoogleBuilder(provideApplication()));
-    }
-
-    private GoogleApiClient.Builder getGoogleBuilder(Context context) {
-        return new GoogleApiClient.Builder(context)
-                .addApi(Places.GEO_DATA_API)
-                .addApi(Places.PLACE_DETECTION_API)
-                .addApi(LocationServices.API);
+        return new Google(provideApplication());
     }
 }

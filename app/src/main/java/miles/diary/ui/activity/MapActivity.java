@@ -34,9 +34,6 @@ import miles.diary.ui.fragment.DismissingDialogFragment;
  */
 public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
-    @Inject
-    Repository repository;
-
     @Bind(R.id.activity_map_toolbar)
     Toolbar toolbar;
 

@@ -49,9 +49,6 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
     @Bind(R.id.activity_location_autocomplete) TypefaceAutoCompleteTextView autoCompleteTextView;
     @Bind(R.id.activity_location_image) ImageView mapIcon;
 
-    @Inject
-    Google google;
-
     @State String placeName;
     @State String placeId;
 

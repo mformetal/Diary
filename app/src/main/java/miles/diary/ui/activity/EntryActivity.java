@@ -71,9 +71,6 @@ public class EntryActivity extends TransitionActivity {
         DELETE
     }
 
-    @Inject
-    Repository repository;
-
     @Bind(R.id.activity_entry_place_photos)
     FloatingActionButton photosFab;
     @Bind(R.id.activity_entry_toolbar)

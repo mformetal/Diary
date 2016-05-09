@@ -53,13 +53,6 @@ import miles.diary.util.ViewUtils;
 
 public class NewEntryActivity extends BaseActivity implements View.OnClickListener, Google.GoogleCallback {
 
-    @Inject
-    Repository repository;
-    @Inject
-    Google google;
-    @Inject
-    Weather weather;
-
     @Bind(R.id.fragment_entry_toolbar) Toolbar toolbar;
     @Bind(R.id.activity_new_entry_body) TypefaceEditText bodyInput;
     @Bind(R.id.activity_new_entry_photo) CircleImageView photo;

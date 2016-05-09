@@ -72,15 +72,12 @@ abstract class BaseRealmAdapter<T extends RealmObject, VH extends RecyclerView.V
 
     @Override
     public void setData(List<T> collection, boolean shouldAnimate) {
-//        if (shouldAnimate) {
-//            animateTo(collection);
-//        } else {
-//            clear();
-//            addAll(collection);
-//        }
-
-        clear();
-        addAll(collection);
+        if (shouldAnimate) {
+            animateTo(collection);
+        } else {
+            clear();
+            addAll(collection);
+        }
     }
 
     @Override

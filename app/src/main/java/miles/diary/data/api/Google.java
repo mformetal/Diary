@@ -116,9 +116,10 @@ public class Google extends SimpleLifecycleCallbacks implements GoogleApiClient.
     public void connect(GoogleCallback googleCallback) {
         if (this.googleCallback != googleCallback) {
             this.googleCallback = googleCallback;
-            if (!client.isConnected() || !client.isConnecting()) {
-                client.connect();
-            }
+        }
+
+        if (!client.isConnected() || !client.isConnecting()) {
+            client.connect();
         }
     }
 

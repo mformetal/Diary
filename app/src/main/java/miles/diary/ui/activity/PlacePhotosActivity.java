@@ -34,9 +34,6 @@ public class PlacePhotosActivity extends BaseActivity implements Google.GoogleCa
     @Bind(R.id.activity_place_photos_pager)
     ViewPager pager;
 
-    @Inject
-    Google google;
-
     private PlacePhotosAdapter placePhotosAdapter;
     @State String id;
 

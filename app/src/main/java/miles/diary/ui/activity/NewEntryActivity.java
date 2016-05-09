@@ -49,6 +49,7 @@ import miles.diary.ui.widget.CircleImageView;
 import miles.diary.ui.widget.TypefaceButton;
 import miles.diary.ui.widget.TypefaceEditText;
 import miles.diary.util.AnimUtils;
+import miles.diary.util.Logg;
 import miles.diary.util.ViewUtils;
 
 public class NewEntryActivity extends BaseActivity implements View.OnClickListener, Google.GoogleCallback {
@@ -106,9 +107,6 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     protected void onResume() {
         super.onResume();
         google.connect(this);
-        if (location == null) {
-            getLocationData();
-        }
     }
 
     @Override
@@ -316,15 +314,17 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
         if (hasPermissions(permissions)) {
             if (hasConnection()) {
                 if (LocationUtils.isLocationEnabled(this)) {
-                    google.getLocation()
-                            .subscribe(new ActivitySubscriber<Location>(this) {
-                                @Override
-                                public void onNext(Location location1) {
-                                    location = location1;
-                                    getWeather(location);
-                                    getPlace(location);
-                                }
-                            });
+                    if (location == null) {
+                        google.getLocation()
+                                .subscribe(new ActivitySubscriber<Location>(this) {
+                                    @Override
+                                    public void onNext(Location location1) {
+                                        location = location1;
+                                        getWeather(location);
+                                        getPlace(location);
+                                    }
+                                });
+                    }
                 } else {
                     Snackbar.make(root,
                             R.string.location_not_enabled,

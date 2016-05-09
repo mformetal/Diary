@@ -33,6 +33,7 @@ import miles.diary.data.model.realm.Entry;
 import miles.diary.data.model.realm.Search;
 import miles.diary.data.model.realm.Sorter;
 import miles.diary.data.rx.ActivitySubscriber;
+import miles.diary.data.rx.DataLoadingSubscriber;
 import miles.diary.ui.PreDrawer;
 import miles.diary.ui.TintingSearchListener;
 import miles.diary.ui.transition.FabContainerTransition;
@@ -43,7 +44,7 @@ import miles.diary.util.DataLoadingListener;
 import miles.diary.util.Logg;
 import rx.functions.Func1;
 
-public class HomeActivity extends BaseActivity implements DataLoadingListener {
+public class HomeActivity extends BaseActivity implements DataLoadingListener<List<Entry>> {
 
     @Bind(R.id.activity_home_recycler) RecyclerView recyclerView;
     @Bind(R.id.activity_home_toolbar) Toolbar toolbar;
@@ -106,6 +107,11 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
     @Override
     public void onBackPressed() {
         if (searchWidget.interceptBackButton()) {
+            return;
+        }
+
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
             return;
         }
 
@@ -201,6 +207,15 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
     }
 
     @Override
+    public void onLoadData(List<Entry> entries) {
+        if (entries.isEmpty()) {
+            onLoadEmpty();
+        } else {
+            entryAdapter.addAll(entries);
+        }
+    }
+
+    @Override
     public void onLoadStart() {
         showLoading();
     }
@@ -288,30 +303,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
                     }
                 })
                 .first()
-                .subscribe(new ActivitySubscriber<List<Entry>>(this) {
-                    @Override
-                    public void onNext(List<Entry> entries) {
-                        entryAdapter.addAll(entries);
-                        if (entries.isEmpty()) {
-                            onLoadEmpty();
-                        }
-                    }
-
-                    @Override
-                    public void onStart() {
-                        onLoadStart();
-                    }
-
-                    @Override
-                    public void onCompleted() {
-                        onLoadComplete();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        onLoadError(e);
-                    }
-                });
+                .subscribe(new DataLoadingSubscriber<List<Entry>>(this));
     }
 
     private void runEnterAnimation() {

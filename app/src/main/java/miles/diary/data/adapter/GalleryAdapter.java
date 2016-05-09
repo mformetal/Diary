@@ -54,11 +54,6 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
         inflater = LayoutInflater.from(activity);
     }
 
-    public void setCursor(final Cursor cursor1) {
-        cursor = cursor1;
-        notifyDataSetChanged();
-    }
-
     @Override
     public GalleryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new GalleryViewHolder(inflater.inflate(R.layout.adapter_gallery_layout, parent, false));
@@ -72,6 +67,11 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
     @Override
     public int getItemCount() {
         return cursor != null ? cursor.getCount() : 0;
+    }
+
+    public void setCursor(final Cursor cursor1) {
+        cursor = cursor1;
+        notifyDataSetChanged();
     }
 
     class GalleryViewHolder extends BindingViewHolder<Integer> {

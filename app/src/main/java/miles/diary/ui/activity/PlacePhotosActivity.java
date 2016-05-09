@@ -76,7 +76,9 @@ public class PlacePhotosActivity extends BaseActivity implements Google.GoogleCa
 
     @Override
     protected void onDestroy() {
-        placePhotosAdapter.release();
+        if (placePhotosAdapter != null) {
+            placePhotosAdapter.release();
+        }
         super.onDestroy();
     }
 

@@ -79,12 +79,49 @@ public class Google implements GoogleApiClient.ConnectionCallbacks,
                 .build();
     }
 
+    @Override
+    public void onConnected(Bundle bundle) {
+        if (checkActivity()) {
+            if (googleCallback != null) {
+                googleCallback.onConnected(bundle);
+            }
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        if (checkActivity()) {
+            if (connectionResult.hasResolution()) {
+                try {
+                    connectionResult.startResolutionForResult(getActivity(), 5);
+                } catch (IntentSender.SendIntentException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                Logg.log("CONNECTION FAILED WITH CODE: " + connectionResult.getErrorCode());
+            }
+        }
+    }
+
     public void setActivity(BaseActivity activity) {
         this.activity = new WeakReference<>(activity);
     }
 
     public void connect(GoogleCallback googleCallback) {
-        this.googleCallback = googleCallback;
+        if (this.googleCallback != googleCallback) {
+            this.googleCallback = googleCallback;
+            if (!client.isConnected() || !client.isConnecting()) {
+                client.connect();
+            }
+        }
+    }
+
+    public void connect() {
         if (!client.isConnected() || !client.isConnecting()) {
             client.connect();
         }
@@ -143,7 +180,7 @@ public class Google implements GoogleApiClient.ConnectionCallbacks,
 
     @SuppressWarnings({"ResourceType"})
     public Observable<Location> getLocation() {
-        if (checkActivity()) {
+        if (!checkActivity()) {
             return Observable.empty();
         }
 
@@ -219,40 +256,11 @@ public class Google implements GoogleApiClient.ConnectionCallbacks,
 
     private boolean checkActivity() {
         BaseActivity activity = getActivity();
-        return activity != null && !activity.isFinishing();
+        return activity != null;
     }
 
     private BaseActivity getActivity() {
         return activity.get();
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-        if (checkActivity()) {
-            if (googleCallback != null) {
-                googleCallback.onConnected(bundle);
-            }
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        if (checkActivity()) {
-            if (connectionResult.hasResolution()) {
-                try {
-                    connectionResult.startResolutionForResult(getActivity(), 5);
-                } catch (IntentSender.SendIntentException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                Logg.log("CONNECTION FAILED WITH CODE: " + connectionResult.getErrorCode());
-            }
-        }
     }
 
     public interface GoogleCallback {

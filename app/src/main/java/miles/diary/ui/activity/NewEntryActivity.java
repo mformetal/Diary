@@ -49,9 +49,12 @@ import miles.diary.ui.widget.CircleImageView;
 import miles.diary.ui.widget.TypefaceButton;
 import miles.diary.ui.widget.TypefaceEditText;
 import miles.diary.util.AnimUtils;
+import miles.diary.util.Logg;
 import miles.diary.util.ViewUtils;
+import rx.Observable;
+import rx.functions.Func1;
 
-public class NewEntryActivity extends BaseActivity implements View.OnClickListener {
+public class NewEntryActivity extends BaseActivity implements View.OnClickListener, Google.GoogleCallback {
 
     @Inject
     Repository repository;
@@ -79,8 +82,8 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     @State String placeId;
     @State String temperature;
     @State Uri imageUri;
-    @State WeatherResponse weatherResponse;
     @State Location location;
+    private WeatherResponse weatherResponse;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -102,12 +105,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
         ViewUtils.mutate(locationName, ContextCompat.getColor(this, R.color.accent));
 
         google.setActivity(this);
-        google.connect(new Google.GoogleCallback() {
-            @Override
-            public void onConnected(Bundle bundle) {
-                getLocationData();
-            }
-        });
+        google.connect(this);
     }
 
     @Override
@@ -116,9 +114,14 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     }
 
     @Override
+    public void onConnected(Bundle bundle) {
+        getLocationData();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
-        google.connect(null);
+        google.connect(this);
         if (location == null) {
             getLocationData();
         }

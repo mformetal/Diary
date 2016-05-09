@@ -76,7 +76,10 @@ public class SearchWidget extends TypefaceEditText {
 
     public boolean interceptBackButton() {
         if (getVisibility() == View.VISIBLE) {
-            setText("");
+            if (!getTextAsString().isEmpty()) {
+                setText("");
+            }
+
             toggle(new int[] { getWidth(), 0 });
             return true;
         }

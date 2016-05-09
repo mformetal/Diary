@@ -18,12 +18,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import butterknife.Bind;
-import miles.diary.DiaryApplication;
 import miles.diary.R;
-import miles.diary.data.api.Repository;
 import miles.diary.data.model.realm.Entry;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.ui.fragment.ConfirmationDialog;
@@ -93,7 +89,7 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
         for (Entry entry: entries) {
-            if (entry.hasLocation()) {
+            if (entry.hasLatLng()) {
                 hasLocation = true;
 
                 builder.include(entry.getPosition());

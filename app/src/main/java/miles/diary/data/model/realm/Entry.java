@@ -14,7 +14,6 @@ import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
 import miles.diary.ui.activity.NewEntryActivity;
-import miles.diary.util.Logg;
 
 public class Entry extends RealmObject implements RealmModel<Entry>, ClusterItem {
 
@@ -64,7 +63,7 @@ public class Entry extends RealmObject implements RealmModel<Entry>, ClusterItem
 
     @Override
     public LatLng getPosition() {
-        if (hasLocation()) {
+        if (hasLatLng()) {
             return new LatLng(latitude, longitude);
         } else {
             throw new NullPointerException("Attempt to get the LatLng of an Entry that does not " +
@@ -103,7 +102,7 @@ public class Entry extends RealmObject implements RealmModel<Entry>, ClusterItem
         return uri != null;
     }
 
-    public boolean hasLocation() {
+    public boolean hasLatLng() {
         return latitude != null && longitude != null;
     }
 

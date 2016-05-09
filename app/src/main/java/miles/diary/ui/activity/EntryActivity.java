@@ -112,7 +112,6 @@ public class EntryActivity extends TransitionActivity {
     @Override
     public void onBackPressed() {
         if (dataChanged) {
-            Logg.log("DATA CHANGED");
             setResultAction(Action.EDIT);
         } else {
             super.onBackPressed();

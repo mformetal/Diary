@@ -24,22 +24,18 @@ import android.view.animation.Interpolator;
 import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import butterknife.Bind;
 import butterknife.OnClick;
 import icepick.State;
-import miles.diary.DiaryApplication;
 import miles.diary.R;
-import miles.diary.data.api.Repository;
 import miles.diary.data.model.google.CopiedPlace;
 import miles.diary.util.LocationUtils;
 import miles.diary.data.api.Google;
-import miles.diary.data.api.Weather;
 import miles.diary.data.model.realm.Entry;
 import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.data.rx.ActivitySubscriber;
@@ -49,7 +45,6 @@ import miles.diary.ui.widget.CircleImageView;
 import miles.diary.ui.widget.TypefaceButton;
 import miles.diary.ui.widget.TypefaceEditText;
 import miles.diary.util.AnimUtils;
-import miles.diary.util.Logg;
 import miles.diary.util.ViewUtils;
 
 public class NewEntryActivity extends BaseActivity implements View.OnClickListener, Google.GoogleCallback {
@@ -89,6 +84,17 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
         if (bundle != null) {
             long id =  bundle.getLong(EntryActivity.INTENT_KEY, -1L);
             if (id != -1L) {
+                Entry entry = repository.get(Entry.class, id);
+                placeName = entry.getPlaceName();
+                placeId = entry.getPlaceId();
+                temperature = entry.getWeather();
+                imageUri = Uri.parse(entry.getUri());
+                if (entry.hasLatLng()) {
+                    location = new Location("GPS");
+                    LatLng latLng = entry.getPosition();
+                    location.setLatitude(latLng.latitude);
+                    location.setLongitude(latLng.longitude);
+                }
                 updateViews(repository.get(Entry.class, id));
             }
         }
@@ -324,6 +330,8 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                                         getPlace(location);
                                     }
                                 });
+                    } else {
+                        setLocationText(placeName);
                     }
                 } else {
                     Snackbar.make(root,

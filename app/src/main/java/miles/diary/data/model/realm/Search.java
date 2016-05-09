@@ -17,7 +17,7 @@ public class Search {
     private Search(SearchBuilder searchBuilder) {
         constraint = searchBuilder.constraint;
         casing = searchBuilder.casing;
-        useOr = searchBuilder.usOr;
+        useOr = searchBuilder.useOr;
         fieldNames = searchBuilder.fieldNames;
         sorter = new Sorter(searchBuilder.sortKeys, searchBuilder.sortOrders);
     }
@@ -38,7 +38,7 @@ public class Search {
 
         private String constraint = "";
         private Case casing = Case.INSENSITIVE;
-        private boolean usOr = true;
+        private boolean useOr = true;
         private String[] fieldNames = new String[0];
         private String[] sortKeys = new String[0];
         private Sort[] sortOrders = new Sort[0];
@@ -53,8 +53,8 @@ public class Search {
             return this;
         }
 
-        public SearchBuilder setUsOr(boolean usOr) {
-            this.usOr = usOr;
+        public SearchBuilder setUseOr(boolean usOr) {
+            this.useOr = usOr;
             return this;
         }
 

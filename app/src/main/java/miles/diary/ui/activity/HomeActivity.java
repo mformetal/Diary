@@ -243,7 +243,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener<Li
         color = ColorsUtils.modifyAlpha(color, .7f);
         final Search search = Search.builder()
                 .setCasing(Case.INSENSITIVE)
-                .setUsOr(true)
+                .setUseOr(true)
                 .setFieldNames("body", "placeName")
                 .setSortKeys("dateMillis")
                 .setSortOrders(Sort.DESCENDING)
@@ -267,7 +267,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener<Li
                 super.onSearchTextChanged(text);
                 search.constraint = text;
 
-                repository.searchFieldnames(Entry.class, search)
+                repository.search(Entry.class, search)
                         .debounce(150, TimeUnit.MILLISECONDS)
                         .subscribe(new ActivitySubscriber<List<Entry>>(HomeActivity.this) {
                             @Override
@@ -293,16 +293,9 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener<Li
     }
 
     private void fetchData() {
-        repository.exposeSearch(Entry.class)
-                .findAllSortedAsync("dateMillis", Sort.DESCENDING)
-                .asObservable()
-                .filter(new Func1<RealmResults<Entry>, Boolean>() {
-                    @Override
-                    public Boolean call(RealmResults<Entry> ts) {
-                        return repository.isDataValid(ts);
-                    }
-                })
-                .first()
+        Sorter sorter = new Sorter(new String[] {"dateMillis"}, new Sort[] {Sort.DESCENDING});
+
+        repository.getAllSorted(Entry.class, sorter)
                 .subscribe(new DataLoadingSubscriber<List<Entry>>(this));
     }
 

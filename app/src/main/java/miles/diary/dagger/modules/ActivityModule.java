@@ -5,6 +5,7 @@ import android.app.Activity;
 import dagger.Module;
 import dagger.Provides;
 import miles.diary.dagger.ActivityScope;
+import miles.diary.ui.activity.BaseActivity;
 
 /**
  * Created by mbpeele on 5/8/16.
@@ -12,15 +13,15 @@ import miles.diary.dagger.ActivityScope;
 @Module
 public class ActivityModule {
 
-    private final Activity activity;
+    private final BaseActivity activity;
 
-    public ActivityModule(Activity activity) {
+    public ActivityModule(BaseActivity activity) {
         this.activity = activity;
     }
 
     @Provides
     @ActivityScope
-    Activity activity() {
+    BaseActivity activity() {
         return activity;
     }
 

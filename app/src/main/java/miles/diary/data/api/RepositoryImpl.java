@@ -11,9 +11,8 @@ import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
-import miles.diary.R;
-import miles.diary.data.error.NoInternetException;
 import miles.diary.data.error.NoRealmObjectKeyException;
+import miles.diary.data.error.RealmClosedException;
 import miles.diary.data.model.realm.RealmModel;
 import miles.diary.data.model.realm.Search;
 import miles.diary.data.model.realm.Sorter;
@@ -47,6 +46,14 @@ public class RepositoryImpl implements Repository {
     public <T extends RealmObject> Observable<List<T>> getAll(Class<T> tClass) {
         return exposeSearch(tClass)
                 .findAllAsync()
+                .asObservable()
+                .compose(this.<T>applyTransformer());
+    }
+
+    @Override
+    public <T extends RealmObject> Observable<List<T>> getAllSorted(Class<T> tClass, Sorter sorter) {
+        return exposeSearch(tClass)
+                .findAllSortedAsync(sorter.keys, sorter.sorts)
                 .asObservable()
                 .compose(this.<T>applyTransformer());
     }
@@ -95,7 +102,7 @@ public class RepositoryImpl implements Repository {
         if (hasConnection()) {
             return DataObservable.upload(object, realm);
         } else {
-            return Observable.error(new NoInternetException());
+            return Observable.error(new RealmClosedException());
         }
     }
 
@@ -104,7 +111,7 @@ public class RepositoryImpl implements Repository {
         if (hasConnection()) {
             return DataObservable.upload(dataTransaction, realm);
         } else {
-            return Observable.error(new NoInternetException());
+            return Observable.error(new RealmClosedException());
         }
     }
 
@@ -113,23 +120,12 @@ public class RepositoryImpl implements Repository {
         if (hasConnection()) {
             return DataObservable.delete(object, realm);
         } else {
-            return Single.error(new NoInternetException());
+            return Single.error(new RealmClosedException());
         }
     }
 
     @Override
-    public <T extends RealmObject> RealmQuery<T> exposeSearch(Class<T> tClass) {
-        return realm.where(tClass);
-    }
-
-    @Override
-    public <T extends RealmObject> Observable<List<T>> searchFieldnames(Class<T> tClass, Search search) {
-        Throwable throwable = search.validate();
-
-        if (throwable != null) {
-            return Observable.error(throwable);
-        }
-
+    public <T extends RealmObject> Observable<List<T>> search(Class<T> tClass, Search search) {
         RealmQuery<T> query = exposeSearch(tClass);
 
         query.beginGroup();
@@ -164,7 +160,7 @@ public class RepositoryImpl implements Repository {
         if (hasConnection()) {
             return DataObservable.update(transaction, realm);
         } else {
-            return Observable.error(new NoInternetException());
+            return Observable.error(new RealmClosedException());
         }
     }
 
@@ -181,6 +177,10 @@ public class RepositoryImpl implements Repository {
     @Override
     public boolean hasConnection() {
         return !realm.isClosed();
+    }
+
+    private  <T extends RealmObject> RealmQuery<T> exposeSearch(Class<T> tClass) {
+        return realm.where(tClass);
     }
 
     private <C extends RealmObject> Observable.Transformer<RealmResults<C>, List<C>> applyTransformer() {

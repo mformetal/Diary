@@ -5,6 +5,7 @@ import android.app.Activity;
 import dagger.Component;
 import miles.diary.dagger.ActivityScope;
 import miles.diary.dagger.modules.ActivityModule;
+import miles.diary.ui.activity.BaseActivity;
 
 /**
  * Created by mbpeele on 5/8/16.
@@ -13,5 +14,5 @@ import miles.diary.dagger.modules.ActivityModule;
 @Component(dependencies = ApplicationComponent.class, modules = ActivityModule.class)
 public interface ActivityComponent {
 
-    Activity activity();
+    BaseActivity activity();
 }

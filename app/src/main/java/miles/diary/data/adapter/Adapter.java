@@ -10,11 +10,9 @@ import io.realm.RealmObject;
  */
 interface Adapter<T> {
 
-    boolean animateContentsChanging();
-
     List<T> getData();
 
-    void setData(List<T> collection);
+    void setData(List<T> collection, boolean shouldAnimate);
 
     T getObject(int item);
 

@@ -9,7 +9,6 @@ import java.util.List;
 
 import io.realm.RealmObject;
 import miles.diary.ui.activity.BaseActivity;
-import miles.diary.util.Logg;
 
 /**
  * Created by mbpeele on 2/3/16.
@@ -72,13 +71,16 @@ abstract class BaseRealmAdapter<T extends RealmObject, VH extends RecyclerView.V
     public List<T> getData() { return data; }
 
     @Override
-    public void setData(List<T> collection) {
-        if (animateContentsChanging()) {
-            animateTo(collection);
-        } else {
-            clear();
-            addAll(collection);
-        }
+    public void setData(List<T> collection, boolean shouldAnimate) {
+//        if (shouldAnimate) {
+//            animateTo(collection);
+//        } else {
+//            clear();
+//            addAll(collection);
+//        }
+
+        clear();
+        addAll(collection);
     }
 
     @Override

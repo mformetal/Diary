@@ -44,7 +44,7 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    Storage provideDataStore() {
+    Storage provideStorage() {
         return new StorageImpl(provideApplication());
     }
 

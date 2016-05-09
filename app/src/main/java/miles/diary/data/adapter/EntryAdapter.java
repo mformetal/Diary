@@ -77,11 +77,6 @@ public class EntryAdapter extends BaseRealmAdapter<Entry, RecyclerView.ViewHolde
         }
     }
 
-    @Override
-    public boolean animateContentsChanging() {
-        return true;
-    }
-
     public void addAndSort(Entry entry) {
         List<Entry> entries = getData();
         if (entries.isEmpty()) {

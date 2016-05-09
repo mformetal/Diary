@@ -23,7 +23,7 @@ public interface ApplicationComponent {
 
     Google google();
 
-    Storage datastore();
+    Storage storage();
 
     void inject(BaseActivity activity);
 

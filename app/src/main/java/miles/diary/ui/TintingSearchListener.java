@@ -86,7 +86,7 @@ public abstract class TintingSearchListener implements SearchWidget.SearchListen
 
     @Override
     public void onSearchDismiss(int[] position) {
-        if (tintView.isInLayout()) {
+        if (tintView.isAttachedToWindow() && tintView.isInLayout()) {
             root.bringChildToFront(tintView);
 
             float radius = (float) Math.sqrt(Math.pow(root.getHeight(), 2) + Math.pow(root.getWidth(), 2));
@@ -108,6 +108,16 @@ public abstract class TintingSearchListener implements SearchWidget.SearchListen
             animatorSet.play(revealAnimator).with(alpha);
             animatorSet.setInterpolator(interpolator);
             animatorSet.start();
+        } else {
+            ObjectAnimator alpha = ObjectAnimator.ofFloat(tintView, View.ALPHA, 1f, 0f);
+            alpha.setDuration(AnimUtils.longAnim(root.getContext()));
+            alpha.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    root.removeView(tintView);
+                }
+            });
+            alpha.start();
         }
     }
 

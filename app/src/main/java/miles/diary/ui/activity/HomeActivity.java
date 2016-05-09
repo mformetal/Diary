@@ -30,6 +30,8 @@ import io.realm.Sort;
 import miles.diary.R;
 import miles.diary.data.adapter.EntryAdapter;
 import miles.diary.data.model.realm.Entry;
+import miles.diary.data.model.realm.Search;
+import miles.diary.data.model.realm.Sorter;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.ui.PreDrawer;
 import miles.diary.ui.TintingSearchListener;
@@ -224,6 +226,14 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
     private void addSearchListener() {
         int color = ContextCompat.getColor(this, R.color.window_background);
         color = ColorsUtils.modifyAlpha(color, .7f);
+        final Search search = Search.builder()
+                .setCasing(Case.INSENSITIVE)
+                .setUsOr(true)
+                .setFieldNames("body", "placeName")
+                .setSortKeys("dateMillis")
+                .setSortOrders(Sort.DESCENDING)
+                .createRealmSearch();
+
         SearchWidget.SearchListener searchListener = new TintingSearchListener(root, color) {
             @Override
             public void onSearchShow(int[] position) {
@@ -238,15 +248,17 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
             }
 
             @Override
-            public void onSearchTextChanged(String text) {
+            public void onSearchTextChanged(final String text) {
                 super.onSearchTextChanged(text);
-                repository.searchFieldnames(Entry.class, text, Case.INSENSITIVE, true, "body", "placeName")
+                search.constraint = text;
+
+                repository.searchFieldnames(Entry.class, search)
                         .debounce(150, TimeUnit.MILLISECONDS)
                         .subscribe(new ActivitySubscriber<List<Entry>>(HomeActivity.this) {
                             @Override
                             public void onNext(List<Entry> entries) {
                                 root.bringChildToFront(recyclerView);
-                                entryAdapter.setData(entries);
+                                entryAdapter.setData(entries, true);
 
                                 scrollToTop();
                             }

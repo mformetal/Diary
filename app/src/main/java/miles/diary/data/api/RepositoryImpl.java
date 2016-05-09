@@ -1,7 +1,5 @@
 package miles.diary.data.api;
 
-import android.app.Application;
-
 import com.google.common.collect.ImmutableList;
 
 import java.lang.reflect.Field;
@@ -9,7 +7,6 @@ import java.util.List;
 
 import javax.inject.Singleton;
 
-import io.realm.Case;
 import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.RealmQuery;
@@ -17,9 +14,10 @@ import io.realm.RealmResults;
 import miles.diary.data.error.NoInternetException;
 import miles.diary.data.error.NoRealmObjectKeyException;
 import miles.diary.data.model.realm.RealmModel;
+import miles.diary.data.model.realm.Search;
+import miles.diary.data.model.realm.Sorter;
 import miles.diary.data.rx.DataObservable;
 import miles.diary.data.rx.DataTransaction;
-import miles.diary.util.Logg;
 import rx.Observable;
 import rx.Single;
 import rx.functions.Func1;
@@ -136,40 +134,59 @@ public class RepositoryImpl implements Repository {
     }
 
     @Override
-    public <T extends RealmObject> Observable<List<T>> searchFieldnames(Class<T> tClass, String constraint,
-                                                                        Case casing, boolean useOr,
-                                                                        String... fieldNames) {
-        if (fieldNames.length == 0) {
-            throw new IllegalArgumentException("Must give some fieldNames as varargs searchFieldNames param");
+    public <T extends RealmObject> Observable<List<T>> searchFieldnames(Class<T> tClass, Search search) {
+        Throwable throwable = search.validate();
+
+        if (throwable != null) {
+            return Observable.error(throwable);
         }
 
         RealmQuery<T> query = exposeSearch(tClass);
 
         query.beginGroup();
-        for (String fieldName: fieldNames) {
-            query.contains(fieldName, constraint, casing);
+        for (String fieldName : search.fieldNames) {
+            query.contains(fieldName, search.constraint, search.casing);
 
-            if (useOr) {
+            if (search.useOr) {
                 query.or();
             }
         }
         query.endGroup();
 
-        return query.findAllAsync()
-                .asObservable()
-                .filter(new Func1<RealmResults<T>, Boolean>() {
-                    @Override
-                    public Boolean call(RealmResults<T> ts) {
-                        return isDataValid(ts);
-                    }
-                })
-                .map(new Func1<RealmResults<T>, List<T>>() {
-                    @Override
-                    public List<T> call(RealmResults<T> ts) {
-                        return ImmutableList.copyOf(ts);
-                    }
-                })
-                .first();
+        Sorter sorter = search.sorter;
+        if (sorter.hasInformation()) {
+            return query.findAllSortedAsync(sorter.keys, sorter.sorts)
+                    .asObservable()
+                    .filter(new Func1<RealmResults<T>, Boolean>() {
+                        @Override
+                        public Boolean call(RealmResults<T> ts) {
+                            return isDataValid(ts);
+                        }
+                    })
+                    .map(new Func1<RealmResults<T>, List<T>>() {
+                        @Override
+                        public List<T> call(RealmResults<T> ts) {
+                            return ImmutableList.copyOf(ts);
+                        }
+                    })
+                    .first();
+        } else {
+            return query.findAllAsync()
+                    .asObservable()
+                    .filter(new Func1<RealmResults<T>, Boolean>() {
+                        @Override
+                        public Boolean call(RealmResults<T> ts) {
+                            return isDataValid(ts);
+                        }
+                    })
+                    .map(new Func1<RealmResults<T>, List<T>>() {
+                        @Override
+                        public List<T> call(RealmResults<T> ts) {
+                            return ImmutableList.copyOf(ts);
+                        }
+                    })
+                    .first();
+        }
     }
 
     @Override

@@ -54,11 +54,6 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
     }
 
     @Override
-    public void inject(DiaryApplication diaryApplication) {
-        diaryApplication.getApplicationComponent().inject(this);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish();

@@ -80,11 +80,6 @@ public class GalleryActivity extends BaseActivity implements LoaderManager.Loade
     }
 
     @Override
-    public void inject(DiaryApplication diaryApplication) {
-
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_gallery, menu);
         return super.onCreateOptionsMenu(menu);

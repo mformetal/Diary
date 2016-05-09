@@ -105,11 +105,6 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     }
 
     @Override
-    public void inject(DiaryApplication diaryApplication) {
-        diaryApplication.getApplicationComponent().inject(this);
-    }
-
-    @Override
     public void onConnected(Bundle bundle) {
         getLocationData();
     }

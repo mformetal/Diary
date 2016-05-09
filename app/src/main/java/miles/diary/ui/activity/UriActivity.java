@@ -27,6 +27,7 @@ import miles.diary.ui.transition.SimpleTransitionListener;
 import miles.diary.util.FileUtils;
 import miles.diary.util.Logg;
 import miles.diary.util.UriType;
+import miles.diary.util.ViewUtils;
 
 /**
  * Created by mbpeele on 3/7/16.
@@ -55,17 +56,12 @@ public class UriActivity extends BaseActivity {
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        new ZoomController(imageView);
+        ViewUtils.setZoomControls(imageView);
 
         Intent intent = getIntent();
 
         uri = intent.getData();
         load();
-    }
-
-    @Override
-    public void inject(DiaryApplication diaryApplication) {
-        diaryApplication.getApplicationComponent().inject(this);
     }
 
     @Override

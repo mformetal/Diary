@@ -23,16 +23,12 @@ import android.widget.Toolbar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
-
 import butterknife.Bind;
 import io.realm.Case;
 import io.realm.RealmResults;
 import io.realm.Sort;
-import miles.diary.DiaryApplication;
 import miles.diary.R;
 import miles.diary.data.adapter.EntryAdapter;
-import miles.diary.data.api.Repository;
 import miles.diary.data.model.realm.Entry;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.ui.PreDrawer;
@@ -42,16 +38,10 @@ import miles.diary.ui.widget.SearchWidget;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.ColorsUtils;
 import miles.diary.util.DataLoadingListener;
-import miles.diary.util.DataStore;
 import miles.diary.util.Logg;
 import rx.functions.Func1;
 
 public class HomeActivity extends BaseActivity implements DataLoadingListener {
-
-    @Inject
-    DataStore datastore;
-    @Inject
-    Repository repository;
 
     @Bind(R.id.activity_home_recycler) RecyclerView recyclerView;
     @Bind(R.id.activity_home_toolbar) Toolbar toolbar;
@@ -89,9 +79,9 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
 
         addNavigationViewClickListener();
 
-        if (datastore.isFirstTimeUser()) {
+        if (storage.getBoolean("firstTime", true)) {
             drawerLayout.openDrawer(GravityCompat.START);
-            datastore.setFirstTimeUser(false);
+            storage.setBoolean("firstTime", false);
         }
 
         fetchData();
@@ -109,11 +99,6 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
         });
 
         addSearchListener();
-    }
-
-    @Override
-    public void inject(DiaryApplication diaryApplication) {
-        diaryApplication.getApplicationComponent().inject(this);
     }
 
     @Override

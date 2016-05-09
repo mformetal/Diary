@@ -57,11 +57,6 @@ public class PlacePhotosActivity extends BaseActivity implements Google.GoogleCa
     }
 
     @Override
-    public void inject(DiaryApplication diaryApplication) {
-        diaryApplication.getApplicationComponent().inject(this);
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
         google.connect(this);

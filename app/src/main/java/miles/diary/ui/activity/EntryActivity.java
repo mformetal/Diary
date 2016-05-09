@@ -113,11 +113,6 @@ public class EntryActivity extends TransitionActivity {
     }
 
     @Override
-    public void inject(DiaryApplication diaryApplication) {
-        diaryApplication.getApplicationComponent().inject(this);
-    }
-
-    @Override
     public void onBackPressed() {
         if (dataChanged) {
             Logg.log("DATA CHANGED");
@@ -220,7 +215,7 @@ public class EntryActivity extends TransitionActivity {
                 @Override
                 public void onTransitionEnd(Transition transition) {
                     AnimUtils.visible(toolbar).start();
-                    new ZoomController(image);
+                    ViewUtils.setZoomControls(image);
                 }
             });
 

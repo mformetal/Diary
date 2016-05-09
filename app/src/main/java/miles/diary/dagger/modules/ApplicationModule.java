@@ -1,25 +1,16 @@
 package miles.diary.dagger.modules;
 
-import android.app.Activity;
-import android.content.Context;
-import android.os.Bundle;
-
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.Places;
-
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import icepick.Icepick;
 import miles.diary.DiaryApplication;
 import miles.diary.data.api.Google;
 import miles.diary.data.api.Repository;
 import miles.diary.data.api.RepositoryImpl;
 import miles.diary.data.api.Weather;
-import miles.diary.util.DataStore;
-import miles.diary.util.SimpleLifecycleCallbacks;
+import miles.diary.util.StorageImpl;
+import miles.diary.util.Storage;
 
 /**
  * Created by mbpeele on 5/8/16.
@@ -28,35 +19,9 @@ import miles.diary.util.SimpleLifecycleCallbacks;
 public class ApplicationModule {
 
     private final DiaryApplication application;
-    private Repository repository;
 
     public ApplicationModule(DiaryApplication application) {
         this.application = application;
-        application.registerActivityLifecycleCallbacks(new SimpleLifecycleCallbacks() {
-            @Override
-            public void onActivityResumed(Activity activity) {
-                super.onActivityResumed(activity);
-                repository.open();
-            }
-
-            @Override
-            public void onActivityPaused(Activity activity) {
-                super.onActivityPaused(activity);
-                repository.close();
-            }
-
-            @Override
-            public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-                super.onActivityCreated(activity, savedInstanceState);
-                Icepick.restoreInstanceState(activity, savedInstanceState);
-            }
-
-            @Override
-            public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-                super.onActivitySaveInstanceState(activity, outState);
-                Icepick.saveInstanceState(activity, outState);
-            }
-        });
     }
 
     @Provides
@@ -68,9 +33,7 @@ public class ApplicationModule {
     @Provides
     @Singleton
     Repository provideRepository() {
-        repository = new RepositoryImpl();
-        repository.open();
-        return repository;
+        return new RepositoryImpl();
     }
 
     @Provides
@@ -81,8 +44,8 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    DataStore provideDataStore() {
-        return new DataStore(provideApplication());
+    Storage provideDataStore() {
+        return new StorageImpl(provideApplication());
     }
 
     @Provides

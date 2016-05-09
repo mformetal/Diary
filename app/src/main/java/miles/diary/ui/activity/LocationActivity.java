@@ -84,11 +84,6 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
     }
 
     @Override
-    public void inject(DiaryApplication diaryApplication) {
-        diaryApplication.getApplicationComponent().inject(this);
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
         google.connect(this);

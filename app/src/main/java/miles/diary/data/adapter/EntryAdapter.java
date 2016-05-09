@@ -59,9 +59,9 @@ public class EntryAdapter extends BaseRealmAdapter<Entry, RecyclerView.ViewHolde
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         switch (viewType) {
             case TYPE_IMAGE:
-                return new ImageViewHolder(layoutInflater.inflate(R.layout.adapter_entry_image, parent, false));
+                return new ImageViewHolder(getLayoutInflater().inflate(R.layout.adapter_entry_image, parent, false));
             case TYPE_TEXT:
-                return new TextViewHolder(layoutInflater.inflate(R.layout.adapter_entry_text, parent, false));
+                return new TextViewHolder(getLayoutInflater().inflate(R.layout.adapter_entry_text, parent, false));
         }
         return null;
     }
@@ -139,11 +139,11 @@ public class EntryAdapter extends BaseRealmAdapter<Entry, RecyclerView.ViewHolde
             ((View) body.getParent()).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = EntryActivity.newIntent(host, entry);
+                    Intent intent = EntryActivity.newIntent(getHost(), entry);
                     ActivityOptions options =
-                            ActivityOptions.makeSceneTransitionAnimation(host,
-                                    body, host.getString(R.string.transition_entry_text));
-                    host.startActivityForResult(intent, HomeActivity.RESULT_CODE_ENTRY, options.toBundle());
+                            ActivityOptions.makeSceneTransitionAnimation(getHost(),
+                                    body, getHost().getString(R.string.transition_entry_text));
+                    getHost().startActivityForResult(intent, HomeActivity.RESULT_CODE_ENTRY, options.toBundle());
                 }
             });
 
@@ -187,11 +187,11 @@ public class EntryAdapter extends BaseRealmAdapter<Entry, RecyclerView.ViewHolde
             image.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = EntryActivity.newIntent(host, entry);
+                    Intent intent = EntryActivity.newIntent(getHost(), entry);
                     ActivityOptions options =
-                            ActivityOptions.makeSceneTransitionAnimation(host,
-                                   image, host.getString(R.string.transition_entry_image));
-                    host.startActivityForResult(intent, HomeActivity.RESULT_CODE_ENTRY, options.toBundle());
+                            ActivityOptions.makeSceneTransitionAnimation(getHost(),
+                                   image, getHost().getString(R.string.transition_entry_image));
+                    getHost().startActivityForResult(intent, HomeActivity.RESULT_CODE_ENTRY, options.toBundle());
                 }
             });
             time.setText(TextUtils.formatDate(entry.getDate()));
@@ -210,7 +210,7 @@ public class EntryAdapter extends BaseRealmAdapter<Entry, RecyclerView.ViewHolde
                 location.setVisibility(View.GONE);
             }
 
-            Glide.with(host)
+            Glide.with(getHost())
                     .fromString()
                     .load(entry.getUri())
                     .animate(AnimUtils.REVEAL)

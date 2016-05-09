@@ -17,9 +17,9 @@ import miles.diary.util.Logg;
 abstract class BaseRealmAdapter<T extends RealmObject, VH extends RecyclerView.ViewHolder>
         extends RecyclerView.Adapter<VH> implements Adapter<T> {
 
-    protected final List<T> data;
-    protected final BaseActivity host;
-    protected final LayoutInflater layoutInflater;
+    private final List<T> data;
+    private final BaseActivity host;
+    private final LayoutInflater layoutInflater;
 
     public BaseRealmAdapter(BaseActivity activity) {
         host = activity;
@@ -108,6 +108,14 @@ abstract class BaseRealmAdapter<T extends RealmObject, VH extends RecyclerView.V
     public void clear() {
         data.clear();
         notifyDataSetChanged();
+    }
+
+    public LayoutInflater getLayoutInflater() {
+        return layoutInflater;
+    }
+
+    public BaseActivity getHost() {
+        return host;
     }
 
     private void animateTo(List<T> newData) {

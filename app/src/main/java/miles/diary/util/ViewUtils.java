@@ -106,6 +106,10 @@ public class ViewUtils {
         return statusBarSize;
     }
 
+    public static void setZoomControls(ImageView imageView) {
+
+    }
+
     public static float displayHeight(Context context) {
         Point point = new Point();
         ((Activity) context).getWindow().getWindowManager().getDefaultDisplay().getRealSize(point);

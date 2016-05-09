@@ -1,7 +1,5 @@
 package miles.diary.dagger.components;
 
-import android.content.Context;
-
 import javax.inject.Singleton;
 
 import dagger.Component;
@@ -11,13 +9,7 @@ import miles.diary.data.api.Google;
 import miles.diary.data.api.Repository;
 import miles.diary.data.api.Weather;
 import miles.diary.ui.activity.BaseActivity;
-import miles.diary.ui.activity.EntryActivity;
-import miles.diary.ui.activity.HomeActivity;
-import miles.diary.ui.activity.LocationActivity;
-import miles.diary.ui.activity.MapActivity;
-import miles.diary.ui.activity.NewEntryActivity;
-import miles.diary.ui.activity.PlacePhotosActivity;
-import miles.diary.ui.activity.UriActivity;
+import miles.diary.util.Storage;
 
 @Singleton
 @Component(modules = ApplicationModule.class)
@@ -31,18 +23,8 @@ public interface ApplicationComponent {
 
     Google google();
 
-    void inject(HomeActivity activity);
+    Storage datastore();
 
-    void inject(MapActivity activity);
-
-    void inject(EntryActivity activity);
-
-    void inject(LocationActivity locationActivity);
-
-    void inject(NewEntryActivity newEntryActivity);
-
-    void inject(PlacePhotosActivity activity);
-
-    void inject(UriActivity activity);
+    void inject(BaseActivity activity);
 
 }

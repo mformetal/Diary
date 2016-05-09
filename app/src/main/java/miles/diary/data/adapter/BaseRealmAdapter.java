@@ -9,6 +9,7 @@ import java.util.List;
 
 import io.realm.RealmObject;
 import miles.diary.ui.activity.BaseActivity;
+import miles.diary.util.Logg;
 
 /**
  * Created by mbpeele on 2/3/16.
@@ -71,6 +72,16 @@ abstract class BaseRealmAdapter<T extends RealmObject, VH extends RecyclerView.V
     public List<T> getData() { return data; }
 
     @Override
+    public void setData(List<T> collection) {
+        if (animateContentsChanging()) {
+            animateTo(collection);
+        } else {
+            clear();
+            addAll(collection);
+        }
+    }
+
+    @Override
     public void removeObject(int position) {
         data.remove(position);
         notifyItemRemoved(position);
@@ -78,12 +89,14 @@ abstract class BaseRealmAdapter<T extends RealmObject, VH extends RecyclerView.V
 
     @Override
     public boolean removeObject(T realmObject) {
-        boolean removal =  data.remove(realmObject);
-        if (removal) {
-            notifyDataSetChanged();
+        if (data.contains(realmObject)) {
+            int index = data.indexOf(realmObject);
+            data.remove(realmObject);
+            notifyItemRemoved(index);
+            return true;
+        } else {
+            return false;
         }
-
-        return removal;
     }
 
     @Override
@@ -95,5 +108,43 @@ abstract class BaseRealmAdapter<T extends RealmObject, VH extends RecyclerView.V
     public void clear() {
         data.clear();
         notifyDataSetChanged();
+    }
+
+    private void animateTo(List<T> newData) {
+        applyAndAnimateRemovals(newData);
+        applyAndAnimateAdditions(newData);
+        applyAndAnimateMovedItems(newData);
+    }
+
+    private void applyAndAnimateRemovals(List<T> newData) {
+        for (int i = data.size() - 1; i >= 0; i--) {
+            final T model = data.get(i);
+            if (!newData.contains(model)) {
+                data.remove(model);
+                notifyItemRemoved(i);
+            }
+        }
+    }
+
+    private void applyAndAnimateAdditions(List<T> newData) {
+        for (int i = 0; i < newData.size(); i++) {
+            final T model = newData.get(i);
+            if (!data.contains(model)) {
+                data.add(i, model);
+                notifyItemInserted(i);
+            }
+        }
+    }
+
+    private void applyAndAnimateMovedItems(List<T> newData) {
+        for (int toPosition = newData.size() - 1; toPosition >= 0; toPosition--) {
+            final T model = newData.get(toPosition);
+            final int fromPosition = data.indexOf(model);
+            if (fromPosition >= 0 && fromPosition != toPosition) {
+                data.remove(fromPosition);
+                data.add(toPosition, model);
+                notifyItemMoved(fromPosition, toPosition);
+            }
+        }
     }
 }

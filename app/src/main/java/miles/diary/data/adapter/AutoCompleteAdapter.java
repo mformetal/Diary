@@ -84,8 +84,6 @@ public class AutoCompleteAdapter extends ArrayAdapter<AutoCompleteItem> implemen
 
         final Status status = autocompletePredictions.getStatus();
         if (!status.isSuccess()) {
-            Logg.log("Error contacting API: " + status.toString());
-            Logg.log("STATUS CODE: " + status.getStatusCode());
             autocompletePredictions.release();
             return null;
         }

@@ -75,7 +75,6 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
                 }
 
                 google.setActivity(this);
-                google.connect(this);
             } else {
                 noInternet();
             }
@@ -183,7 +182,7 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
                     setReturnData();
                     finishAfterTransition();
                 } else {
-                    Snackbar.make(root, R.string.activity_location_no_input,
+                    Snackbar.make(root, R.string.location_no_input_prompt,
                             Snackbar.LENGTH_SHORT).show();
                 }
                 break;

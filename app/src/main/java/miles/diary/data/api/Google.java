@@ -38,6 +38,7 @@ import miles.diary.data.rx.OkHttpObservable;
 import miles.diary.ui.activity.BaseActivity;
 import miles.diary.util.LocationUtils;
 import miles.diary.util.Logg;
+import miles.diary.util.SimpleLifecycleCallbacks;
 import miles.diary.util.SimpleLocationListener;
 import miles.diary.util.URLFormatter;
 import okhttp3.OkHttpClient;
@@ -52,14 +53,14 @@ import rx.schedulers.Schedulers;
  * Created by mbpeele on 2/21/16.
  */
 @Singleton
-public class Google implements GoogleApiClient.ConnectionCallbacks,
+public class Google extends SimpleLifecycleCallbacks implements GoogleApiClient.ConnectionCallbacks,
     GoogleApiClient.OnConnectionFailedListener {
 
     private final GoogleApiClient client;
+    private final OkHttpClient okHttpClient;
+    private final Gson gson;
     private WeakReference<BaseActivity> activity;
     private GoogleCallback googleCallback;
-    private OkHttpClient okHttpClient;
-    private Gson gson;
 
     public Google(Context context) {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();

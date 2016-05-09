@@ -156,11 +156,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
                                 public void onNext(Entry entry) {
                                     entryAdapter.addAndSort(entry);
 
-                                    LinearLayoutManager linearLayoutManager =
-                                            (LinearLayoutManager) recyclerView.getLayoutManager();
-                                    if (linearLayoutManager.findFirstCompletelyVisibleItemPosition() == 0) {
-                                        linearLayoutManager.scrollToPosition(0);
-                                    }
+                                    scrollToTop();
 
                                     if (emptyView != null) {
                                         emptyView.setVisibility(View.GONE);
@@ -258,20 +254,30 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
 
             @Override
             public void onSearchTextChanged(String text) {
+                super.onSearchTextChanged(text);
                 repository.searchFieldnames(Entry.class, text, Case.INSENSITIVE, true, "body", "placeName")
                         .debounce(150, TimeUnit.MILLISECONDS)
                         .subscribe(new ActivitySubscriber<List<Entry>>(HomeActivity.this) {
                             @Override
                             public void onNext(List<Entry> entries) {
                                 root.bringChildToFront(recyclerView);
-                                entryAdapter.clear();
-                                entryAdapter.addAll(entries);
+                                entryAdapter.setData(entries);
+
+                                scrollToTop();
                             }
                         });
             }
         };
 
         searchWidget.addSearchListener(searchListener);
+    }
+
+    private void scrollToTop() {
+        LinearLayoutManager linearLayoutManager =
+                (LinearLayoutManager) recyclerView.getLayoutManager();
+        if (linearLayoutManager.findFirstCompletelyVisibleItemPosition() == 0) {
+            linearLayoutManager.scrollToPosition(0);
+        }
     }
 
     private void fetchData() {

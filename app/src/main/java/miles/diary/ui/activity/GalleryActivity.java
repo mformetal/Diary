@@ -17,7 +17,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toolbar;
 
 import java.io.File;
@@ -29,8 +28,9 @@ import miles.diary.DiaryApplication;
 import miles.diary.R;
 import miles.diary.data.adapter.GalleryAdapter;
 import miles.diary.ui.SpacingDecoration;
+import miles.diary.ui.fragment.ConfirmationDialog;
+import miles.diary.ui.fragment.DismissingDialogFragment;
 import miles.diary.util.FileUtils;
-import miles.diary.util.Logg;
 
 /**
  * Created by mbpeele on 1/29/16.
@@ -66,6 +66,16 @@ public class GalleryActivity extends BaseActivity implements LoaderManager.Loade
             } else {
                 setupGallery();
             }
+        } else {
+            ConfirmationDialog dialog =
+                    ConfirmationDialog.newInstance(getString(R.string.no_camera_error));
+            dialog.setDismissListener(new DismissingDialogFragment.OnDismissListener() {
+                @Override
+                public void onDismiss(DismissingDialogFragment fragment) {
+                    finish();
+                }
+            });
+            dialog.show(getFragmentManager(), CONFIRMATION_DIALOG);
         }
     }
 

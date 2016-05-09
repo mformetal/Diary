@@ -38,7 +38,7 @@ public class EntryAdapter extends BaseRealmAdapter<Entry, RecyclerView.ViewHolde
     private static final int TYPE_TEXT = 1;
     private static final int TYPE_VIDEO = 2;
 
-    private Gson gson;
+    private final Gson gson;
 
     public EntryAdapter(BaseActivity activity) {
         super(activity);
@@ -75,6 +75,11 @@ public class EntryAdapter extends BaseRealmAdapter<Entry, RecyclerView.ViewHolde
         } else if (holder instanceof ImageViewHolder) {
             ((ImageViewHolder) holder).bind(entry);
         }
+    }
+
+    @Override
+    public boolean animateContentsChanging() {
+        return true;
     }
 
     public void addAndSort(Entry entry) {

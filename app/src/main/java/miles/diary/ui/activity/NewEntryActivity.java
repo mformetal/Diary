@@ -49,10 +49,7 @@ import miles.diary.ui.widget.CircleImageView;
 import miles.diary.ui.widget.TypefaceButton;
 import miles.diary.ui.widget.TypefaceEditText;
 import miles.diary.util.AnimUtils;
-import miles.diary.util.Logg;
 import miles.diary.util.ViewUtils;
-import rx.Observable;
-import rx.functions.Func1;
 
 public class NewEntryActivity extends BaseActivity implements View.OnClickListener, Google.GoogleCallback {
 
@@ -105,7 +102,6 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
         ViewUtils.mutate(locationName, ContextCompat.getColor(this, R.color.accent));
 
         google.setActivity(this);
-        google.connect(this);
     }
 
     @Override
@@ -181,7 +177,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                     setResult(RESULT_OK, result);
                     finishAfterTransition();
                 } else {
-                    Snackbar.make(root, R.string.activity_new_entry_no_input_error,
+                    Snackbar.make(root, R.string.new_entry_no_input_error,
                             Snackbar.LENGTH_SHORT).show();
                 }
                 break;
@@ -343,7 +339,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                             });
                 } else {
                     Snackbar.make(root,
-                            R.string.activity_location_not_enabled,
+                            R.string.location_not_enabled,
                             Snackbar.LENGTH_LONG)
                             .setAction(android.R.string.ok, new View.OnClickListener() {
                                 @Override

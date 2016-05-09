@@ -85,7 +85,7 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
     public void onLoadEmpty() {
         ConfirmationDialog dialog =
-                ConfirmationDialog.newInstance(getString(R.string.activity_map_empty));
+                ConfirmationDialog.newInstance(getString(R.string.map_entries_empty));
         dialog.setDismissListener(new DismissingDialogFragment.OnDismissListener() {
             @Override
             public void onDismiss(DismissingDialogFragment fragment) {

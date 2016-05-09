@@ -54,7 +54,6 @@ public class PlacePhotosActivity extends BaseActivity implements Google.GoogleCa
         }
 
         google.setActivity(this);
-        google.connect(this);
     }
 
     @Override
@@ -112,7 +111,7 @@ public class PlacePhotosActivity extends BaseActivity implements Google.GoogleCa
 
     private void onErrorOrEmpty() {
         ConfirmationDialog dialog =
-                ConfirmationDialog.newInstance(getString(R.string.activity_place_photos_empty));
+                ConfirmationDialog.newInstance(getString(R.string.place_photos_empty));
         dialog.setDismissListener(new DismissingDialogFragment.OnDismissListener() {
             @Override
             public void onDismiss(DismissingDialogFragment fragment) {

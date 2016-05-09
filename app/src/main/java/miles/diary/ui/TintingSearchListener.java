@@ -86,26 +86,34 @@ public abstract class TintingSearchListener implements SearchWidget.SearchListen
 
     @Override
     public void onSearchDismiss(int[] position) {
-        root.bringChildToFront(tintView);
+        if (tintView.isInLayout()) {
+            root.bringChildToFront(tintView);
 
-        float radius = (float) Math.sqrt(Math.pow(root.getHeight(), 2) + Math.pow(root.getWidth(), 2));
-        Animator revealAnimator =
-                ViewAnimationUtils.createCircularReveal(tintView, position[0], position[1], radius, 0f);
-        revealAnimator.setDuration(AnimUtils.longAnim(root.getContext()));
-        revealAnimator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                root.removeView(tintView);
-            }
-        });
-        revealAnimator.setDuration(AnimUtils.longAnim(root.getContext()));
+            float radius = (float) Math.sqrt(Math.pow(root.getHeight(), 2) + Math.pow(root.getWidth(), 2));
+            Animator revealAnimator =
+                    ViewAnimationUtils.createCircularReveal(tintView, position[0], position[1], radius, 0f);
+            revealAnimator.setDuration(AnimUtils.longAnim(root.getContext()));
+            revealAnimator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    root.removeView(tintView);
+                }
+            });
+            revealAnimator.setDuration(AnimUtils.longAnim(root.getContext()));
 
-        ObjectAnimator alpha = ObjectAnimator.ofFloat(tintView, View.ALPHA, 1f, 0f);
-        alpha.setDuration(revealAnimator.getDuration());
+            ObjectAnimator alpha = ObjectAnimator.ofFloat(tintView, View.ALPHA, 1f, 0f);
+            alpha.setDuration(revealAnimator.getDuration());
 
-        AnimatorSet animatorSet = new AnimatorSet();
-        animatorSet.play(revealAnimator).with(alpha);
-        animatorSet.setInterpolator(interpolator);
-        animatorSet.start();
+            AnimatorSet animatorSet = new AnimatorSet();
+            animatorSet.play(revealAnimator).with(alpha);
+            animatorSet.setInterpolator(interpolator);
+            animatorSet.start();
+        }
+    }
+
+    @Override
+    public void onSearchTextChanged(String text) {
+        // remove the tintView, since it's currently on top of the searched items
+        root.removeView(tintView);
     }
 }

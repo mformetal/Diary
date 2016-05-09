@@ -1,5 +1,6 @@
 package miles.diary.util;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import android.provider.Settings;
 
 import java.util.List;
 
+import miles.diary.ui.activity.BaseActivity;
 import rx.Observable;
 import rx.Subscriber;
 

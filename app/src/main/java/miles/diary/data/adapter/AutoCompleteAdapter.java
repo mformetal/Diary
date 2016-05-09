@@ -25,9 +25,9 @@ import miles.diary.util.Logg;
 /**
  * Created by mbpeele on 3/2/16.
  */
-public class AutoCompleteAdapter extends ArrayAdapter<AutocompletePrediction> implements Filterable {
+public class AutoCompleteAdapter extends ArrayAdapter<AutoCompleteItem> implements Filterable {
 
-    private List<AutocompletePrediction> data;
+    private List<AutoCompleteItem> data;
     private final GoogleApiClient client;
     private final LatLngBounds bounds;
 
@@ -44,7 +44,7 @@ public class AutoCompleteAdapter extends ArrayAdapter<AutocompletePrediction> im
     }
 
     @Override
-    public AutocompletePrediction getItem(int position) {
+    public AutoCompleteItem getItem(int position) {
         return data.get(position);
     }
 
@@ -75,7 +75,7 @@ public class AutoCompleteAdapter extends ArrayAdapter<AutocompletePrediction> im
         };
     }
 
-    private List<AutocompletePrediction> getAutocomplete(CharSequence constraint) {
+    private List<AutoCompleteItem> getAutocomplete(CharSequence constraint) {
         PendingResult<AutocompletePredictionBuffer> results =
                 Places.GeoDataApi
                         .getAutocompletePredictions(client, constraint.toString(), bounds, null);
@@ -84,18 +84,16 @@ public class AutoCompleteAdapter extends ArrayAdapter<AutocompletePrediction> im
 
         final Status status = autocompletePredictions.getStatus();
         if (!status.isSuccess()) {
-            Logg.log("Error contacting API: " + status.toString());
-            Logg.log("STATUS CODE: " + status.getStatusCode());
             autocompletePredictions.release();
             return null;
         }
 
         Iterator<AutocompletePrediction> iterator = autocompletePredictions.iterator();
-        List<AutocompletePrediction> resultList = new ArrayList<>(autocompletePredictions.getCount());
+        List<AutoCompleteItem> resultList = new ArrayList<>(autocompletePredictions.getCount());
         while (iterator.hasNext()) {
             AutocompletePrediction prediction = iterator.next();
             prediction.freeze();
-            resultList.add(prediction);
+            resultList.add(new AutoCompleteItem(prediction));
         }
 
         autocompletePredictions.release();

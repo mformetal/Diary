@@ -13,12 +13,12 @@ import miles.diary.ui.activity.BaseActivity;
 /**
  * Created by mbpeele on 2/3/16.
  */
-public abstract class BaseRealmAdapter<T extends RealmObject, VH extends RecyclerView.ViewHolder>
+abstract class BaseRealmAdapter<T extends RealmObject, VH extends RecyclerView.ViewHolder>
         extends RecyclerView.Adapter<VH> implements Adapter<T> {
 
-    protected final List<T> data;
-    protected final BaseActivity host;
-    protected final LayoutInflater layoutInflater;
+    private final List<T> data;
+    private final BaseActivity host;
+    private final LayoutInflater layoutInflater;
 
     public BaseRealmAdapter(BaseActivity activity) {
         host = activity;
@@ -71,6 +71,16 @@ public abstract class BaseRealmAdapter<T extends RealmObject, VH extends Recycle
     public List<T> getData() { return data; }
 
     @Override
+    public void setData(List<T> collection, boolean shouldAnimate) {
+        if (shouldAnimate) {
+            animateTo(collection);
+        } else {
+            clear();
+            addAll(collection);
+        }
+    }
+
+    @Override
     public void removeObject(int position) {
         data.remove(position);
         notifyItemRemoved(position);
@@ -78,12 +88,14 @@ public abstract class BaseRealmAdapter<T extends RealmObject, VH extends Recycle
 
     @Override
     public boolean removeObject(T realmObject) {
-        boolean removal =  data.remove(realmObject);
-        if (removal) {
-            notifyDataSetChanged();
+        if (data.contains(realmObject)) {
+            int index = data.indexOf(realmObject);
+            data.remove(realmObject);
+            notifyItemRemoved(index);
+            return true;
+        } else {
+            return false;
         }
-
-        return removal;
     }
 
     @Override
@@ -95,5 +107,51 @@ public abstract class BaseRealmAdapter<T extends RealmObject, VH extends Recycle
     public void clear() {
         data.clear();
         notifyDataSetChanged();
+    }
+
+    public LayoutInflater getLayoutInflater() {
+        return layoutInflater;
+    }
+
+    public BaseActivity getHost() {
+        return host;
+    }
+
+    private void animateTo(List<T> newData) {
+        applyAndAnimateRemovals(newData);
+        applyAndAnimateAdditions(newData);
+        applyAndAnimateMovedItems(newData);
+    }
+
+    private void applyAndAnimateRemovals(List<T> newData) {
+        for (int i = data.size() - 1; i >= 0; i--) {
+            final T model = data.get(i);
+            if (!newData.contains(model)) {
+                data.remove(model);
+                notifyItemRemoved(i);
+            }
+        }
+    }
+
+    private void applyAndAnimateAdditions(List<T> newData) {
+        for (int i = 0; i < newData.size(); i++) {
+            final T model = newData.get(i);
+            if (!data.contains(model)) {
+                data.add(i, model);
+                notifyItemInserted(i);
+            }
+        }
+    }
+
+    private void applyAndAnimateMovedItems(List<T> newData) {
+        for (int toPosition = newData.size() - 1; toPosition >= 0; toPosition--) {
+            final T model = newData.get(toPosition);
+            final int fromPosition = data.indexOf(model);
+            if (fromPosition >= 0 && fromPosition != toPosition) {
+                data.remove(fromPosition);
+                data.add(toPosition, model);
+                notifyItemMoved(fromPosition, toPosition);
+            }
+        }
     }
 }

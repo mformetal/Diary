@@ -27,7 +27,7 @@
                     android:id="@+id/activity_home_search_widget"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/activity_home_search_widget_hint"
+                    android:hint="@string/search_widget_hint"
                     android:visibility="gone" />
 
             </Toolbar>

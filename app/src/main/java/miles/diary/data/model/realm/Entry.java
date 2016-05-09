@@ -33,13 +33,25 @@ public class Entry extends RealmObject implements RealmModel<Entry>, ClusterItem
     private Double latitude;
     private Double longitude;
 
+    /**
+     * Empty constructor for RealmObject.
+     * It is important that this contain nothing else but a call to super()
+     * Not doing so results in a NullPointerException due to the peculiarities of Realm.
+     */
     public Entry() {
         super();
-        date = new Date();
-        dateMillis = date.getTime();
+        // DON'T PUT ANYTHING HERE FOR THE LOVE OF ALL THAT IS HOLY
     }
 
+    /**
+     * To construct an Entry instance, use Entry#builder()
+     * to obtain an instance of the builder, and set the values of fields there.
+     * @param builder: Private builder constructor.
+     */
     private Entry(EntryBuilder builder) {
+        super();
+        setDate(new Date()); // Done here instead of builder to ensure that an Entry always has a Date
+
         body = builder.body;
         uri = builder.uri;
         placeName = builder.placeName;
@@ -51,7 +63,7 @@ public class Entry extends RealmObject implements RealmModel<Entry>, ClusterItem
 
     @Override
     public LatLng getPosition() {
-        if (hasLocation()) {
+        if (hasLatLng()) {
             return new LatLng(latitude, longitude);
         } else {
             throw new NullPointerException("Attempt to get the LatLng of an Entry that does not " +
@@ -77,11 +89,20 @@ public class Entry extends RealmObject implements RealmModel<Entry>, ClusterItem
         return dateMillis;
     }
 
+    public void setDate(Date date) {
+        this.date = date;
+        setDateMillis(date.getTime());
+    }
+
+    public void setDateMillis(long dateMillis) {
+        this.dateMillis = dateMillis;
+    }
+
     public boolean hasImageUri() {
         return uri != null;
     }
 
-    public boolean hasLocation() {
+    public boolean hasLatLng() {
         return latitude != null && longitude != null;
     }
 

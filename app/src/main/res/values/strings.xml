@@ -7,45 +7,31 @@
 
     <string name="error_no_internet">No internet connection found.</string>
 
-    <string name="activity_home_no_entries">No current diary entries. Click the button below to get started!</string>
-    <string name="activity_home_search_widget_hint">Search anything</string>
+    <string name="no_entries">No current diary entries. Click the button below to get started!</string>
+    <string name="search_widget_hint">Search anything</string>
 
-    <string name="activity_place_photos_empty">Couldn\'t find any photos of this place.</string>
+    <string name="place_photos_empty">Couldn\'t find any photos of this place.</string>
 
-    <string name="activity_location_text_hint">Type place or click above</string>
-    <string name="activity_location_no_input">Choose a place first!</string>
-    <string name="activity_location_not_enabled">Enable Location!</string>
+    <string name="location_input_hint">Type place or click above</string>
+    <string name="location_no_input_prompt">Choose a place first!</string>
+    <string name="location_not_enabled">Enable Location!</string>
 
-    <string name="activity_new_entry_speech_not_supported">Phone does not support speech-to-text</string>
-    <string name="activity_new_entry_speech_prompt">Speak your thoughts aloud</string>
-    <string name="activity_new_entry_location_hint">Add Location</string>
-    <string name="activity_new_entry_no_input_error">Your Entry must not be empty</string>
-    <string name="activity_new_entry_body_hint">Memorialize your thoughts</string>
+    <string name="new_entry_location_hint">Add Location</string>
+    <string name="new_entry_no_input_error">Your Entry must not be empty</string>
+    <string name="new_entry_body_hint">Memorialize your thoughts</string>
 
-    <string name="activity_gallery_no_camera_error">This device doesn\'t support Camera.</string>
+    <string name="no_camera_error">This device doesn\'t support Camera.</string>
 
-    <string name="activity_gallery_camera">Camera</string>
-    <string name="activity_gallery_video">Video</string>
+    <string name="map_entries_empty">No entries hoe</string>
 
-    <string name="activity_uri_crop">Crop</string>
-    <string name="activity_uri_text">Text</string>
-    <string name="activity_uri_scribble">Draw</string>
-
-    <string name="activity_map_empty">No entries hoe</string>
-
-    <string name="fragment_profile_name_hint">Enter your name here!</string>
-
-    <string name="menu_uri_confirm">DONE</string>
-
-    <string name="menu_new_entry_done">Add Entry</string>
-
-    <string name="menu_home_new_entry">New Entry</string>
-    <string name="menu_home_map">Map</string>
-    <string name="menu_home_calendar">Calendar</string>
-    <string name="menu_home_prompts">Ideas</string>
-
-    <string name="menu_entry_edit">Edit</string>
-    <string name="menu_entry_favorite">Favorite</string>
-    <string name="menu_entry_delete">Delete</string>
+    <string name="menu_new_entry_confirm">Add Entry</string>
+    <string name="menu_new_entry_prompt">New Entry</string>
+    <string name="menu_map">Map</string>
+    <string name="menu_calendar">Calendar</string>
+    <string name="menu_prompts">Ideas</string>
+    <string name="menu_edit">Edit</string>
+    <string name="menu_delete">Delete</string>
+    <string name="menu_camera">Camera</string>
+    <string name="menu_uri_confirm">Done</string>
 
 </resources>

@@ -1,23 +1,23 @@
 package miles.diary.data.api;
 
-import android.app.Application;
-
 import com.google.common.collect.ImmutableList;
 
 import java.lang.reflect.Field;
 import java.util.List;
 
-import io.realm.Case;
+import javax.inject.Singleton;
+
 import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
-import miles.diary.data.error.NoInternetException;
 import miles.diary.data.error.NoRealmObjectKeyException;
+import miles.diary.data.error.RealmClosedException;
 import miles.diary.data.model.realm.RealmModel;
+import miles.diary.data.model.realm.Search;
+import miles.diary.data.model.realm.Sorter;
 import miles.diary.data.rx.DataObservable;
 import miles.diary.data.rx.DataTransaction;
-import miles.diary.util.Logg;
 import rx.Observable;
 import rx.Single;
 import rx.functions.Func1;
@@ -25,6 +25,7 @@ import rx.functions.Func1;
 /**
  * Created by mbpeele on 3/2/16.
  */
+@Singleton
 public class RepositoryImpl implements Repository {
 
     private Realm realm;
@@ -46,19 +47,15 @@ public class RepositoryImpl implements Repository {
         return exposeSearch(tClass)
                 .findAllAsync()
                 .asObservable()
-                .filter(new Func1<RealmResults<T>, Boolean>() {
-                    @Override
-                    public Boolean call(RealmResults<T> ts) {
-                        return isDataValid(ts);
-                    }
-                })
-                .map(new Func1<RealmResults<T>, List<T>>() {
-                    @Override
-                    public List<T> call(RealmResults<T> ts) {
-                        return ImmutableList.copyOf(ts);
-                    }
-                })
-                .first();
+                .compose(this.<T>applyTransformer());
+    }
+
+    @Override
+    public <T extends RealmObject> Observable<List<T>> getAllSorted(Class<T> tClass, Sorter sorter) {
+        return exposeSearch(tClass)
+                .findAllSortedAsync(sorter.keys, sorter.sorts)
+                .asObservable()
+                .compose(this.<T>applyTransformer());
     }
 
     @Override
@@ -105,7 +102,7 @@ public class RepositoryImpl implements Repository {
         if (hasConnection()) {
             return DataObservable.upload(object, realm);
         } else {
-            return Observable.error(new NoInternetException());
+            return Observable.error(new RealmClosedException());
         }
     }
 
@@ -114,7 +111,7 @@ public class RepositoryImpl implements Repository {
         if (hasConnection()) {
             return DataObservable.upload(dataTransaction, realm);
         } else {
-            return Observable.error(new NoInternetException());
+            return Observable.error(new RealmClosedException());
         }
     }
 
@@ -123,50 +120,34 @@ public class RepositoryImpl implements Repository {
         if (hasConnection()) {
             return DataObservable.delete(object, realm);
         } else {
-            return Single.error(new NoInternetException());
+            return Single.error(new RealmClosedException());
         }
     }
 
     @Override
-    public <T extends RealmObject> RealmQuery<T> exposeSearch(Class<T> tClass) {
-        return realm.where(tClass);
-    }
-
-    @Override
-    public <T extends RealmObject> Observable<List<T>> searchFieldnames(Class<T> tClass, String constraint,
-                                                                        Case casing, boolean useOr,
-                                                                        String... fieldNames) {
-        if (fieldNames.length == 0) {
-            throw new IllegalArgumentException("Must give some fieldNames as varargs searchFieldNames param");
-        }
-
+    public <T extends RealmObject> Observable<List<T>> search(Class<T> tClass, Search search) {
         RealmQuery<T> query = exposeSearch(tClass);
 
         query.beginGroup();
-        for (String fieldName: fieldNames) {
-            query.contains(fieldName, constraint, casing);
+        for (String fieldName : search.fieldNames) {
+            query.contains(fieldName, search.constraint, search.casing);
 
-            if (useOr) {
+            if (search.useOr) {
                 query.or();
             }
         }
         query.endGroup();
 
-        return query.findAllAsync()
-                .asObservable()
-                .filter(new Func1<RealmResults<T>, Boolean>() {
-                    @Override
-                    public Boolean call(RealmResults<T> ts) {
-                        return isDataValid(ts);
-                    }
-                })
-                .map(new Func1<RealmResults<T>, List<T>>() {
-                    @Override
-                    public List<T> call(RealmResults<T> ts) {
-                        return ImmutableList.copyOf(ts);
-                    }
-                })
-                .first();
+        Sorter sorter = search.sorter;
+        if (sorter.hasInformation()) {
+            return query.findAllSortedAsync(sorter.keys, sorter.sorts)
+                    .asObservable()
+                    .compose(this.<T>applyTransformer());
+        } else {
+            return query.findAllAsync()
+                    .asObservable()
+                    .compose(this.<T>applyTransformer());
+        }
     }
 
     @Override
@@ -179,7 +160,7 @@ public class RepositoryImpl implements Repository {
         if (hasConnection()) {
             return DataObservable.update(transaction, realm);
         } else {
-            return Observable.error(new NoInternetException());
+            return Observable.error(new RealmClosedException());
         }
     }
 
@@ -196,5 +177,28 @@ public class RepositoryImpl implements Repository {
     @Override
     public boolean hasConnection() {
         return !realm.isClosed();
+    }
+
+    private  <T extends RealmObject> RealmQuery<T> exposeSearch(Class<T> tClass) {
+        return realm.where(tClass);
+    }
+
+    private <C extends RealmObject> Observable.Transformer<RealmResults<C>, List<C>> applyTransformer() {
+        return new Observable.Transformer<RealmResults<C>, List<C>>() {
+            @Override
+            public Observable<List<C>> call(Observable<RealmResults<C>> realmResultsObservable) {
+                return realmResultsObservable.filter(new Func1<RealmResults<C>, Boolean>() {
+                    @Override
+                    public Boolean call(RealmResults<C> cs) {
+                        return isDataValid(cs);
+                    }
+                }).map(new Func1<RealmResults<C>, List<C>>() {
+                    @Override
+                    public List<C> call(RealmResults<C> cs) {
+                        return ImmutableList.copyOf(cs);
+                    }
+                }).first();
+            }
+        };
     }
 }

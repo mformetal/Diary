@@ -4,6 +4,8 @@ import android.content.Context;
 
 import com.google.gson.Gson;
 
+import javax.inject.Singleton;
+
 import miles.diary.R;
 import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.data.rx.OkHttpObservable;
@@ -16,6 +18,7 @@ import rx.schedulers.Schedulers;
 /**
  * Created by mbpeele on 2/4/16.
  */
+@Singleton
 public class Weather {
 
     private OkHttpClient client;

@@ -1,14 +1,12 @@
 package miles.diary.data.api;
 
-import android.util.Pair;
-
 import java.util.List;
 
-import io.realm.Case;
 import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
-import miles.diary.data.model.realm.Profile;
+import miles.diary.data.model.realm.Search;
+import miles.diary.data.model.realm.Sorter;
 import miles.diary.data.rx.DataTransaction;
 import rx.Observable;
 import rx.Single;
@@ -24,6 +22,8 @@ public interface Repository {
 
     <T extends RealmObject> Observable<List<T>> getAll(Class<T> tClass);
 
+    <T extends RealmObject> Observable<List<T>> getAllSorted(Class<T> tClass, Sorter sorter);
+
     <T extends RealmObject> Observable<T> getObject(Class<T> tClass, long key);
 
     <T extends RealmObject> T get(Class<T> tClass, long key);
@@ -36,11 +36,7 @@ public interface Repository {
 
     <T extends RealmObject> Single<Void> deleteObject(T object);
 
-    <T extends RealmObject> RealmQuery<T> exposeSearch(Class<T> tClass);
-
-    <T extends RealmObject> Observable<List<T>> searchFieldnames(Class<T> tClass, String constraint,
-                                                                 Case casing, boolean useOr,
-                                                                 String... fieldNames);
+    <T extends RealmObject> Observable<List<T>> search(Class<T> tClass, Search search);
 
     void deleteAll();
 

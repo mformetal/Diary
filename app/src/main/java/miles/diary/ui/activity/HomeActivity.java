@@ -25,13 +25,12 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
 import io.realm.Case;
-import io.realm.RealmResults;
 import io.realm.Sort;
 import miles.diary.R;
 import miles.diary.data.adapter.EntryAdapter;
 import miles.diary.data.model.realm.Entry;
-import miles.diary.data.model.realm.Search;
-import miles.diary.data.model.realm.Sorter;
+import miles.diary.data.model.Search;
+import miles.diary.data.model.Sorter;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.data.rx.DataLoadingSubscriber;
 import miles.diary.ui.PreDrawer;
@@ -40,9 +39,8 @@ import miles.diary.ui.transition.FabContainerTransition;
 import miles.diary.ui.widget.SearchWidget;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.ColorsUtils;
-import miles.diary.util.DataLoadingListener;
+import miles.diary.data.DataLoadingListener;
 import miles.diary.util.Logg;
-import rx.functions.Func1;
 
 public class HomeActivity extends BaseActivity implements DataLoadingListener<List<Entry>> {
 
@@ -245,7 +243,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener<Li
                 .setCasing(Case.INSENSITIVE)
                 .setUseOr(true)
                 .setFieldNames("body", "placeName")
-                .setSortKeys("dateMillis")
+                .setSortKeys(Entry.KEY)
                 .setSortOrders(Sort.DESCENDING)
                 .createRealmSearch();
 
@@ -293,7 +291,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener<Li
     }
 
     private void fetchData() {
-        Sorter sorter = new Sorter(new String[] {"dateMillis"}, new Sort[] {Sort.DESCENDING});
+        Sorter sorter = new Sorter(new String[] {Entry.KEY}, new Sort[] {Sort.DESCENDING});
 
         repository.getAllSorted(Entry.class, sorter)
                 .subscribe(new DataLoadingSubscriber<List<Entry>>(this));

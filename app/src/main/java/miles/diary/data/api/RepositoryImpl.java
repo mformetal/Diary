@@ -14,8 +14,8 @@ import io.realm.RealmResults;
 import miles.diary.data.error.NoRealmObjectKeyException;
 import miles.diary.data.error.RealmClosedException;
 import miles.diary.data.model.realm.RealmModel;
-import miles.diary.data.model.realm.Search;
-import miles.diary.data.model.realm.Sorter;
+import miles.diary.data.model.Search;
+import miles.diary.data.model.Sorter;
 import miles.diary.data.rx.DataObservable;
 import miles.diary.data.rx.DataTransaction;
 import rx.Observable;
@@ -53,7 +53,7 @@ public class RepositoryImpl implements Repository {
     @Override
     public <T extends RealmObject> Observable<List<T>> getAllSorted(Class<T> tClass, Sorter sorter) {
         return exposeSearch(tClass)
-                .findAllSortedAsync(sorter.keys, sorter.sorts)
+                .findAllSortedAsync(sorter.fieldNames, sorter.sortOrders)
                 .asObservable()
                 .compose(this.<T>applyTransformer());
     }
@@ -140,7 +140,7 @@ public class RepositoryImpl implements Repository {
 
         Sorter sorter = search.sorter;
         if (sorter.hasInformation()) {
-            return query.findAllSortedAsync(sorter.keys, sorter.sorts)
+            return query.findAllSortedAsync(sorter.fieldNames, sorter.sortOrders)
                     .asObservable()
                     .compose(this.<T>applyTransformer());
         } else {

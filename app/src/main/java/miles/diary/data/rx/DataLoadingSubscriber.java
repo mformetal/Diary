@@ -1,6 +1,6 @@
 package miles.diary.data.rx;
 
-import miles.diary.util.DataLoadingListener;
+import miles.diary.data.DataLoadingListener;
 import rx.Subscriber;
 
 /**

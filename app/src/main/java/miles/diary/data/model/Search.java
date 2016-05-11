@@ -1,4 +1,4 @@
-package miles.diary.data.model.realm;
+package miles.diary.data.model;
 
 import io.realm.Case;
 import io.realm.Sort;
@@ -34,7 +34,7 @@ public class Search {
         return new SearchBuilder();
     }
 
-    public static class SearchBuilder {
+    public final static class SearchBuilder {
 
         private String constraint = "";
         private Case casing = Case.INSENSITIVE;

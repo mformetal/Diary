@@ -1,4 +1,4 @@
-package miles.diary.util;
+package miles.diary.data;
 
 /**
  * Created by mbpeele on 3/2/16.

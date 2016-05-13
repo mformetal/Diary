@@ -1,4 +1,4 @@
-package miles.diary.data.model;
+package miles.diary.data.model.realm;
 
 import java.util.LinkedList;
 import java.util.List;

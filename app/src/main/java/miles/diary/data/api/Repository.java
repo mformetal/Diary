@@ -4,8 +4,8 @@ import java.util.List;
 
 import io.realm.RealmObject;
 import io.realm.RealmResults;
-import miles.diary.data.model.Search;
-import miles.diary.data.model.Sorter;
+import miles.diary.data.model.realm.Search;
+import miles.diary.data.model.realm.Sorter;
 import miles.diary.data.rx.DataTransaction;
 import rx.Observable;
 import rx.Single;

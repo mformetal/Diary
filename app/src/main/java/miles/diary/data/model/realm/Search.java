@@ -1,4 +1,4 @@
-package miles.diary.data.model;
+package miles.diary.data.model.realm;
 
 import io.realm.Case;
 import io.realm.Sort;

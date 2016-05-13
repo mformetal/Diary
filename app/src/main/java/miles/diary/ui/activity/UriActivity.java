@@ -20,6 +20,7 @@ import butterknife.Bind;
 import icepick.State;
 import miles.diary.R;
 import miles.diary.ui.PaletteWindows;
+import miles.diary.ui.fragment.CameraFragment;
 import miles.diary.ui.transition.SimpleTransitionListener;
 import miles.diary.util.FileUtils;
 import miles.diary.util.Logg;

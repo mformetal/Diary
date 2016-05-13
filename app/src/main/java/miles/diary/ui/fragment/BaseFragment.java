@@ -28,12 +28,6 @@ public abstract class BaseFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        inject((DiaryApplication) context.getApplicationContext());
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                        Bundle savedInstanceState) {
         return inflater.inflate(getLayoutId(), container, false);
@@ -46,6 +40,4 @@ public abstract class BaseFragment extends Fragment {
     }
 
     protected abstract int getLayoutId();
-
-    public abstract void inject(DiaryApplication diaryApplication);
 }

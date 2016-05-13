@@ -10,7 +10,7 @@ public class DataLoadingSubscriber<T> extends Subscriber<T> {
 
     private DataLoadingListener<T> dataLoadingListener;
 
-    public DataLoadingSubscriber(DataLoadingListener dataLoadingListener) {
+    public DataLoadingSubscriber(DataLoadingListener<T> dataLoadingListener) {
         this.dataLoadingListener = dataLoadingListener;
     }
 

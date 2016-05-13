@@ -294,7 +294,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener<Li
         Sorter sorter = new Sorter(new String[] {Entry.KEY}, new Sort[] {Sort.DESCENDING});
 
         repository.getAllSorted(Entry.class, sorter)
-                .subscribe(new DataLoadingSubscriber<List<Entry>>(this));
+                .subscribe(new DataLoadingSubscriber<>(this));
     }
 
     private void runEnterAnimation() {

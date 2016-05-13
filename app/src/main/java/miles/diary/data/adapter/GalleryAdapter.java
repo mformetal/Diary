@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.CursorAdapter;
 import android.support.v7.widget.RecyclerView;
 import android.transition.Fade;
 import android.transition.Transition;
@@ -69,9 +70,11 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
         return cursor != null ? cursor.getCount() : 0;
     }
 
-    public void setCursor(final Cursor cursor1) {
-        cursor = cursor1;
-        notifyDataSetChanged();
+    public void setCursor(final Cursor cursor) {
+        if (cursor != null) {
+            this.cursor = cursor;
+            notifyDataSetChanged();
+        }
     }
 
     class GalleryViewHolder extends BindingViewHolder<Integer> {
@@ -98,9 +101,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
                 if (file.length() != 0) {
                     final Uri uri = Uri.fromFile(file);
 
-                    Glide.with(host)
-                            .load(uri)
-                            .into(imageView);
+                    loadImage(uri);
 
                     imageView.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -120,6 +121,13 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
                     });
                 }
             }
+        }
+
+        private void loadImage(Uri uri) {
+            Glide.with(host)
+                    .load(uri)
+                    .error(R.drawable.ic_error_24dp)
+                    .into(imageView);
         }
     }
 }

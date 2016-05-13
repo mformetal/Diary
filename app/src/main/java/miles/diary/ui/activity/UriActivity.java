@@ -18,11 +18,8 @@ import com.bumptech.glide.request.target.Target;
 
 import butterknife.Bind;
 import icepick.State;
-import miles.diary.DiaryApplication;
 import miles.diary.R;
 import miles.diary.ui.PaletteWindows;
-import miles.diary.ui.ZoomController;
-import miles.diary.ui.transition.ScalingImageTransition;
 import miles.diary.ui.transition.SimpleTransitionListener;
 import miles.diary.util.FileUtils;
 import miles.diary.util.Logg;
@@ -45,7 +42,6 @@ public class UriActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_uri);
-        setupTransitions();
 
         setActionBar(toolbar);
 
@@ -84,11 +80,6 @@ public class UriActivity extends BaseActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void setupTransitions() {
-        getWindow().setSharedElementEnterTransition(new ScalingImageTransition());
-        getWindow().setSharedElementReturnTransition(new ScalingImageTransition());
     }
 
     private void load() {

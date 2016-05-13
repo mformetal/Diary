@@ -1,6 +1,7 @@
 package miles.diary.ui.activity;
 
 import android.Manifest;
+import android.app.ActionBar;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -55,8 +56,11 @@ public class GalleryActivity extends BaseActivity implements LoaderManager.Loade
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
         setActionBar(toolbar);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setDisplayShowHomeEnabled(true);
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+        }
 
         if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
             String[] camera = new String[] {Manifest.permission.CAMERA,

@@ -1,4 +1,4 @@
-package miles.diary.ui;
+package miles.diary.util;
 
 import android.text.Editable;
 import android.text.TextWatcher;

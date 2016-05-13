@@ -18,12 +18,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import butterknife.Bind;
-import miles.diary.DiaryApplication;
 import miles.diary.R;
-import miles.diary.data.api.Repository;
 import miles.diary.data.model.realm.Entry;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.ui.fragment.ConfirmationDialog;
@@ -33,9 +29,6 @@ import miles.diary.ui.fragment.DismissingDialogFragment;
  * Created by mbpeele on 3/13/16.
  */
 public class MapActivity extends BaseActivity implements OnMapReadyCallback {
-
-    @Inject
-    Repository repository;
 
     @Bind(R.id.activity_map_toolbar)
     Toolbar toolbar;
@@ -51,11 +44,6 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.activity_map_fragment);
         mapFragment.getMapAsync(this);
-    }
-
-    @Override
-    public void inject(DiaryApplication diaryApplication) {
-        diaryApplication.getContextComponent().inject(this);
     }
 
     @Override
@@ -85,7 +73,7 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
     public void onLoadEmpty() {
         ConfirmationDialog dialog =
-                ConfirmationDialog.newInstance(getString(R.string.activity_map_empty));
+                ConfirmationDialog.newInstance(getString(R.string.map_entries_empty));
         dialog.setDismissListener(new DismissingDialogFragment.OnDismissListener() {
             @Override
             public void onDismiss(DismissingDialogFragment fragment) {
@@ -101,7 +89,7 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
         for (Entry entry: entries) {
-            if (entry.hasLocation()) {
+            if (entry.hasLatLng()) {
                 hasLocation = true;
 
                 builder.include(entry.getPosition());

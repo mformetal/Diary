@@ -1,11 +1,13 @@
-package miles.diary.util;
+package miles.diary.data;
 
 /**
  * Created by mbpeele on 3/2/16.
  */
-public interface DataLoadingListener {
+public interface DataLoadingListener<T> {
 
     void onLoadEmpty();
+
+    void onLoadData(T data);
 
     void onLoadComplete();
 

@@ -2,8 +2,6 @@ package miles.diary.ui.activity;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
-import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -12,7 +10,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,37 +23,26 @@ import android.widget.Toolbar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
-
 import butterknife.Bind;
 import io.realm.Case;
-import io.realm.RealmObject;
-import io.realm.RealmResults;
 import io.realm.Sort;
-import miles.diary.DiaryApplication;
 import miles.diary.R;
 import miles.diary.data.adapter.EntryAdapter;
-import miles.diary.data.api.Repository;
 import miles.diary.data.model.realm.Entry;
+import miles.diary.data.model.Search;
+import miles.diary.data.model.Sorter;
 import miles.diary.data.rx.ActivitySubscriber;
-import miles.diary.data.rx.DataTransaction;
+import miles.diary.data.rx.DataLoadingSubscriber;
 import miles.diary.ui.PreDrawer;
 import miles.diary.ui.TintingSearchListener;
 import miles.diary.ui.transition.FabContainerTransition;
 import miles.diary.ui.widget.SearchWidget;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.ColorsUtils;
-import miles.diary.util.DataLoadingListener;
-import miles.diary.util.DataStore;
+import miles.diary.data.DataLoadingListener;
 import miles.diary.util.Logg;
-import rx.functions.Func1;
 
-public class HomeActivity extends BaseActivity implements DataLoadingListener {
-
-    @Inject
-    DataStore datastore;
-    @Inject
-    Repository repository;
+public class HomeActivity extends BaseActivity implements DataLoadingListener<List<Entry>> {
 
     @Bind(R.id.activity_home_recycler) RecyclerView recyclerView;
     @Bind(R.id.activity_home_toolbar) Toolbar toolbar;
@@ -94,9 +80,9 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
 
         addNavigationViewClickListener();
 
-        if (datastore.isFirstTimeUser()) {
+        if (storage.getBoolean("firstTime", true)) {
             drawerLayout.openDrawer(GravityCompat.START);
-            datastore.setFirstTimeUser(false);
+            storage.setBoolean("firstTime", false);
         }
 
         fetchData();
@@ -117,13 +103,13 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
     }
 
     @Override
-    public void inject(DiaryApplication diaryApplication) {
-        diaryApplication.getContextComponent().inject(this);
-    }
-
-    @Override
     public void onBackPressed() {
         if (searchWidget.interceptBackButton()) {
+            return;
+        }
+
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
             return;
         }
 
@@ -161,11 +147,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
                                 public void onNext(Entry entry) {
                                     entryAdapter.addAndSort(entry);
 
-                                    LinearLayoutManager linearLayoutManager =
-                                            (LinearLayoutManager) recyclerView.getLayoutManager();
-                                    if (linearLayoutManager.findFirstCompletelyVisibleItemPosition() == 0) {
-                                        linearLayoutManager.scrollToPosition(0);
-                                    }
+                                    scrollToTop();
 
                                     if (emptyView != null) {
                                         emptyView.setVisibility(View.GONE);
@@ -223,6 +205,15 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
     }
 
     @Override
+    public void onLoadData(List<Entry> entries) {
+        if (entries.isEmpty()) {
+            onLoadEmpty();
+        } else {
+            entryAdapter.addAll(entries);
+        }
+    }
+
+    @Override
     public void onLoadStart() {
         showLoading();
     }
@@ -248,6 +239,14 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
     private void addSearchListener() {
         int color = ContextCompat.getColor(this, R.color.window_background);
         color = ColorsUtils.modifyAlpha(color, .7f);
+        final Search search = Search.builder()
+                .setCasing(Case.INSENSITIVE)
+                .setUseOr(true)
+                .setFieldNames("body", "placeName")
+                .setSortKeys(Entry.KEY)
+                .setSortOrders(Sort.DESCENDING)
+                .createRealmSearch();
+
         SearchWidget.SearchListener searchListener = new TintingSearchListener(root, color) {
             @Override
             public void onSearchShow(int[] position) {
@@ -262,15 +261,19 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
             }
 
             @Override
-            public void onSearchTextChanged(String text) {
-                repository.searchFieldnames(Entry.class, text, Case.INSENSITIVE, true, "body", "placeName")
+            public void onSearchTextChanged(final String text) {
+                super.onSearchTextChanged(text);
+                search.constraint = text;
+
+                repository.search(Entry.class, search)
                         .debounce(150, TimeUnit.MILLISECONDS)
                         .subscribe(new ActivitySubscriber<List<Entry>>(HomeActivity.this) {
                             @Override
                             public void onNext(List<Entry> entries) {
                                 root.bringChildToFront(recyclerView);
-                                entryAdapter.clear();
-                                entryAdapter.addAll(entries);
+                                entryAdapter.setData(entries, true);
+
+                                scrollToTop();
                             }
                         });
             }
@@ -279,41 +282,19 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener {
         searchWidget.addSearchListener(searchListener);
     }
 
+    private void scrollToTop() {
+        LinearLayoutManager linearLayoutManager =
+                (LinearLayoutManager) recyclerView.getLayoutManager();
+        if (linearLayoutManager.findFirstCompletelyVisibleItemPosition() == 0) {
+            linearLayoutManager.scrollToPosition(0);
+        }
+    }
+
     private void fetchData() {
-        repository.exposeSearch(Entry.class)
-                .findAllSortedAsync("dateMillis", Sort.DESCENDING)
-                .asObservable()
-                .filter(new Func1<RealmResults<Entry>, Boolean>() {
-                    @Override
-                    public Boolean call(RealmResults<Entry> ts) {
-                        return repository.isDataValid(ts);
-                    }
-                })
-                .first()
-                .subscribe(new ActivitySubscriber<List<Entry>>(this) {
-                    @Override
-                    public void onNext(List<Entry> entries) {
-                        entryAdapter.addAll(entries);
-                        if (entries.isEmpty()) {
-                            onLoadEmpty();
-                        }
-                    }
+        Sorter sorter = new Sorter(new String[] {Entry.KEY}, new Sort[] {Sort.DESCENDING});
 
-                    @Override
-                    public void onStart() {
-                        onLoadStart();
-                    }
-
-                    @Override
-                    public void onCompleted() {
-                        onLoadComplete();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        onLoadError(e);
-                    }
-                });
+        repository.getAllSorted(Entry.class, sorter)
+                .subscribe(new DataLoadingSubscriber<>(this));
     }
 
     private void runEnterAnimation() {

@@ -7,17 +7,17 @@
         <item
             android:id="@+id/navigation_menu_home_map"
             android:icon="@drawable/ic_world_24dp"
-            android:title="@string/menu_home_map"/>
+            android:title="@string/menu_map"/>
 
         <item
             android:id="@+id/navigation_menu_home_calendar"
             android:icon="@drawable/ic_calendar_24dp"
-            android:title="@string/menu_home_calendar"/>
+            android:title="@string/menu_calendar"/>
 
         <item
             android:id="@+id/navigation_menu_home_ideas"
             android:icon="@drawable/ic_lightbulb_outline_24dp"
-            android:title="@string/menu_home_prompts" />
+            android:title="@string/menu_prompts" />
 
     </group>
 

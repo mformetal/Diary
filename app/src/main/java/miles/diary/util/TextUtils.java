@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import miles.diary.R;
+import miles.diary.data.error.IllegalFontException;
 
 /**
  * Created by mbpeele on 1/14/16.
@@ -48,8 +49,7 @@ public final class TextUtils {
         String font = context.getResources().getString(R.string.default_font);
         Typeface typeface = fontMap.get(font);
         if (typeface == null) {
-            throw new IllegalArgumentException(
-                    "Font name must match file name in assets/fonts/ directory: " + font);
+           throw new IllegalFontException(font);
         }
         return typeface;
     }
@@ -60,8 +60,7 @@ public final class TextUtils {
         }
         Typeface typeface = fontMap.get(font);
         if (typeface == null) {
-            throw new IllegalArgumentException(
-                    "Font name must match file name in assets/fonts/ directory: " + font);
+            throw new IllegalFontException(font);
         }
         return typeface;
     }

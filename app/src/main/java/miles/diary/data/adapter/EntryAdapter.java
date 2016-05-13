@@ -38,7 +38,7 @@ public class EntryAdapter extends BaseRealmAdapter<Entry, RecyclerView.ViewHolde
     private static final int TYPE_TEXT = 1;
     private static final int TYPE_VIDEO = 2;
 
-    private Gson gson;
+    private final Gson gson;
 
     public EntryAdapter(BaseActivity activity) {
         super(activity);
@@ -59,9 +59,9 @@ public class EntryAdapter extends BaseRealmAdapter<Entry, RecyclerView.ViewHolde
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         switch (viewType) {
             case TYPE_IMAGE:
-                return new ImageViewHolder(layoutInflater.inflate(R.layout.adapter_entry_image, parent, false));
+                return new ImageViewHolder(getLayoutInflater().inflate(R.layout.adapter_entry_image, parent, false));
             case TYPE_TEXT:
-                return new TextViewHolder(layoutInflater.inflate(R.layout.adapter_entry_text, parent, false));
+                return new TextViewHolder(getLayoutInflater().inflate(R.layout.adapter_entry_text, parent, false));
         }
         return null;
     }
@@ -79,22 +79,26 @@ public class EntryAdapter extends BaseRealmAdapter<Entry, RecyclerView.ViewHolde
 
     public void addAndSort(Entry entry) {
         List<Entry> entries = getData();
-        long target = entry.getDateMillis();
-        long diff = Integer.MAX_VALUE;
-        int ndx = 0;
+        if (entries.isEmpty()) {
+            addObject(entry);
+        } else {
+            long target = entry.getDateMillis();
+            long diff = Integer.MAX_VALUE;
+            int ndx = 0;
 
-        for (int i = 0; i < entries.size(); i++) {
-            Entry entry1 = entries.get(i);
-            long dataTime = entry1.getDateMillis();
+            for (int i = 0; i < entries.size(); i++) {
+                Entry entry1 = entries.get(i);
+                long dataTime = entry1.getDateMillis();
 
-            long timeDiff = Math.abs(target - dataTime);
-            if (timeDiff < diff) {
-                diff = timeDiff;
-                ndx = i;
+                long timeDiff = Math.abs(target - dataTime);
+                if (timeDiff < diff) {
+                    diff = timeDiff;
+                    ndx = i;
+                }
             }
-        }
 
-        addAtPosition(entry, ndx);
+            addAtPosition(entry, ndx);
+        }
     }
 
     public void update(Entry entry) {
@@ -130,11 +134,11 @@ public class EntryAdapter extends BaseRealmAdapter<Entry, RecyclerView.ViewHolde
             ((View) body.getParent()).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = EntryActivity.newIntent(host, entry);
+                    Intent intent = EntryActivity.newIntent(getHost(), entry);
                     ActivityOptions options =
-                            ActivityOptions.makeSceneTransitionAnimation(host,
-                                    body, host.getString(R.string.transition_entry_text));
-                    host.startActivityForResult(intent, HomeActivity.RESULT_CODE_ENTRY, options.toBundle());
+                            ActivityOptions.makeSceneTransitionAnimation(getHost(),
+                                    body, getHost().getString(R.string.transition_entry_text));
+                    getHost().startActivityForResult(intent, HomeActivity.RESULT_CODE_ENTRY, options.toBundle());
                 }
             });
 
@@ -178,11 +182,11 @@ public class EntryAdapter extends BaseRealmAdapter<Entry, RecyclerView.ViewHolde
             image.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = EntryActivity.newIntent(host, entry);
+                    Intent intent = EntryActivity.newIntent(getHost(), entry);
                     ActivityOptions options =
-                            ActivityOptions.makeSceneTransitionAnimation(host,
-                                   image, host.getString(R.string.transition_entry_image));
-                    host.startActivityForResult(intent, HomeActivity.RESULT_CODE_ENTRY, options.toBundle());
+                            ActivityOptions.makeSceneTransitionAnimation(getHost(),
+                                   image, getHost().getString(R.string.transition_entry_image));
+                    getHost().startActivityForResult(intent, HomeActivity.RESULT_CODE_ENTRY, options.toBundle());
                 }
             });
             time.setText(TextUtils.formatDate(entry.getDate()));
@@ -201,7 +205,7 @@ public class EntryAdapter extends BaseRealmAdapter<Entry, RecyclerView.ViewHolde
                 location.setVisibility(View.GONE);
             }
 
-            Glide.with(host)
+            Glide.with(getHost())
                     .fromString()
                     .load(entry.getUri())
                     .animate(AnimUtils.REVEAL)

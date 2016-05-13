@@ -1,5 +1,7 @@
 package miles.diary.data.api;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.IntentSender;
 import android.location.Address;
 import android.location.Location;
@@ -21,17 +23,22 @@ import com.google.android.gms.location.places.PlacePhotoResult;
 import com.google.android.gms.location.places.Places;
 import com.google.gson.Gson;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Singleton;
+
 import miles.diary.R;
 import miles.diary.data.adapter.AutoCompleteAdapter;
+import miles.diary.data.model.google.CopiedPlace;
 import miles.diary.data.model.google.PlaceResponse;
 import miles.diary.data.rx.GoogleObservable;
 import miles.diary.data.rx.OkHttpObservable;
 import miles.diary.ui.activity.BaseActivity;
 import miles.diary.util.LocationUtils;
 import miles.diary.util.Logg;
+import miles.diary.util.SimpleLifecycleCallbacks;
 import miles.diary.util.SimpleLocationListener;
 import miles.diary.util.URLFormatter;
 import okhttp3.OkHttpClient;
@@ -45,47 +52,103 @@ import rx.schedulers.Schedulers;
 /**
  * Created by mbpeele on 2/21/16.
  */
-public class Google implements GoogleApiClient.ConnectionCallbacks,
+@Singleton
+public class Google extends SimpleLifecycleCallbacks implements GoogleApiClient.ConnectionCallbacks,
     GoogleApiClient.OnConnectionFailedListener {
 
     private final GoogleApiClient client;
-    private final BaseActivity activity;
-    private GoogleServiceCallback callback;
-    private OkHttpClient okHttpClient;
-    private Gson gson;
+    private final OkHttpClient okHttpClient;
+    private final Gson gson;
+    private WeakReference<BaseActivity> activity;
+    private GoogleCallback googleCallback;
 
-    private static int FAILED_CODE = 5;
-
-    public Google(final BaseActivity activity1, GoogleApiClient.Builder builder,
-                  GoogleServiceCallback googleServiceCallback) {
-        activity = activity1;
-
+    public Google(Context context) {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        httpClient.addInterceptor(logging);
-        okHttpClient = httpClient.build();
+        okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(logging)
+                .build();
 
         gson = new Gson();
 
-        client = builder.addConnectionCallbacks(this)
+        client = new GoogleApiClient.Builder(context)
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
-        client.connect();
-
-        callback = googleServiceCallback;
     }
 
-    public void cleanup() {
-        client.disconnect();
+    @Override
+    public void onConnected(Bundle bundle) {
+        if (checkActivity()) {
+            if (googleCallback != null) {
+                googleCallback.onConnected(bundle);
+            }
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        if (checkActivity()) {
+            if (connectionResult.hasResolution()) {
+                try {
+                    connectionResult.startResolutionForResult(getActivity(), 5);
+                } catch (IntentSender.SendIntentException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                Logg.log("CONNECTION FAILED WITH CODE: " + connectionResult.getErrorCode());
+            }
+        }
+    }
+
+    public void setActivity(BaseActivity activity) {
+        this.activity = new WeakReference<>(activity);
+    }
+
+    public void connect(GoogleCallback googleCallback) {
+        if (this.googleCallback != googleCallback) {
+            this.googleCallback = googleCallback;
+        }
+
+        if (!client.isConnected() || !client.isConnecting()) {
+            client.connect();
+        }
+    }
+
+    public void connect() {
+        if (!client.isConnected() || !client.isConnecting()) {
+            client.connect();
+        }
+    }
+
+    public void disconnect() {
+        if (client.isConnected() || client.isConnecting()) {
+            client.disconnect();
+        }
     }
 
     public AutoCompleteAdapter getAutoCompleteAdapter() {
-        return new AutoCompleteAdapter(activity, R.layout.autocomplete_adapter, client, null);
+        if (!checkActivity()) {
+            return null;
+        }
+
+        return new AutoCompleteAdapter(getActivity(), R.layout.autocomplete_adapter, client, null);
     }
 
     public Observable<PlaceResponse> searchNearby(Location location, float radius) {
-        String url = URLFormatter.nearbySearch(activity, location, radius);
+        if (!checkActivity()) {
+            return Observable.empty();
+        }
+
+        String url = URLFormatter.nearbySearch(getActivity(), location, radius);
 
         OkHttpObservable<PlaceResponse> okHttpObservable = OkHttpObservable.<PlaceResponse>builder()
                 .target(PlaceResponse.class)
@@ -100,14 +163,14 @@ public class Google implements GoogleApiClient.ConnectionCallbacks,
     }
 
     @SuppressWarnings({"ResourceType"})
-    public Observable<List<PlaceLikelihood>> getCurrentPlace(PlaceFilter placeFilter) {
+    public Observable<List<CopiedPlace>> getCurrentPlace(final PlaceFilter placeFilter) {
         return GoogleObservable.execute(Places.PlaceDetectionApi.getCurrentPlace(client, placeFilter))
-                .map(new Func1<PlaceLikelihoodBuffer, List<PlaceLikelihood>>() {
+                .map(new Func1<PlaceLikelihoodBuffer, List<CopiedPlace>>() {
                     @Override
-                    public List<PlaceLikelihood> call(PlaceLikelihoodBuffer placeLikelihoods) {
-                        List<PlaceLikelihood> list = new ArrayList<PlaceLikelihood>();
+                    public List<CopiedPlace> call(PlaceLikelihoodBuffer placeLikelihoods) {
+                        List<CopiedPlace> list = new ArrayList<>();
                         for (PlaceLikelihood placeLikelihood : placeLikelihoods) {
-                            list.add(placeLikelihood);
+                            list.add(new CopiedPlace(placeLikelihood.getPlace()));
                         }
                         placeLikelihoods.release();
                         return list;
@@ -119,6 +182,10 @@ public class Google implements GoogleApiClient.ConnectionCallbacks,
 
     @SuppressWarnings({"ResourceType"})
     public Observable<Location> getLocation() {
+        if (!checkActivity()) {
+            return Observable.empty();
+        }
+
         return Observable.create(new Observable.OnSubscribe<Location>() {
             @Override
             public void call(final Subscriber<? super Location> subscriber) {
@@ -128,7 +195,7 @@ public class Google implements GoogleApiClient.ConnectionCallbacks,
                 if (location != null) {
                     subscriber.onNext(location);
                 } else {
-                    final LocationManager locationManager = LocationUtils.getLocationManager(activity);
+                    final LocationManager locationManager = LocationUtils.getLocationManager(getActivity());
 
                     SimpleLocationListener simpleLocationListener = new SimpleLocationListener() {
                         @Override
@@ -138,7 +205,7 @@ public class Google implements GoogleApiClient.ConnectionCallbacks,
                         }
                     };
 
-                    LocationUtils.getLocationUpdates(activity, simpleLocationListener);
+                    LocationUtils.getLocationUpdates(getActivity(), simpleLocationListener);
                 }
 
                 subscriber.onCompleted();
@@ -147,7 +214,11 @@ public class Google implements GoogleApiClient.ConnectionCallbacks,
     }
 
     public Observable<List<Address>> getAddressFromLocation(Location location, int results) {
-        return LocationUtils.geocode(activity, location, results)
+        if (checkActivity()) {
+            return Observable.empty();
+        }
+
+        return LocationUtils.geocode(getActivity(), location, results)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -186,39 +257,15 @@ public class Google implements GoogleApiClient.ConnectionCallbacks,
     }
 
     private boolean checkActivity() {
-        return activity != null && !activity.isFinishing();
+        BaseActivity activity = getActivity();
+        return activity != null;
     }
 
-    @Override
-    public void onConnected(Bundle bundle) {
-        if (checkActivity()) {
-            if (callback != null) {
-                callback.onConnected(bundle);
-            }
-        }
+    private BaseActivity getActivity() {
+        return activity.get();
     }
 
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        if (checkActivity()) {
-            if (connectionResult.hasResolution()) {
-                try {
-                    connectionResult.startResolutionForResult(activity, FAILED_CODE);
-                } catch (IntentSender.SendIntentException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                Logg.log("CONNECTION FAILED WITH CODE: " + connectionResult.getErrorCode());
-            }
-        }
-    }
-
-    public interface GoogleServiceCallback {
+    public interface GoogleCallback {
 
         void onConnected(Bundle bundle);
     }

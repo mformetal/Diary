@@ -1,6 +1,7 @@
 package miles.diary.data.adapter;
 
 import java.util.Collection;
+import java.util.List;
 
 import io.realm.RealmObject;
 
@@ -9,7 +10,9 @@ import io.realm.RealmObject;
  */
 interface Adapter<T> {
 
-    Collection<?> getData();
+    List<T> getData();
+
+    void setData(List<T> collection, boolean shouldAnimate);
 
     T getObject(int item);
 

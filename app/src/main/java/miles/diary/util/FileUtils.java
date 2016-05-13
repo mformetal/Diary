@@ -36,9 +36,6 @@ public class FileUtils {
     private static final String FOLDER_NAME = "Diary";
     private static final String IMAGE_TYPE = ".jpg";
 
-    private final static String MIME_IMAGE = "image/jpeg";
-    private final static String MIME_VIDEO = "video/mp4";
-
     private FileUtils() {}
 
     public static File createPhotoFile() throws IOException {
@@ -61,104 +58,19 @@ public class FileUtils {
         return contentUri;
     }
 
-    public static boolean isImageUri(Context context, Uri uri) {
+    public static UriType getUriType(Context context, Uri uri) {
         ContentResolver contentResolver = context.getContentResolver();
         String contentResolverType = contentResolver.getType(uri);
         if (contentResolverType != null) {
-            return contentResolverType.equals(MIME_IMAGE);
+            return UriType.type(contentResolverType);
         } else {
             String extension = MimeTypeMap.getFileExtensionFromUrl(uri.toString());
             if (extension != null) {
-                String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
-                return type.equals(MIME_IMAGE);
+                String mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+                return UriType.type(mime);
+            } else {
+                return UriType.NONE;
             }
         }
-
-        return false;
-    }
-
-    public static Observable<byte[]> saveBitmap(final Context context, final Bitmap bitmap,
-                                                final String name) {
-        return Observable.create(new Observable.OnSubscribe<byte[]>() {
-            @Override
-            public void call(Subscriber<? super byte[]> subscriber) {
-                subscriber.onStart();
-
-                try {
-                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-                    byte[] bytes = stream.toByteArray();
-
-                    OutputStream outputStream
-                            = context.openFileOutput(name, Context.MODE_PRIVATE);
-                    outputStream.write(bytes);
-
-                    subscriber.onNext(bytes);
-                } catch (Exception e) {
-                    subscriber.onError(e);
-                } finally {
-                    subscriber.onCompleted();
-                }
-            }
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
-    }
-
-    public static Observable<Bitmap> getBitmap(final Context context, final String name,
-                                               final int reqWidth, final int reqHeight) {
-        return Observable.create(new Observable.OnSubscribe<Bitmap>() {
-            @Override
-            public void call(Subscriber<? super Bitmap> subscriber) {
-                subscriber.onStart();
-
-                try {
-                    InputStream test = context.openFileInput(name);
-                    Bitmap bitmap = BitmapFactory.decodeStream(test);
-
-                    int width = bitmap.getWidth();
-                    int height = bitmap.getHeight();
-                    float scaleWidth = ((float) reqWidth) / width;
-                    float scaleHeight = ((float) reqHeight) / height;
-
-                    Matrix matrix = new Matrix();
-                    matrix.postScale(scaleWidth, scaleHeight);
-                    Bitmap resizedBitmap = Bitmap.createBitmap(
-                            bitmap, 0, 0, width, height, matrix, false);
-                    bitmap.recycle();
-
-                    subscriber.onNext(resizedBitmap);
-                } catch (IOException e) {
-                    subscriber.onError(e);
-                }
-
-                subscriber.onCompleted();
-            }
-        });
-    }
-
-    public static Observable<byte[]> getBitmapBytes(final Context context, final String name) {
-        return Observable.create(new Observable.OnSubscribe<byte[]>() {
-            @Override
-            public void call(Subscriber<? super byte[]> subscriber) {
-                subscriber.onStart();
-
-                try {
-                    InputStream inputStream = context.openFileInput(name);
-                    subscriber.onNext(ByteStreams.toByteArray(inputStream));
-                } catch (IOException e) {
-                    subscriber.onError(e);
-                }
-
-                subscriber.onCompleted();
-            }
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
-    }
-
-    public static void deleteBitmapFile(Context context, String name) {
-        context.deleteFile(name);
-    }
-
-    public static boolean isFileAvailable(Context context, String name) {
-        File file = context.getFileStreamPath(name);
-        return !(file == null || !file.exists());
     }
 }

@@ -38,7 +38,7 @@
             android:lines="1"
             android:singleLine="true"
             android:textColor="@color/dialog_text"
-            android:hint="@string/activity_location_text_hint" />
+            android:hint="@string/location_input_hint" />
 
     </android.support.design.widget.TextInputLayout>
 

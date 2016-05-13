@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.CursorAdapter;
 import android.support.v7.widget.RecyclerView;
 import android.transition.Fade;
 import android.transition.Transition;
@@ -35,7 +36,9 @@ import miles.diary.ui.activity.EntryActivity;
 import miles.diary.ui.activity.GalleryActivity;
 import miles.diary.ui.activity.HomeActivity;
 import miles.diary.ui.activity.UriActivity;
+import miles.diary.util.FileUtils;
 import miles.diary.util.Logg;
+import miles.diary.util.UriType;
 
 /**
  * Created by mbpeele on 3/7/16.
@@ -52,11 +55,6 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
         inflater = LayoutInflater.from(activity);
     }
 
-    public void setCursor(final Cursor cursor1) {
-        cursor = cursor1;
-        notifyDataSetChanged();
-    }
-
     @Override
     public GalleryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new GalleryViewHolder(inflater.inflate(R.layout.adapter_gallery_layout, parent, false));
@@ -70,6 +68,13 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
     @Override
     public int getItemCount() {
         return cursor != null ? cursor.getCount() : 0;
+    }
+
+    public void setCursor(final Cursor cursor) {
+        if (cursor != null) {
+            this.cursor = cursor;
+            notifyDataSetChanged();
+        }
     }
 
     class GalleryViewHolder extends BindingViewHolder<Integer> {
@@ -96,9 +101,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
                 if (file.length() != 0) {
                     final Uri uri = Uri.fromFile(file);
 
-                    Glide.with(host)
-                            .load(uri)
-                            .into(imageView);
+                    loadImage(uri);
 
                     imageView.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -118,6 +121,13 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
                     });
                 }
             }
+        }
+
+        private void loadImage(Uri uri) {
+            Glide.with(host)
+                    .load(uri)
+                    .error(R.drawable.ic_error_24dp)
+                    .into(imageView);
         }
     }
 }

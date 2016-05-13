@@ -15,10 +15,7 @@ import android.widget.ImageView;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.places.AutocompletePrediction;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.ui.PlacePicker;
 
 import java.util.List;
@@ -27,10 +24,13 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.OnClick;
+import icepick.State;
 import miles.diary.DiaryApplication;
 import miles.diary.R;
 import miles.diary.data.adapter.AutoCompleteAdapter;
 import miles.diary.data.api.Google;
+import miles.diary.data.model.google.AutoCompleteItem;
+import miles.diary.data.model.google.CopiedPlace;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.ui.widget.TypefaceAutoCompleteTextView;
 import miles.diary.ui.widget.TypefaceButton;
@@ -40,21 +40,17 @@ import miles.diary.util.Logg;
 /**
  * Created by mbpeele on 2/6/16.
  */
-public class LocationActivity extends TransitionActivity implements View.OnClickListener {
+public class LocationActivity extends TransitionActivity implements View.OnClickListener, Google.GoogleCallback {
 
     private final static int REQUEST_LOCATION_PERMISSION = 1;
     private final static int REQUEST_PLACE_PICKER = 2;
-
-    @Inject
-    GoogleApiClient.Builder googleApiClientBuilder;
 
     @Bind(R.id.activity_location_pos_button) TypefaceButton posButton;
     @Bind(R.id.activity_location_autocomplete) TypefaceAutoCompleteTextView autoCompleteTextView;
     @Bind(R.id.activity_location_image) ImageView mapIcon;
 
-    private Google googleService;
-    private String placeName;
-    private String placeId;
+    @State String placeName;
+    @State String placeId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,24 +71,7 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
                     }
                 }
 
-                googleService = new Google(this, googleApiClientBuilder, new Google.GoogleServiceCallback() {
-                    @Override
-                    public void onConnected(Bundle bundle) {
-                        final AutoCompleteAdapter autoCompleteAdapter = googleService.getAutoCompleteAdapter();
-                        autoCompleteTextView.setAdapter(autoCompleteAdapter);
-
-                        autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                final AutocompletePrediction item = autoCompleteAdapter.getItem(position);
-                                placeId = item.getPlaceId();
-                                placeName = item.getPrimaryText(null).toString();
-                            }
-                        });
-
-                        getPlace();
-                    }
-                });
+                google.setActivity(this);
             } else {
                 noInternet();
             }
@@ -102,8 +81,32 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
     }
 
     @Override
-    public void inject(DiaryApplication diaryApplication) {
-        diaryApplication.getContextComponent().inject(this);
+    protected void onResume() {
+        super.onResume();
+        google.connect(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        google.disconnect();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        final AutoCompleteAdapter autoCompleteAdapter = google.getAutoCompleteAdapter();
+        autoCompleteTextView.setAdapter(autoCompleteAdapter);
+
+        autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                final AutoCompleteItem item = autoCompleteAdapter.getItem(position);
+                placeId = item.placeId;
+                placeName = item.primaryText;
+            }
+        });
+
+        getPlace();
     }
 
     @Override
@@ -171,7 +174,7 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
                     setReturnData();
                     finishAfterTransition();
                 } else {
-                    Snackbar.make(root, R.string.activity_location_no_input,
+                    Snackbar.make(root, R.string.location_no_input_prompt,
                             Snackbar.LENGTH_SHORT).show();
                 }
                 break;
@@ -189,13 +192,13 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
 
     private void getPlace() {
         if (placeName == null && placeId == null) {
-            googleService.getCurrentPlace(null)
-                    .subscribe(new ActivitySubscriber<List<PlaceLikelihood>>(this) {
+            google.getCurrentPlace(null)
+                    .subscribe(new ActivitySubscriber<List<CopiedPlace>>(this) {
                         @Override
-                        public void onNext(List<PlaceLikelihood> likelyPlaces) {
-                            Place placeInfo = likelyPlaces.get(0).getPlace();
-                            placeName = placeInfo.getName().toString();
-                            placeId = placeInfo.getId();
+                        public void onNext(List<CopiedPlace> copiedPlaces) {
+                            CopiedPlace copiedPlace = copiedPlaces.get(0);
+                            placeName = copiedPlace.getName().toString();
+                            placeId = copiedPlace.getId();
                         }
                     });
         }

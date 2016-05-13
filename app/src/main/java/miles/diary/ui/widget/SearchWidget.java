@@ -15,9 +15,8 @@ import java.util.List;
 
 import miles.diary.R;
 import miles.diary.ui.CancelDetector;
-import miles.diary.ui.SimpleTextWatcher;
+import miles.diary.util.SimpleTextWatcher;
 import miles.diary.util.AnimUtils;
-import miles.diary.util.Logg;
 
 /**
  * Created by mbpeele on 3/11/16.
@@ -77,7 +76,10 @@ public class SearchWidget extends TypefaceEditText {
 
     public boolean interceptBackButton() {
         if (getVisibility() == View.VISIBLE) {
-            setText("");
+            if (!getTextAsString().isEmpty()) {
+                setText("");
+            }
+
             toggle(new int[] { getWidth(), 0 });
             return true;
         }

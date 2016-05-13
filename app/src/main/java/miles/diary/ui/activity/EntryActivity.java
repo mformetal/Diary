@@ -46,6 +46,7 @@ import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.data.rx.DataTransaction;
 import miles.diary.ui.PaletteWindows;
 import miles.diary.ui.TypefacerSpan;
+import miles.diary.ui.ZoomController;
 import miles.diary.ui.transition.RoundedImageViewTransition;
 import miles.diary.ui.transition.SimpleTransitionListener;
 import miles.diary.ui.widget.RoundedImageView;
@@ -69,9 +70,6 @@ public class EntryActivity extends TransitionActivity {
         EDIT,
         DELETE
     }
-
-    @Inject
-    Repository repository;
 
     @Bind(R.id.activity_entry_place_photos)
     FloatingActionButton photosFab;
@@ -102,6 +100,7 @@ public class EntryActivity extends TransitionActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_entry);
 
+        toolbar.setTitle("");
         setActionBar(toolbar);
         if (getActionBar() != null) {
             getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -112,14 +111,8 @@ public class EntryActivity extends TransitionActivity {
     }
 
     @Override
-    public void inject(DiaryApplication diaryApplication) {
-        diaryApplication.getContextComponent().inject(this);
-    }
-
-    @Override
     public void onBackPressed() {
         if (dataChanged) {
-            Logg.log("DATA CHANGED");
             setResultAction(Action.EDIT);
         } else {
             super.onBackPressed();
@@ -286,6 +279,8 @@ public class EntryActivity extends TransitionActivity {
         }
 
         if (entry.getUri() != null) {
+            postponeEnterTransition();
+
             image.setVisibility(View.VISIBLE);
 
             Glide.with(this)
@@ -307,6 +302,8 @@ public class EntryActivity extends TransitionActivity {
                                     .maximumColorCount(3)
                                     .clearFilters()
                                     .generate(new PaletteWindows(EntryActivity.this, resource));
+
+                            startPostponedEnterTransition();
                             return false;
                         }
                     })

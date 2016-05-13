@@ -4,13 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.PlacePhotoMetadataBuffer;
 import com.google.android.gms.location.places.PlacePhotoMetadataResult;
 
 import javax.inject.Inject;
 
 import butterknife.Bind;
+import icepick.State;
 import miles.diary.DiaryApplication;
 import miles.diary.R;
 import miles.diary.data.adapter.PlacePhotosAdapter;
@@ -24,13 +24,10 @@ import rx.functions.Action1;
 /**
  * Created by mbpeele on 3/6/16.
  */
-public class PlacePhotosActivity extends BaseActivity implements Google.GoogleServiceCallback {
+public class PlacePhotosActivity extends BaseActivity implements Google.GoogleCallback {
 
     public static final String ID = "placeId";
     public static final String NAME = "placeName";
-
-    @Inject
-    GoogleApiClient.Builder googleApiClientBuilder;
 
     @Bind(R.id.activity_place_name_view)
     TypefaceTextView nameView;
@@ -38,8 +35,7 @@ public class PlacePhotosActivity extends BaseActivity implements Google.GoogleSe
     ViewPager pager;
 
     private PlacePhotosAdapter placePhotosAdapter;
-    private Google googleService;
-    private String id;
+    @State String id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,27 +50,36 @@ public class PlacePhotosActivity extends BaseActivity implements Google.GoogleSe
             nameView.setText(name);
         }
 
-        googleService = new Google(this, googleApiClientBuilder, this);
+        google.setActivity(this);
     }
 
     @Override
-    public void inject(DiaryApplication diaryApplication) {
-        diaryApplication.getContextComponent().inject(this);
+    protected void onResume() {
+        super.onResume();
+        google.connect(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        google.disconnect();
     }
 
     @Override
     protected void onDestroy() {
-        placePhotosAdapter.release();
+        if (placePhotosAdapter != null) {
+            placePhotosAdapter.release();
+        }
         super.onDestroy();
     }
 
     @Override
     public void onConnected(Bundle bundle) {
-        placePhotosAdapter = new PlacePhotosAdapter(googleService, this);
+        placePhotosAdapter = new PlacePhotosAdapter(google, this);
         pager.setOffscreenPageLimit(2);
         pager.setAdapter(placePhotosAdapter);
 
-        googleService.getPlacePhotos(id)
+        google.getPlacePhotos(id)
                 .doOnError(new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
@@ -98,7 +103,7 @@ public class PlacePhotosActivity extends BaseActivity implements Google.GoogleSe
 
     private void onErrorOrEmpty() {
         ConfirmationDialog dialog =
-                ConfirmationDialog.newInstance(getString(R.string.activity_place_photos_empty));
+                ConfirmationDialog.newInstance(getString(R.string.place_photos_empty));
         dialog.setDismissListener(new DismissingDialogFragment.OnDismissListener() {
             @Override
             public void onDismiss(DismissingDialogFragment fragment) {

@@ -8,8 +8,4 @@
     android:scaleType="centerCrop"
     android:elevation="@dimen/fab_elevation" >
 
-    <!--app:aspectRatioEnabled="true"-->
-    <!--app:dominantMeasurement="width"-->
-    <!--app:aspectRatio="1.333" -->
-
 </miles.diary.ui.widget.SquareImageView>

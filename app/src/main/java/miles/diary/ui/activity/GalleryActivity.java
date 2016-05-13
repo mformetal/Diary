@@ -1,6 +1,7 @@
 package miles.diary.ui.activity;
 
 import android.Manifest;
+import android.app.ActionBar;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -17,19 +18,20 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toolbar;
 
 import java.io.File;
 import java.io.IOException;
 
 import butterknife.Bind;
+import icepick.State;
 import miles.diary.DiaryApplication;
 import miles.diary.R;
 import miles.diary.data.adapter.GalleryAdapter;
 import miles.diary.ui.SpacingDecoration;
+import miles.diary.ui.fragment.ConfirmationDialog;
+import miles.diary.ui.fragment.DismissingDialogFragment;
 import miles.diary.util.FileUtils;
-import miles.diary.util.Logg;
 
 /**
  * Created by mbpeele on 1/29/16.
@@ -47,15 +49,18 @@ public class GalleryActivity extends BaseActivity implements LoaderManager.Loade
     RecyclerView recyclerView;
 
     private GalleryAdapter adapter;
-    private File cameraFile;
+    @State File cameraFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
         setActionBar(toolbar);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setDisplayShowHomeEnabled(true);
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+        }
 
         if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
             String[] camera = new String[] {Manifest.permission.CAMERA,
@@ -65,12 +70,17 @@ public class GalleryActivity extends BaseActivity implements LoaderManager.Loade
             } else {
                 setupGallery();
             }
+        } else {
+            ConfirmationDialog dialog =
+                    ConfirmationDialog.newInstance(getString(R.string.no_camera_error));
+            dialog.setDismissListener(new DismissingDialogFragment.OnDismissListener() {
+                @Override
+                public void onDismiss(DismissingDialogFragment fragment) {
+                    finish();
+                }
+            });
+            dialog.show(getFragmentManager(), CONFIRMATION_DIALOG);
         }
-    }
-
-    @Override
-    public void inject(DiaryApplication diaryApplication) {
-
     }
 
     @Override
@@ -145,9 +155,27 @@ public class GalleryActivity extends BaseActivity implements LoaderManager.Loade
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String[] projection = new String[] { MediaStore.Images.Media.DATA };
-        return new CursorLoader(this, MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                projection, null, null, MediaStore.Images.ImageColumns.DATE_TAKEN);
+        String[] projection = {
+                MediaStore.Files.FileColumns._ID,
+                MediaStore.Files.FileColumns.DATA,
+                MediaStore.Files.FileColumns.DATE_ADDED,
+                MediaStore.Files.FileColumns.MEDIA_TYPE,
+                MediaStore.Files.FileColumns.MIME_TYPE,
+                MediaStore.Files.FileColumns.TITLE
+        };
+
+        String selection = MediaStore.Files.FileColumns.MEDIA_TYPE + "="
+                + MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
+
+        Uri queryUri = MediaStore.Files.getContentUri("external");
+
+        return new CursorLoader(this,
+                queryUri,
+                projection,
+                selection,
+                null, // Selection args (none).
+                MediaStore.Files.FileColumns.DATE_ADDED + " DESC" // Sort order.
+        );
     }
 
     @Override

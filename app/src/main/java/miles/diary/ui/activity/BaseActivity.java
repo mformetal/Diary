@@ -13,10 +13,18 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Toolbar;
 
+import javax.inject.Inject;
+
 import butterknife.ButterKnife;
+import icepick.Icepick;
 import miles.diary.DiaryApplication;
 import miles.diary.R;
+import miles.diary.dagger.modules.ActivityModule;
+import miles.diary.data.api.Google;
 import miles.diary.data.api.Repository;
+import miles.diary.data.api.Weather;
+import miles.diary.util.Storage;
+import miles.diary.util.StorageImpl;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
 
@@ -24,6 +32,15 @@ import rx.subscriptions.CompositeSubscription;
  * Created by mbpeele on 1/14/16.
  */
 public abstract class BaseActivity extends AppCompatActivity {
+
+    @Inject
+    Google google;
+    @Inject
+    Repository repository;
+    @Inject
+    Weather weather;
+    @Inject
+    Storage storage;
 
     private CompositeSubscription compositeSubscription;
     protected ViewGroup root;
@@ -34,27 +51,47 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        inject((DiaryApplication) getApplication());
+        getDiaryApplication().getApplicationComponent().inject(this);
+
+        repository.open();
 
         compositeSubscription = new CompositeSubscription();
+
+        Icepick.restoreInstanceState(this, savedInstanceState);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Icepick.saveInstanceState(this, outState);
     }
 
     @Override
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
+
         ButterKnife.bind(this);
+
         root = (ViewGroup) ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        repository.close();
+
         compositeSubscription.unsubscribe();
+
         ButterKnife.unbind(this);
     }
 
-    public abstract void inject(DiaryApplication diaryApplication);
+    public DiaryApplication getDiaryApplication() {
+        return ((DiaryApplication) getApplication());
+    }
 
+    protected ActivityModule getActivityModule() {
+        return new ActivityModule(this);
+    }
 
     public void addSubscription(Subscription subscription) {
         compositeSubscription.add(subscription);
@@ -74,7 +111,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         Snackbar.make(root, getString(R.string.error_no_internet), Snackbar.LENGTH_SHORT).show();
     }
 
-    public boolean hasPermissions(String[] permissions) {
+    public boolean hasPermissions(String... permissions) {
         for (String permission: permissions) {
             if (ActivityCompat.checkSelfPermission(this, permission)
                     != PackageManager.PERMISSION_GRANTED) {

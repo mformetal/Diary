@@ -24,20 +24,18 @@ import android.view.animation.Interpolator;
 import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 
-import javax.inject.Inject;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.OnClick;
-import miles.diary.DiaryApplication;
+import icepick.State;
 import miles.diary.R;
-import miles.diary.data.api.Repository;
+import miles.diary.data.model.google.CopiedPlace;
 import miles.diary.util.LocationUtils;
 import miles.diary.data.api.Google;
-import miles.diary.data.api.Weather;
-import miles.diary.data.model.google.PlaceResponse;
 import miles.diary.data.model.realm.Entry;
 import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.data.rx.ActivitySubscriber;
@@ -49,12 +47,7 @@ import miles.diary.ui.widget.TypefaceEditText;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.ViewUtils;
 
-public class NewEntryActivity extends BaseActivity implements View.OnClickListener {
-
-    @Inject
-    Repository repository;
-    @Inject
-    GoogleApiClient.Builder googleApiClientBuilder;
+public class NewEntryActivity extends BaseActivity implements View.OnClickListener, Google.GoogleCallback {
 
     @Bind(R.id.fragment_entry_toolbar) Toolbar toolbar;
     @Bind(R.id.activity_new_entry_body) TypefaceEditText bodyInput;
@@ -71,14 +64,12 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     private final static int RESULT_IMAGE = 2;
     private final static int REQUEST_LOCATION_PERMISSION = 3;
 
-    private String placeName;
-    private String placeId;
-    private String temperature;
-    private Uri imageUri;
+    @State String placeName;
+    @State String placeId;
+    @State String temperature;
+    @State Uri imageUri;
+    @State Location location;
     private WeatherResponse weatherResponse;
-    private Google google;
-    private Weather weather;
-    private Location location;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -93,42 +84,41 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
         if (bundle != null) {
             long id =  bundle.getLong(EntryActivity.INTENT_KEY, -1L);
             if (id != -1L) {
+                Entry entry = repository.get(Entry.class, id);
+                placeName = entry.getPlaceName();
+                placeId = entry.getPlaceId();
+                temperature = entry.getWeather();
+                imageUri = Uri.parse(entry.getUri());
+                if (entry.hasLatLng()) {
+                    location = new Location("GPS");
+                    LatLng latLng = entry.getPosition();
+                    location.setLatitude(latLng.latitude);
+                    location.setLongitude(latLng.longitude);
+                }
                 updateViews(repository.get(Entry.class, id));
             }
         }
 
         ViewUtils.mutate(locationName, ContextCompat.getColor(this, R.color.accent));
 
-        weather = new Weather(this);
-
-        google = new Google(this, googleApiClientBuilder,
-                new Google.GoogleServiceCallback() {
-                    @Override
-                    public void onConnected(Bundle bundle) {
-                        getLocationData();
-                    }
-                });
+        google.setActivity(this);
     }
 
     @Override
-    public void inject(DiaryApplication diaryApplication) {
-        diaryApplication.getContextComponent().inject(this);
+    public void onConnected(Bundle bundle) {
+        getLocationData();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (location == null && LocationUtils.isLocationEnabled(this)) {
-            google.getLocation()
-                    .subscribe(new ActivitySubscriber<Location>(this) {
-                        @Override
-                        public void onNext(Location location1) {
-                            location = location1;
-                            getWeather(location);
-                            getPlace(location);
-                        }
-                    });
-        }
+        google.connect(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        google.disconnect();
     }
 
     @Override
@@ -179,7 +169,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                     setResult(RESULT_OK, result);
                     finishAfterTransition();
                 } else {
-                    Snackbar.make(root, R.string.activity_new_entry_no_input_error,
+                    Snackbar.make(root, R.string.new_entry_no_input_error,
                             Snackbar.LENGTH_SHORT).show();
                 }
                 break;
@@ -245,7 +235,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
 
             placeName = entry.getPlaceName();
             placeId = entry.getPlaceId();
-            if (entry.getPlaceName() != null) {
+            if (placeName != null) {
                 setLocationText(placeName);
             }
         }
@@ -263,7 +253,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
         objectAnimator.start();
     }
 
-    private void getPlace(Location location1) {
+    private void getPlace(final Location location1) {
         if (placeName == null && placeId == null) {
             final ObjectAnimator pulse = ObjectAnimator.ofFloat(locationName, View.SCALE_X, .95f, 1f);
             pulse.setDuration(AnimUtils.mediumAnim(this));
@@ -271,16 +261,15 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
             pulse.setRepeatMode(ValueAnimator.REVERSE);
             pulse.start();
 
-            google.searchNearby(location1, 3)
-                    .subscribe(new ActivitySubscriber<PlaceResponse>(this) {
+            google.getCurrentPlace(null)
+                    .subscribe(new ActivitySubscriber<List<CopiedPlace>>(this) {
                         @Override
-                        public void onNext(PlaceResponse placeResponse) {
+                        public void onNext(List<CopiedPlace> copiedPlaces) {
                             pulse.end();
 
-                            PlaceResponse.PlaceResult result =
-                                    placeResponse.getResults().get(0);
-                            placeName = result.getName();
-                            placeId = result.getId();
+                            CopiedPlace copiedPlace = copiedPlaces.get(0);
+                            placeName = copiedPlace.getName();
+                            placeId = copiedPlace.getId();
 
                             setLocationText(placeName);
                         }
@@ -331,18 +320,22 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
         if (hasPermissions(permissions)) {
             if (hasConnection()) {
                 if (LocationUtils.isLocationEnabled(this)) {
-                    google.getLocation()
-                            .subscribe(new ActivitySubscriber<Location>(this) {
-                                @Override
-                                public void onNext(Location location1) {
-                                    location = location1;
-                                    getWeather(location);
-                                    getPlace(location);
-                                }
-                            });
+                    if (location == null) {
+                        google.getLocation()
+                                .subscribe(new ActivitySubscriber<Location>(this) {
+                                    @Override
+                                    public void onNext(Location location1) {
+                                        location = location1;
+                                        getWeather(location);
+                                        getPlace(location);
+                                    }
+                                });
+                    } else {
+                        setLocationText(placeName);
+                    }
                 } else {
                     Snackbar.make(root,
-                            R.string.activity_location_not_enabled,
+                            R.string.location_not_enabled,
                             Snackbar.LENGTH_LONG)
                             .setAction(android.R.string.ok, new View.OnClickListener() {
                                 @Override
@@ -352,6 +345,8 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                             })
                             .show();
                 }
+            } else {
+                noInternet();
             }
         } else {
             ActivityCompat.requestPermissions(this, permissions, REQUEST_LOCATION_PERMISSION);

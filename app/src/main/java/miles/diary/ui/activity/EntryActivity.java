@@ -100,6 +100,7 @@ public class EntryActivity extends TransitionActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_entry);
 
+        toolbar.setTitle("");
         setActionBar(toolbar);
         if (getActionBar() != null) {
             getActionBar().setDisplayHomeAsUpEnabled(true);

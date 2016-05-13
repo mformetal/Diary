@@ -32,21 +32,16 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.google.gson.Gson;
 
-import javax.inject.Inject;
-
 import butterknife.Bind;
 import butterknife.OnClick;
 import icepick.State;
-import miles.diary.DiaryApplication;
 import miles.diary.R;
-import miles.diary.data.api.Repository;
 import miles.diary.data.model.realm.Entry;
 import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.data.rx.ActivitySubscriber;
-import miles.diary.data.rx.DataTransaction;
+import miles.diary.data.rx.RealmTransaction;
 import miles.diary.ui.PaletteWindows;
 import miles.diary.ui.TypefacerSpan;
-import miles.diary.ui.ZoomController;
 import miles.diary.ui.transition.RoundedImageViewTransition;
 import miles.diary.ui.transition.SimpleTransitionListener;
 import miles.diary.ui.widget.RoundedImageView;
@@ -166,7 +161,7 @@ public class EntryActivity extends TransitionActivity {
                     final String placeName = bundle.getString(NewEntryActivity.PLACE_NAME);
                     final String placeId = bundle.getString(NewEntryActivity.PLACE_ID);
 
-                    repository.updateObject(new DataTransaction<Entry>() {
+                    repository.updateObject(new RealmTransaction<Entry>() {
                         @Override
                         public Entry call() {
                             return entry.update(body, uri, placeName, placeId);

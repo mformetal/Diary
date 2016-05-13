@@ -4,12 +4,11 @@ import io.realm.Realm;
 import io.realm.RealmObject;
 import rx.Observable;
 import rx.Single;
-import rx.SingleSubscriber;
 
 /**
  * Created by mbpeele on 3/3/16.
  */
-public class DataObservable {
+public class RealmObservable {
 
     public static <T extends RealmObject> Single<Void> delete(final T object, final Realm realm) {
         return Single.create(new RealmSingleSubscription(realm) {
@@ -30,22 +29,22 @@ public class DataObservable {
         });
     }
 
-    public static <T extends RealmObject> Observable<T> upload(final DataTransaction<T> dataTransaction,
+    public static <T extends RealmObject> Observable<T> upload(final RealmTransaction<T> realmTransaction,
                                                                final Realm realm) {
         return Observable.create(new RealmObservableSubscription<T>(realm) {
             @Override
             public T commit() {
-                return realm.copyToRealm(dataTransaction.call());
+                return realm.copyToRealm(realmTransaction.call());
             }
         });
     }
 
-    public static <T extends RealmObject> Observable<T> update(final DataTransaction<T> dataTransaction,
+    public static <T extends RealmObject> Observable<T> update(final RealmTransaction<T> realmTransaction,
                                                                final Realm realm) {
         return Observable.create(new RealmObservableSubscription<T>(realm) {
             @Override
             public T commit() {
-                return realm.copyToRealmOrUpdate(dataTransaction.call());
+                return realm.copyToRealmOrUpdate(realmTransaction.call());
             }
         });
     }

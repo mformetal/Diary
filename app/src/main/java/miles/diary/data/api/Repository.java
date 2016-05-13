@@ -6,7 +6,7 @@ import io.realm.RealmObject;
 import io.realm.RealmResults;
 import miles.diary.data.model.realm.Search;
 import miles.diary.data.model.realm.Sorter;
-import miles.diary.data.rx.DataTransaction;
+import miles.diary.data.rx.RealmTransaction;
 import rx.Observable;
 import rx.Single;
 
@@ -29,9 +29,9 @@ public interface Repository {
 
     <T extends RealmObject> Observable<T> uploadObject(T object);
 
-    <T extends RealmObject> Observable<T> updateObject(DataTransaction<T> dataTransaction);
+    <T extends RealmObject> Observable<T> updateObject(RealmTransaction<T> realmTransaction);
 
-    <T extends RealmObject> Observable<T> uploadObject(DataTransaction<T> dataTransaction);
+    <T extends RealmObject> Observable<T> uploadObject(RealmTransaction<T> realmTransaction);
 
     <T extends RealmObject> Single<Void> deleteObject(T object);
 

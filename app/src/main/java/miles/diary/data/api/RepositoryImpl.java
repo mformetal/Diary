@@ -16,8 +16,8 @@ import miles.diary.data.error.RealmClosedException;
 import miles.diary.data.model.realm.RealmModel;
 import miles.diary.data.model.realm.Search;
 import miles.diary.data.model.realm.Sorter;
-import miles.diary.data.rx.DataObservable;
-import miles.diary.data.rx.DataTransaction;
+import miles.diary.data.rx.RealmObservable;
+import miles.diary.data.rx.RealmTransaction;
 import rx.Observable;
 import rx.Single;
 import rx.functions.Func1;
@@ -100,16 +100,16 @@ public class RepositoryImpl implements Repository {
     @Override
     public <T extends RealmObject> Observable<T> uploadObject(T object) {
         if (hasConnection()) {
-            return DataObservable.upload(object, realm);
+            return RealmObservable.upload(object, realm);
         } else {
             return Observable.error(new RealmClosedException());
         }
     }
 
     @Override
-    public <T extends RealmObject> Observable<T> uploadObject(DataTransaction<T> dataTransaction) {
+    public <T extends RealmObject> Observable<T> uploadObject(RealmTransaction<T> realmTransaction) {
         if (hasConnection()) {
-            return DataObservable.upload(dataTransaction, realm);
+            return RealmObservable.upload(realmTransaction, realm);
         } else {
             return Observable.error(new RealmClosedException());
         }
@@ -118,7 +118,7 @@ public class RepositoryImpl implements Repository {
     @Override
     public <T extends RealmObject> Single<Void> deleteObject(T object) {
         if (hasConnection()) {
-            return DataObservable.delete(object, realm);
+            return RealmObservable.delete(object, realm);
         } else {
             return Single.error(new RealmClosedException());
         }
@@ -156,9 +156,9 @@ public class RepositoryImpl implements Repository {
     }
 
     @Override
-    public <T extends RealmObject> Observable<T> updateObject(DataTransaction<T> transaction) {
+    public <T extends RealmObject> Observable<T> updateObject(RealmTransaction<T> transaction) {
         if (hasConnection()) {
-            return DataObservable.update(transaction, realm);
+            return RealmObservable.update(transaction, realm);
         } else {
             return Observable.error(new RealmClosedException());
         }

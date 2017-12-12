@@ -16,7 +16,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import icepick.State;
 import miles.diary.R;
 import miles.diary.ui.PaletteWindows;
@@ -31,9 +31,9 @@ import miles.diary.util.ViewUtils;
  */
 public class UriActivity extends BaseActivity {
 
-    @Bind(R.id.activity_uri_toolbar)
+    @BindView(R.id.activity_uri_toolbar)
     Toolbar toolbar;
-    @Bind(R.id.activity_uri_image)
+    @BindView(R.id.activity_uri_image)
     ImageView imageView;
 
     @State Uri uri;

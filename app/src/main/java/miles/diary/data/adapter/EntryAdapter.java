@@ -115,10 +115,10 @@ public class EntryAdapter extends BaseRealmAdapter<Entry, RecyclerView.ViewHolde
 
     class TextViewHolder extends BindingViewHolder<Entry> {
 
-        @Bind(R.id.adapter_entry_text_body) TypefaceTextView body;
-        @Bind(R.id.adapter_entry_text_time) TypefaceTextView time;
-        @Bind(R.id.adapter_entry_text_location) TypefaceTextView location;
-        @Bind(R.id.adapter_entry_text_temperature) TypefaceIconTextView weather;
+        @BindView(R.id.adapter_entry_text_body) TypefaceTextView body;
+        @BindView(R.id.adapter_entry_text_time) TypefaceTextView time;
+        @BindView(R.id.adapter_entry_text_location) TypefaceTextView location;
+        @BindView(R.id.adapter_entry_text_temperature) TypefaceIconTextView weather;
 
         public TextViewHolder(View itemView) {
             super(itemView);
@@ -162,11 +162,11 @@ public class EntryAdapter extends BaseRealmAdapter<Entry, RecyclerView.ViewHolde
 
     class ImageViewHolder extends BindingViewHolder<Entry> {
 
-        @Bind(R.id.adapter_entry_image_time) TypefaceTextView time;
-        @Bind(R.id.adapter_entry_image_view) ImageView image;
-        @Bind(R.id.adapter_entry_image_body) TypefaceTextView body;
-        @Bind(R.id.adapter_entry_image_location) TypefaceTextView location;
-        @Bind(R.id.adapter_entry_image_temperature) TypefaceIconTextView weather;
+        @BindView(R.id.adapter_entry_image_time) TypefaceTextView time;
+        @BindView(R.id.adapter_entry_image_view) ImageView image;
+        @BindView(R.id.adapter_entry_image_body) TypefaceTextView body;
+        @BindView(R.id.adapter_entry_image_location) TypefaceTextView location;
+        @BindView(R.id.adapter_entry_image_temperature) TypefaceIconTextView weather;
 
         public ImageViewHolder(View itemView) {
             super(itemView);

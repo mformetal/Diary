@@ -1,23 +1,20 @@
-apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt'
-apply plugin: 'realm-android'
+apply plugin: "com.android.application"
+apply plugin: "realm-android"
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    compileSdkVersion 27
+    buildToolsVersion "27.0.2"
 
     defaultConfig {
-        applicationId "miles.diary"
+        applicationId "mformetal.diary"
         minSdkVersion 21
-        targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
+        targetSdkVersion 27
     }
 
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
 
@@ -26,31 +23,43 @@ android {
     }
 
     packagingOptions {
-        exclude 'META-INF/services/javax.annotation.processing.Processor'
+        exclude "META-INF/services/javax.annotation.processing.Processor"
     }
 }
 
 dependencies {
-    compile 'frankiesardo:icepick:3.2.0'
-    apt 'frankiesardo:icepick-processor:3.2.0'
+    implementation "frankiesardo:icepick:3.2.0"
+    annotationProcessor "frankiesardo:icepick-processor:3.2.0"
 
-    provided 'com.google.dagger:dagger-compiler:2.0'
-    provided 'org.glassfish:javax.annotation:10.0-b28'
-    compile 'com.google.dagger:dagger:2.0'
-    compile 'com.google.maps.android:android-maps-utils:0.4'
-    compile 'com.google.android.gms:play-services-location:8.4.0'
-    compile 'com.google.guava:guava:19.0'
-    compile 'com.android.support:appcompat-v7:23.3.0'
-    compile 'com.android.support:design:23.3.0'
-    compile 'com.android.support:palette-v7:23.3.0'
-    compile 'com.android.support:support-v13:23.3.0'
-    compile 'com.jakewharton:butterknife:7.0.1'
-    compile 'com.google.code.gson:gson:2.5'
-    compile 'io.reactivex:rxandroid:1.1.0'
-    compile 'io.reactivex:rxjava:1.0.14'
-    compile 'com.squareup.okhttp3:okhttp:3.0.1'
-    compile 'com.squareup.okhttp3:logging-interceptor:3.0.1'
-    compile 'com.github.bumptech.glide:glide:3.7.0'
-    compile 'com.commit451:PhotoView:1.2.4'
-    compile 'com.joanzapata.iconify:android-iconify-weathericons:2.1.1'
+    implementation "com.google.maps.android:android-maps-utils:0.4"
+    implementation "com.google.android.gms:play-services-location:11.6.2"
+    implementation "com.google.guava:guava:22.0"
+
+    def supportVersion = "27.0.1"
+    implementation "com.android.support:appcompat-v7:$supportVersion"
+    implementation "com.android.support:design:$supportVersion"
+    implementation "com.android.support:palette-v7:$supportVersion"
+    implementation "com.android.support:support-v13:$supportVersion"
+
+    def butterKnifeVersion = "8.8.1"
+    implementation "com.jakewharton:butterknife:$butterKnifeVersion"
+    annotationProcessor "com.jakewharton:butterknife-compiler:$butterKnifeVersion"
+
+    def daggerVersion = "2.9"
+    implementation "com.google.dagger:dagger:$daggerVersion"
+    annotationProcessor "com.google.dagger:dagger-compiler:$daggerVersion"
+
+    implementation "com.google.code.gson:gson:2.8.1"
+    implementation "io.reactivex:rxandroid:1.1.0"
+    implementation "io.reactivex:rxjava:1.1.0"
+
+    implementation "com.squareup.okhttp3:okhttp:3.9.1"
+    implementation "com.squareup.okhttp3:logging-interceptor:3.9.1"
+
+    def glideVersion = "4.3.1"
+    implementation "com.github.bumptech.glide:glide:$glideVersion"
+    annotationProcessor "com.github.bumptech.glide:compiler:$glideVersion"
+
+    implementation "com.commit451:PhotoView:1.2.4"
+    implementation "com.joanzapata.iconify:android-iconify-weathericons:2.1.1"
 }

@@ -24,18 +24,16 @@ import android.view.animation.Interpolator;
 import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.OnClick;
 import icepick.State;
 import miles.diary.R;
-import miles.diary.data.model.google.CopiedPlace;
-import miles.diary.util.LocationUtils;
 import miles.diary.data.api.Google;
+import miles.diary.data.model.google.CopiedPlace;
 import miles.diary.data.model.realm.Entry;
 import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.data.rx.ActivitySubscriber;
@@ -45,14 +43,15 @@ import miles.diary.ui.widget.CircleImageView;
 import miles.diary.ui.widget.TypefaceButton;
 import miles.diary.ui.widget.TypefaceEditText;
 import miles.diary.util.AnimUtils;
+import miles.diary.util.LocationUtils;
 import miles.diary.util.ViewUtils;
 
 public class NewEntryActivity extends BaseActivity implements View.OnClickListener, Google.GoogleCallback {
 
-    @Bind(R.id.fragment_entry_toolbar) Toolbar toolbar;
-    @Bind(R.id.activity_new_entry_body) TypefaceEditText bodyInput;
-    @Bind(R.id.activity_new_entry_photo) CircleImageView photo;
-    @Bind(R.id.activity_new_entry_location) TypefaceButton locationName;
+    @BindView(R.id.fragment_entry_toolbar) Toolbar toolbar;
+    @BindView(R.id.activity_new_entry_body) TypefaceEditText bodyInput;
+    @BindView(R.id.activity_new_entry_photo) CircleImageView photo;
+    @BindView(R.id.activity_new_entry_location) TypefaceButton locationName;
 
     public static final String BODY = "body";
     public static final String URI = "uri";

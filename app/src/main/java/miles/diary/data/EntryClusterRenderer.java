@@ -25,9 +25,9 @@ public class EntryClusterRenderer extends DefaultClusterRenderer<Entry> {
     private final IconGenerator clusterIconGenerator;
     private final LayoutInflater layoutInflater;
 
-    @Bind(R.id.marker_entry_image)
+    @BindView(R.id.marker_entry_image)
     CircleImageView imageView;
-    @Bind(R.id.marker_entry_text)
+    @BindView(R.id.marker_entry_text)
     TypefaceTextView textView;
 
     public EntryClusterRenderer(Context context, GoogleMap map, ClusterManager<Entry> clusterManager) {

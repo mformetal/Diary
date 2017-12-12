@@ -79,7 +79,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
 
     class GalleryViewHolder extends BindingViewHolder<Integer> {
 
-        @Bind(R.id.adapter_gallery_image)
+        @BindView(R.id.adapter_gallery_image)
         ImageView imageView;
 
         public GalleryViewHolder(View itemView) {

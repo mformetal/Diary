@@ -23,9 +23,8 @@ import android.widget.Toolbar;
 import java.io.File;
 import java.io.IOException;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import icepick.State;
-import miles.diary.DiaryApplication;
 import miles.diary.R;
 import miles.diary.data.adapter.GalleryAdapter;
 import miles.diary.ui.SpacingDecoration;
@@ -43,9 +42,9 @@ public class GalleryActivity extends BaseActivity implements LoaderManager.Loade
     private final static int PERMISSION_IMAGE = 3;
     private static final int LOADER_ID = 4;
 
-    @Bind(R.id.activity_gallery_toolbar)
+    @BindView(R.id.activity_gallery_toolbar)
     Toolbar toolbar;
-    @Bind(R.id.activity_gallery_recycler)
+    @BindView(R.id.activity_gallery_recycler)
     RecyclerView recyclerView;
 
     private GalleryAdapter adapter;

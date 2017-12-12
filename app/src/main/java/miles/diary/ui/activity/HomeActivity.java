@@ -23,14 +23,15 @@ import android.widget.Toolbar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import io.realm.Case;
 import io.realm.Sort;
 import miles.diary.R;
+import miles.diary.data.DataLoadingListener;
 import miles.diary.data.adapter.EntryAdapter;
-import miles.diary.data.model.realm.Entry;
 import miles.diary.data.model.Search;
 import miles.diary.data.model.Sorter;
+import miles.diary.data.model.realm.Entry;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.data.rx.DataLoadingSubscriber;
 import miles.diary.ui.PreDrawer;
@@ -39,18 +40,17 @@ import miles.diary.ui.transition.FabContainerTransition;
 import miles.diary.ui.widget.SearchWidget;
 import miles.diary.util.AnimUtils;
 import miles.diary.util.ColorsUtils;
-import miles.diary.data.DataLoadingListener;
 import miles.diary.util.Logg;
 
 public class HomeActivity extends BaseActivity implements DataLoadingListener<List<Entry>> {
 
-    @Bind(R.id.activity_home_recycler) RecyclerView recyclerView;
-    @Bind(R.id.activity_home_toolbar) Toolbar toolbar;
-    @Bind(R.id.activity_home_loading) ProgressBar progressBar;
-    @Bind(R.id.activity_home_fab) FloatingActionButton fab;
-    @Bind(R.id.activity_home_search_widget) SearchWidget searchWidget;
-    @Bind(R.id.activity_home_drawer) DrawerLayout drawerLayout;
-    @Bind(R.id.activity_home_navigation_view) NavigationView navigationView;
+    @BindView(R.id.activity_home_recycler) RecyclerView recyclerView;
+    @BindView(R.id.activity_home_toolbar) Toolbar toolbar;
+    @BindView(R.id.activity_home_loading) ProgressBar progressBar;
+    @BindView(R.id.activity_home_fab) FloatingActionButton fab;
+    @BindView(R.id.activity_home_search_widget) SearchWidget searchWidget;
+    @BindView(R.id.activity_home_drawer) DrawerLayout drawerLayout;
+    @BindView(R.id.activity_home_navigation_view) NavigationView navigationView;
 
     private final static int RESULT_CODE_NEW_ENTRY = 1;
     public final static int RESULT_CODE_ENTRY = 2;

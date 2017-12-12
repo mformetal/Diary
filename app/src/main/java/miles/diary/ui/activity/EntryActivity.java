@@ -32,21 +32,16 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.google.gson.Gson;
 
-import javax.inject.Inject;
-
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.OnClick;
 import icepick.State;
-import miles.diary.DiaryApplication;
 import miles.diary.R;
-import miles.diary.data.api.Repository;
 import miles.diary.data.model.realm.Entry;
 import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.data.rx.ActivitySubscriber;
 import miles.diary.data.rx.DataTransaction;
 import miles.diary.ui.PaletteWindows;
 import miles.diary.ui.TypefacerSpan;
-import miles.diary.ui.ZoomController;
 import miles.diary.ui.transition.RoundedImageViewTransition;
 import miles.diary.ui.transition.SimpleTransitionListener;
 import miles.diary.ui.widget.RoundedImageView;
@@ -71,19 +66,19 @@ public class EntryActivity extends TransitionActivity {
         DELETE
     }
 
-    @Bind(R.id.activity_entry_place_photos)
+    @BindView(R.id.activity_entry_place_photos)
     FloatingActionButton photosFab;
-    @Bind(R.id.activity_entry_toolbar)
+    @BindView(R.id.activity_entry_toolbar)
     Toolbar toolbar;
-    @Bind(R.id.activity_entry_body)
+    @BindView(R.id.activity_entry_body)
     TypefaceTextView body;
-    @Bind(R.id.activity_entry_image)
+    @BindView(R.id.activity_entry_image)
     RoundedImageView image;
-    @Bind(R.id.activity_entry_place)
+    @BindView(R.id.activity_entry_place)
     TypefaceTextView place;
-    @Bind(R.id.activity_entry_date)
+    @BindView(R.id.activity_entry_date)
     TypefaceTextView date;
-    @Bind(R.id.activity_entry_weather)
+    @BindView(R.id.activity_entry_weather)
     TypefaceIconTextView weather;
 
     private Entry entry;

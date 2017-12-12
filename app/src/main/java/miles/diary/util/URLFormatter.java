@@ -17,7 +17,7 @@ public class URLFormatter {
     }
 
     public static String weather(Context context, double latitude, double longitude) {
-        return context.getString(R.string.weather_base) + "data/2.5/weather?" +
+        return context.getString(R.string.weather_base) + "data/2.5/weatherView?" +
                 "lat=" + latitude + "&lon=" + longitude + "&APPID=" + context.getString(R.string.weather_api_key);
     }
 }

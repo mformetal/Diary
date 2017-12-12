@@ -134,7 +134,7 @@ public class EntryAdapter extends BaseRealmAdapter<Entry, RecyclerView.ViewHolde
             ((View) body.getParent()).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = EntryActivity.newIntent(getHost(), entry);
+                    Intent intent = EntryActivity.Companion.newIntent(getHost(), entry);
                     ActivityOptions options =
                             ActivityOptions.makeSceneTransitionAnimation(getHost(),
                                     body, getHost().getString(R.string.transition_entry_text));
@@ -182,7 +182,7 @@ public class EntryAdapter extends BaseRealmAdapter<Entry, RecyclerView.ViewHolde
             image.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = EntryActivity.newIntent(getHost(), entry);
+                    Intent intent = EntryActivity.Companion.newIntent(getHost(), entry);
                     ActivityOptions options =
                             ActivityOptions.makeSceneTransitionAnimation(getHost(),
                                    image, getHost().getString(R.string.transition_entry_image));

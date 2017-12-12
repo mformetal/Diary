@@ -7,17 +7,14 @@ import android.support.v4.view.ViewPager;
 import com.google.android.gms.location.places.PlacePhotoMetadataBuffer;
 import com.google.android.gms.location.places.PlacePhotoMetadataResult;
 
-import javax.inject.Inject;
-
-import butterknife.Bind;
+import butterknife.BindView;
 import icepick.State;
-import miles.diary.DiaryApplication;
 import miles.diary.R;
 import miles.diary.data.adapter.PlacePhotosAdapter;
 import miles.diary.data.api.Google;
 import miles.diary.data.rx.ActivitySubscriber;
-import miles.diary.ui.fragment.DismissingDialogFragment;
 import miles.diary.ui.fragment.ConfirmationDialog;
+import miles.diary.ui.fragment.DismissingDialogFragment;
 import miles.diary.ui.widget.TypefaceTextView;
 import rx.functions.Action1;
 
@@ -29,9 +26,9 @@ public class PlacePhotosActivity extends BaseActivity implements Google.GoogleCa
     public static final String ID = "placeId";
     public static final String NAME = "placeName";
 
-    @Bind(R.id.activity_place_name_view)
+    @BindView(R.id.activity_place_name_view)
     TypefaceTextView nameView;
-    @Bind(R.id.activity_place_photos_pager)
+    @BindView(R.id.activity_place_photos_pager)
     ViewPager pager;
 
     private PlacePhotosAdapter placePhotosAdapter;
@@ -50,19 +47,19 @@ public class PlacePhotosActivity extends BaseActivity implements Google.GoogleCa
             nameView.setText(name);
         }
 
-        google.setActivity(this);
+        getGoogle().setActivity(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        google.connect(this);
+        getGoogle().connect(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        google.disconnect();
+        getGoogle().disconnect();
     }
 
     @Override
@@ -75,11 +72,11 @@ public class PlacePhotosActivity extends BaseActivity implements Google.GoogleCa
 
     @Override
     public void onConnected(Bundle bundle) {
-        placePhotosAdapter = new PlacePhotosAdapter(google, this);
+        placePhotosAdapter = new PlacePhotosAdapter(getGoogle(), this);
         pager.setOffscreenPageLimit(2);
         pager.setAdapter(placePhotosAdapter);
 
-        google.getPlacePhotos(id)
+        getGoogle().getPlacePhotos(id)
                 .doOnError(new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
@@ -110,6 +107,6 @@ public class PlacePhotosActivity extends BaseActivity implements Google.GoogleCa
                 finish();
             }
         });
-        dialog.show(getFragmentManager(), CONFIRMATION_DIALOG);
+        dialog.show(getFragmentManager(), Companion.getCONFIRMATION_DIALOG());
     }
 }

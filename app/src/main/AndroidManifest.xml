@@ -14,7 +14,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:name=".DiaryApplication"
+        android:name=".App"
         android:theme="@style/AppTheme" >
 
         <activity

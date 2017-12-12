@@ -14,7 +14,7 @@ public class WeatherResponse {
     @SerializedName("coord")
     @Expose
     private Coord coord;
-    @SerializedName("weather")
+    @SerializedName("weatherView")
     @Expose
     private List<Weather> weather = new ArrayList<Weather>();
     @SerializedName("base")
@@ -84,7 +84,7 @@ public class WeatherResponse {
     /**
      * 
      * @return
-     *     The weather
+     *     The weatherView
      */
     public List<Weather> getWeather() {
         return weather;
@@ -93,7 +93,7 @@ public class WeatherResponse {
     /**
      * 
      * @param weather
-     *     The weather
+     *     The weatherView
      */
     public void setWeather(List<Weather> weather) {
         this.weather = weather;

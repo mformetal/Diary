@@ -18,7 +18,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import miles.diary.R;
 import miles.diary.data.model.realm.Entry;
 import miles.diary.data.rx.ActivitySubscriber;
@@ -30,7 +30,7 @@ import miles.diary.ui.fragment.DismissingDialogFragment;
  */
 public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
-    @Bind(R.id.activity_map_toolbar)
+    @BindView(R.id.activity_map_toolbar)
     Toolbar toolbar;
 
     @Override
@@ -57,7 +57,7 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
     @Override
     public void onMapReady(final GoogleMap googleMap) {
-        repository.getAll(Entry.class)
+        getRepository().getAll(Entry.class)
                 .subscribe(new ActivitySubscriber<List<Entry>>(this) {
                     @Override
                     public void onNext(List<Entry> entries) {
@@ -80,7 +80,7 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
                 finish();
             }
         });
-        dialog.show(getFragmentManager(), CONFIRMATION_DIALOG);
+        dialog.show(getFragmentManager(), Companion.getCONFIRMATION_DIALOG());
     }
 
     private void createInfoWindows(final GoogleMap googleMap, List<Entry> entries) {

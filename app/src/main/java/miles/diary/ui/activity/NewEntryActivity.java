@@ -81,9 +81,9 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
-            long id =  bundle.getLong(EntryActivity.INTENT_KEY, -1L);
+            long id =  bundle.getLong(EntryActivity.Companion.getINTENT_KEY(), -1L);
             if (id != -1L) {
-                Entry entry = repository.get(Entry.class, id);
+                Entry entry = getRepository().get(Entry.class, id);
                 placeName = entry.getPlaceName();
                 placeId = entry.getPlaceId();
                 temperature = entry.getWeather();
@@ -94,13 +94,13 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                     location.setLatitude(latLng.latitude);
                     location.setLongitude(latLng.longitude);
                 }
-                updateViews(repository.get(Entry.class, id));
+                updateViews(getRepository().get(Entry.class, id));
             }
         }
 
         ViewUtils.mutate(locationName, ContextCompat.getColor(this, R.color.accent));
 
-        google.setActivity(this);
+        getGoogle().setActivity(this);
     }
 
     @Override
@@ -111,13 +111,13 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
     @Override
     protected void onResume() {
         super.onResume();
-        google.connect(this);
+        getGoogle().connect(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        google.disconnect();
+        getGoogle().disconnect();
     }
 
     @Override
@@ -168,7 +168,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                     setResult(RESULT_OK, result);
                     finishAfterTransition();
                 } else {
-                    Snackbar.make(root, R.string.new_entry_no_input_error,
+                    Snackbar.make(getRoot(), R.string.new_entry_no_input_error,
                             Snackbar.LENGTH_SHORT).show();
                 }
                 break;
@@ -260,7 +260,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
             pulse.setRepeatMode(ValueAnimator.REVERSE);
             pulse.start();
 
-            google.getCurrentPlace(null)
+            getGoogle().getCurrentPlace(null)
                     .subscribe(new ActivitySubscriber<List<CopiedPlace>>(this) {
                         @Override
                         public void onNext(List<CopiedPlace> copiedPlaces) {
@@ -280,7 +280,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
 
     private void getWeather(Location location) {
         if (temperature == null) {
-            weather.getWeather(location.getLatitude(), location.getLongitude())
+            getWeather().getWeather(location.getLatitude(), location.getLongitude())
                     .subscribe(new ActivitySubscriber<WeatherResponse>(this) {
                         @Override
                         public void onNext(WeatherResponse weatherResponse) {
@@ -320,7 +320,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
             if (hasConnection()) {
                 if (LocationUtils.isLocationEnabled(this)) {
                     if (location == null) {
-                        google.getLocation()
+                        getGoogle().getLocation()
                                 .subscribe(new ActivitySubscriber<Location>(this) {
                                     @Override
                                     public void onNext(Location location1) {
@@ -333,7 +333,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
                         setLocationText(placeName);
                     }
                 } else {
-                    Snackbar.make(root,
+                    Snackbar.make(getRoot(),
                             R.string.location_not_enabled,
                             Snackbar.LENGTH_LONG)
                             .setAction(android.R.string.ok, new View.OnClickListener() {
@@ -366,7 +366,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
 
         sharedEnter.setPathMotion(arcMotion);
         sharedEnter.setInterpolator(easeInOut);
-        sharedEnter.addTarget(root);
+        sharedEnter.addTarget(getRoot());
         sharedEnter.setDuration(dur);
 
         ContainerFabTransition sharedReturn = new ContainerFabTransition(end, start);
@@ -376,7 +376,7 @@ public class NewEntryActivity extends BaseActivity implements View.OnClickListen
 
         sharedReturn.setPathMotion(returnArc);
         sharedReturn.setInterpolator(easeInOut);
-        sharedReturn.addTarget(root);
+        sharedReturn.addTarget(getRoot());
         sharedReturn.setDuration(dur);
 
         getWindow().setSharedElementEnterTransition(sharedEnter);

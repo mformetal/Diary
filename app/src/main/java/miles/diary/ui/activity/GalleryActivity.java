@@ -78,7 +78,7 @@ public class GalleryActivity extends BaseActivity implements LoaderManager.Loade
                     finish();
                 }
             });
-            dialog.show(getFragmentManager(), CONFIRMATION_DIALOG);
+            dialog.show(getFragmentManager(), Companion.getCONFIRMATION_DIALOG());
         }
     }
 

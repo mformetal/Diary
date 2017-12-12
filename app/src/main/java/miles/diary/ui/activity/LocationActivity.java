@@ -20,12 +20,9 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.OnClick;
 import icepick.State;
-import miles.diary.DiaryApplication;
 import miles.diary.R;
 import miles.diary.data.adapter.AutoCompleteAdapter;
 import miles.diary.data.api.Google;
@@ -45,12 +42,12 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
     private final static int REQUEST_LOCATION_PERMISSION = 1;
     private final static int REQUEST_PLACE_PICKER = 2;
 
-    @Bind(R.id.activity_location_pos_button) TypefaceButton posButton;
-    @Bind(R.id.activity_location_autocomplete) TypefaceAutoCompleteTextView autoCompleteTextView;
-    @Bind(R.id.activity_location_image) ImageView mapIcon;
+    @BindView(R.id.activity_location_pos_button) TypefaceButton posButton;
+    @BindView(R.id.activity_location_autocomplete) TypefaceAutoCompleteTextView autoCompleteTextView;
+    @BindView(R.id.activity_location_image) ImageView mapIcon;
 
-    @State String placeName;
-    @State String placeId;
+    private String placeName;
+    private String placeId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +68,7 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
                     }
                 }
 
-                google.setActivity(this);
+                getGoogle().setActivity(this);
             } else {
                 noInternet();
             }
@@ -83,18 +80,18 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
     @Override
     protected void onResume() {
         super.onResume();
-        google.connect(this);
+        getGoogle().connect(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        google.disconnect();
+        getGoogle().disconnect();
     }
 
     @Override
     public void onConnected(Bundle bundle) {
-        final AutoCompleteAdapter autoCompleteAdapter = google.getAutoCompleteAdapter();
+        final AutoCompleteAdapter autoCompleteAdapter = getGoogle().getAutoCompleteAdapter();
         autoCompleteTextView.setAdapter(autoCompleteAdapter);
 
         autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -174,7 +171,7 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
                     setReturnData();
                     finishAfterTransition();
                 } else {
-                    Snackbar.make(root, R.string.location_no_input_prompt,
+                    Snackbar.make(getRoot(), R.string.location_no_input_prompt,
                             Snackbar.LENGTH_SHORT).show();
                 }
                 break;
@@ -192,7 +189,7 @@ public class LocationActivity extends TransitionActivity implements View.OnClick
 
     private void getPlace() {
         if (placeName == null && placeId == null) {
-            google.getCurrentPlace(null)
+            getGoogle().getCurrentPlace(null)
                     .subscribe(new ActivitySubscriber<List<CopiedPlace>>(this) {
                         @Override
                         public void onNext(List<CopiedPlace> copiedPlaces) {

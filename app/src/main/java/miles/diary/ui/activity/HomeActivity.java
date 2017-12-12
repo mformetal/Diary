@@ -80,9 +80,9 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener<Li
 
         addNavigationViewClickListener();
 
-        if (storage.getBoolean("firstTime", true)) {
+        if (getStorage().getBoolean("firstTime", true)) {
             drawerLayout.openDrawer(GravityCompat.START);
-            storage.setBoolean("firstTime", false);
+            getStorage().setBoolean("firstTime", false);
         }
 
         fetchData();
@@ -141,7 +141,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener<Li
             case RESULT_CODE_NEW_ENTRY:
                 if (resultCode == RESULT_OK) {
                     final Bundle bundle = data.getExtras();
-                    repository.uploadObject(Entry.fromBundle(bundle))
+                    getRepository().uploadObject(Entry.fromBundle(bundle))
                             .subscribe(new ActivitySubscriber<Entry>(this) {
                                 @Override
                                 public void onNext(Entry entry) {
@@ -160,11 +160,11 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener<Li
                 if (data != null) {
                     Bundle bundle = data.getExtras();
                     final EntryActivity.Action action = (EntryActivity.Action)
-                            bundle.getSerializable(EntryActivity.INTENT_KEY);
+                            bundle.getSerializable(EntryActivity.Companion.getINTENT_KEY());
                     if (action != null) {
-                        long id = bundle.getLong(EntryActivity.INTENT_ACTION, -1);
+                        long id = bundle.getLong(EntryActivity.Companion.getINTENT_ACTION(), -1);
                         if (id != -1) {
-                            Entry entry = repository.get(Entry.class, id);
+                            Entry entry = getRepository().get(Entry.class, id);
                             executeAction(action, entry);
                         }
                     }
@@ -247,7 +247,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener<Li
                 .setSortOrders(Sort.DESCENDING)
                 .createRealmSearch();
 
-        SearchWidget.SearchListener searchListener = new TintingSearchListener(root, color) {
+        SearchWidget.SearchListener searchListener = new TintingSearchListener(getRoot(), color) {
             @Override
             public void onSearchShow(int[] position) {
                 super.onSearchShow(position);
@@ -265,12 +265,12 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener<Li
                 super.onSearchTextChanged(text);
                 search.constraint = text;
 
-                repository.search(Entry.class, search)
+                getRepository().search(Entry.class, search)
                         .debounce(150, TimeUnit.MILLISECONDS)
                         .subscribe(new ActivitySubscriber<List<Entry>>(HomeActivity.this) {
                             @Override
                             public void onNext(List<Entry> entries) {
-                                root.bringChildToFront(recyclerView);
+                                getRoot().bringChildToFront(recyclerView);
                                 entryAdapter.setData(entries, true);
 
                                 scrollToTop();
@@ -293,12 +293,12 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener<Li
     private void fetchData() {
         Sorter sorter = new Sorter(new String[] {Entry.KEY}, new Sort[] {Sort.DESCENDING});
 
-        repository.getAllSorted(Entry.class, sorter)
+        getRepository().getAllSorted(Entry.class, sorter)
                 .subscribe(new DataLoadingSubscriber<>(this));
     }
 
     private void runEnterAnimation() {
-        PreDrawer.addPreDrawer(root, new PreDrawer.OnPreDrawListener<ViewGroup>() {
+        PreDrawer.addPreDrawer(getRoot(), new PreDrawer.OnPreDrawListener<ViewGroup>() {
             @Override
             public boolean onPreDraw(ViewGroup view) {
                 fab.startAnimation(AnimationUtils.loadAnimation(view.getContext(), R.anim.glide_pop));
@@ -349,7 +349,7 @@ public class HomeActivity extends BaseActivity implements DataLoadingListener<Li
                 if (entryAdapter.isEmpty()) {
                     onLoadEmpty();
                 }
-                addSubscription(repository.deleteObject(entry).subscribe());
+                addSubscription(getRepository().deleteObject(entry).subscribe());
                 break;
             case EDIT:
                 entryAdapter.update(entry);

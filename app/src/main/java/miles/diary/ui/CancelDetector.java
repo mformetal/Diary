@@ -10,6 +10,9 @@ import android.widget.EditText;
 
 import java.util.Arrays;
 
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
+
 /**
  * Created by mbpeele on 2/6/16.
  */
@@ -38,13 +41,13 @@ public class CancelDetector {
 
         hideDrawables = new Drawable[4];
 
-        PreDrawer.addPreDrawer(widget, new PreDrawer.OnPreDrawListener<EditText>() {
+        PreDrawerKt.addPreDrawer(widget, new Function1<View, Unit>() {
             @Override
-            public boolean onPreDraw(EditText view) {
-                Drawable[] drawables = view.getCompoundDrawables();
+            public Unit invoke(View view) {
+                Drawable[] drawables = widget.getCompoundDrawables();
                 hideDrawables = Arrays.copyOf(drawables, drawables.length);
                 canceler = hideDrawables[2];
-                return true;
+                return null;
             }
         });
     }

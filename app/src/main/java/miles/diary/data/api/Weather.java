@@ -4,21 +4,17 @@ import android.content.Context;
 
 import com.google.gson.Gson;
 
-import javax.inject.Singleton;
-
-import miles.diary.R;
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import miles.diary.data.model.weather.WeatherResponse;
 import miles.diary.data.rx.OkHttpObservable;
 import miles.diary.util.URLFormatter;
 import okhttp3.OkHttpClient;
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  * Created by mbpeele on 2/4/16.
  */
-@Singleton
 public class Weather {
 
     private OkHttpClient client;
@@ -31,10 +27,10 @@ public class Weather {
         gson = new Gson();
     }
 
-    public Observable<WeatherResponse> getWeather(final Double latitude, final Double longitude) {
+    public Single<WeatherResponse> getWeather(final Double latitude, final Double longitude) {
         String url = URLFormatter.weather(context, latitude, longitude);
 
-        OkHttpObservable<WeatherResponse> okHttpObservable = OkHttpObservable.<WeatherResponse>builder()
+        OkHttpObservable<WeatherResponse> okHttpObservable = OkHttpObservable.Companion.<WeatherResponse>builder()
                 .target(WeatherResponse.class)
                 .url(url)
                 .gson(gson)

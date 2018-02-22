@@ -4,9 +4,6 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 
-import com.google.android.gms.maps.model.LatLng;
-import com.google.maps.android.clustering.ClusterItem;
-
 import java.util.Date;
 import java.util.Objects;
 
@@ -15,7 +12,7 @@ import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
 import miles.diary.ui.activity.NewEntryActivity;
 
-public class Entry extends RealmObject implements RealmModel<Entry>, ClusterItem {
+public class Entry extends RealmObject {
 
     public final static String KEY = "dateMillis";
 
@@ -61,22 +58,10 @@ public class Entry extends RealmObject implements RealmModel<Entry>, ClusterItem
         latitude = builder.latitude;
     }
 
-    @Override
-    public LatLng getPosition() {
-        if (hasLatLng()) {
-            return new LatLng(latitude, longitude);
-        } else {
-            throw new NullPointerException("Attempt to get the LatLng of an Entry that does not " +
-                    "have location data");
-        }
-    }
-
-    @Override
     public Long getPrimaryKey() {
         return dateMillis;
     }
 
-    @Override
     public boolean isEqualTo(Entry object) {
         return Objects.equals(getPrimaryKey(), object.getPrimaryKey());
     }
@@ -157,12 +142,12 @@ public class Entry extends RealmObject implements RealmModel<Entry>, ClusterItem
     }
 
     public static Entry fromBundle(Bundle bundle) {
-        final String body = bundle.getString(NewEntryActivity.BODY);
-        final Uri uri = bundle.getParcelable(NewEntryActivity.URI);
-        final String placeName = bundle.getString(NewEntryActivity.PLACE_NAME);
-        final String placeId = bundle.getString(NewEntryActivity.PLACE_ID);
-        final String weather = bundle.getString(NewEntryActivity.TEMPERATURE);
-        final Location location = bundle.getParcelable(NewEntryActivity.LOCATION);
+        final String body = bundle.getString(NewEntryActivity.Companion.getBODY());
+        final Uri uri = bundle.getParcelable(NewEntryActivity.Companion.getURI());
+        final String placeName = bundle.getString(NewEntryActivity.Companion.getPLACE_NAME());
+        final String placeId = bundle.getString(NewEntryActivity.Companion.getPLACE_ID());
+        final String weather = bundle.getString(NewEntryActivity.Companion.getTEMPERATURE());
+        final Location location = bundle.getParcelable(NewEntryActivity.Companion.getLOCATION());
 
         return Entry.builder()
                 .setBody(body)

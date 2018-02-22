@@ -1,6 +1,5 @@
 package miles.diary.util;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,14 +9,12 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Looper;
 import android.provider.Settings;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
-import miles.diary.ui.activity.BaseActivity;
-import rx.Observable;
-import rx.Subscriber;
+import io.reactivex.Single;
 
 /**
  * Created by mbpeele on 3/5/16.
@@ -85,22 +82,12 @@ public class LocationUtils {
         context.registerReceiver(receiver, new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION));
     }
 
-    public static Observable<List<Address>> geocode(final Context context, final Location location, final int count) {
-        return Observable.create(new Observable.OnSubscribe<List<Address>>() {
+    public static Single<List<Address>> geocode(final Context context, final Location location, final int count) {
+        return Single.fromCallable(new Callable<List<Address>>() {
             @Override
-            public void call(Subscriber<? super List<Address>> subscriber) {
-                subscriber.onStart();
-
-                Geocoder geocoder = new Geocoder(context);
-
-                try {
-                    subscriber.onNext(geocoder.getFromLocation(
-                            location.getLatitude(), location.getLongitude(), count));
-                } catch (Exception e) {
-                    subscriber.onError(e);
-                } finally {
-                    subscriber.onCompleted();
-                }
+            public List<Address> call() throws Exception {
+                return new Geocoder(context)
+                        .getFromLocation(location.getLatitude(), location.getLongitude(), count);
             }
         });
     }

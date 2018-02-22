@@ -3,7 +3,6 @@ package miles.diary.util;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
@@ -16,9 +15,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 import miles.diary.R;
-import miles.diary.ui.PreDrawer;
-import uk.co.senab.photoview.PhotoViewAttacher;
+import miles.diary.ui.PreDrawerKt;
 
 /**
  * Created by mbpeele on 1/14/16.
@@ -71,11 +71,11 @@ public class ViewUtils {
         }
 
         if (!hasDrawable) {
-            PreDrawer.addPreDrawer(textView, new PreDrawer.OnPreDrawListener<TextView>() {
+            PreDrawerKt.addPreDrawer(textView, new Function1<View, Unit>() {
                 @Override
-                public boolean onPreDraw(TextView view) {
-                    mutate(view.getCompoundDrawables(), color);
-                    return true;
+                public Unit invoke(View view) {
+                    mutate(((TextView) view).getCompoundDrawables(), color);
+                    return null;
                 }
             });
         }

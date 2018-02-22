@@ -5,26 +5,16 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.graphics.Canvas;
-import android.os.Handler;
-import android.support.design.widget.AppBarLayout;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
-import android.view.ViewGroupOverlay;
-import android.view.WindowInsets;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 
-import java.lang.ref.WeakReference;
-
-import miles.diary.R;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 import miles.diary.ui.widget.SearchWidget;
 import miles.diary.util.AnimUtils;
-import miles.diary.util.Logg;
 import miles.diary.util.ViewUtils;
 
 /**
@@ -41,11 +31,11 @@ public abstract class TintingSearchListener implements SearchWidget.SearchListen
         root = viewGroup;
 
         if (root.getWidth() == 0 || root.getHeight() == 0) {
-            PreDrawer.addPreDrawer(root, new PreDrawer.OnPreDrawListener<ViewGroup>() {
+            PreDrawerKt.addPreDrawer(root, new Function1<View, Unit>() {
                 @Override
-                public boolean onPreDraw(ViewGroup view) {
+                public Unit invoke(View view) {
                     createTintView(color);
-                    return true;
+                    return null;
                 }
             });
         } else {

@@ -9,15 +9,9 @@ import android.graphics.PorterDuff
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
-import android.support.design.widget.Snackbar
-import android.support.v4.content.ContextCompat
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.RelativeSizeSpan
-import android.transition.ArcMotion
-import android.transition.ChangeImageTransform
-import android.transition.Transition
-import android.transition.TransitionSet
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -25,42 +19,33 @@ import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.TextView
 import android.widget.Toolbar
-import butterknife.BindView
-import butterknife.OnClick
 import com.google.gson.Gson
+import mformetal.kodi.android.KodiActivity
+import mformetal.kodi.core.Kodi
+import mformetal.kodi.core.api.ScopeRegistry
 import miles.diary.R
 import miles.diary.data.model.realm.Entry
 import miles.diary.data.model.weather.WeatherResponse
-import miles.diary.data.rx.ActivitySubscriber
 import miles.diary.ui.TypefacerSpan
-import miles.diary.ui.transition.RoundedImageViewTransition
-import miles.diary.ui.transition.SimpleTransitionListener
 import miles.diary.ui.widget.RoundedImageView
 import miles.diary.ui.widget.TypefaceIconTextView
 import miles.diary.ui.widget.TypefaceTextView
-import miles.diary.util.AnimUtils
 import miles.diary.util.TextUtils
 import miles.diary.util.ViewUtils
+import miles.diary.util.extensions.findView
 
 /**
  * Created by mbpeele on 2/8/16.
  */
-class EntryActivity : TransitionActivity() {
+class EntryActivity : KodiActivity() {
 
-    @BindView(R.id.activity_entry_place_photos)
-    internal lateinit var photosFab: FloatingActionButton
-    @BindView(R.id.activity_entry_toolbar)
-    internal lateinit var toolbar: Toolbar
-    @BindView(R.id.activity_entry_body)
-    internal lateinit var body: TypefaceTextView
-    @BindView(R.id.activity_entry_image)
-    internal lateinit var image: RoundedImageView
-    @BindView(R.id.activity_entry_place)
-    internal lateinit var place: TypefaceTextView
-    @BindView(R.id.activity_entry_date)
-    internal lateinit var date: TypefaceTextView
-    @BindView(R.id.activity_entry_weather)
-    internal lateinit var weatherView: TypefaceIconTextView
+    val photosFab: FloatingActionButton by findView(R.id.activity_entry_place_photos)
+    val toolbar: Toolbar by findView(R.id.activity_entry_toolbar)
+    val body: TypefaceTextView by findView(R.id.activity_entry_body)
+    val image: RoundedImageView by findView(R.id.activity_entry_image)
+    val place: TypefaceTextView by findView(R.id.activity_entry_place)
+    val date: TypefaceTextView by findView(R.id.activity_entry_date)
+    val weatherView: TypefaceIconTextView by findView(R.id.activity_entry_weather)
 
     private lateinit var entry: Entry
 
@@ -69,6 +54,11 @@ class EntryActivity : TransitionActivity() {
         DELETE
     }
 
+    override fun installModule(kodi: Kodi): ScopeRegistry {
+        return Kodi.EMPTY_REGISTRY
+    }
+
+    @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_entry)
@@ -78,13 +68,6 @@ class EntryActivity : TransitionActivity() {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true)
         }
-
-        entry = repository.get(Entry::class.java, intent.getLongExtra(INTENT_KEY, -1))
-        updateView(entry)
-    }
-
-    override fun overrideTransitions(): Boolean {
-        return false
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -120,66 +103,10 @@ class EntryActivity : TransitionActivity() {
                 val uri = bundle.getParcelable<Uri>(NewEntryActivity.URI)
                 val placeName = bundle.getString(NewEntryActivity.PLACE_NAME)
                 val placeId = bundle.getString(NewEntryActivity.PLACE_ID)
-
-                repository.updateObject({ entry.update(body, uri, placeName, placeId) }).subscribe(object : ActivitySubscriber<Entry>(this) {
-                    override fun onNext(entry1: Entry) {
-                        entry = entry1
-                        updateView(entry)
-                    }
-                })
             }
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
     }
-
-    override fun onEnter(root: ViewGroup, calledIntent: Intent, hasSavedInstanceState: Boolean) {
-        if (entry.uri == null) {
-            val color = ContextCompat.getColor(this, R.color.dark_icons)
-            toolbar.navigationIcon.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN)
-            toolbar.setTitleTextColor(color)
-        } else {
-            val arcMotion = ArcMotion()
-            arcMotion.minimumHorizontalAngle = 50f
-            arcMotion.minimumVerticalAngle = 50f
-
-            val reveal = RoundedImageViewTransition(
-                    Math.max(image.width, image.height) / 2f, 0f)
-            reveal.addTarget(image)
-            reveal.pathMotion = arcMotion
-
-            reveal.addListener(object : SimpleTransitionListener() {
-                override fun onTransitionStart(transition: Transition) {
-                    toolbar.visibility = View.GONE
-                    slideUpView(root, AnimUtils.shortAnim(this@EntryActivity))
-                }
-
-                override fun onTransitionEnd(transition: Transition) {
-                    AnimUtils.visible(toolbar).start()
-                    ViewUtils.setZoomControls(image)
-                }
-            })
-
-            val returnSet = TransitionSet()
-
-            val unreveal = RoundedImageViewTransition(
-                    0f, Math.min(image.width, image.height) / 2f)
-            unreveal.addTarget(image)
-            unreveal.pathMotion = arcMotion
-            unreveal.addListener(object : SimpleTransitionListener() {
-                override fun onTransitionStart(transition: Transition) {
-                    toolbar.visibility = View.GONE
-                }
-            })
-
-            returnSet.addTransition(unreveal)
-            returnSet.addTransition(ChangeImageTransform())
-
-            window.sharedElementEnterTransition = reveal
-            window.sharedElementReturnTransition = returnSet
-        }
-    }
-
-    internal override fun onExit(root: ViewGroup) {}
 
     @SuppressLint("SetTextI18n")
     private fun updateView(entry: Entry) {
@@ -278,16 +205,8 @@ class EntryActivity : TransitionActivity() {
         finish()
     }
 
-    @OnClick(R.id.activity_entry_place_photos)
     protected fun fabClick() {
-        if (hasConnection()) {
-            val intent = Intent(this, PlacePhotosActivity::class.java)
-            intent.putExtra(PlacePhotosActivity.ID, entry.placeId)
-            intent.putExtra(PlacePhotosActivity.NAME, entry.placeName)
-            startActivity(intent)
-        } else {
-            Snackbar.make(root, R.string.error_no_internet, Snackbar.LENGTH_SHORT).show()
-        }
+
     }
 
     companion object {

@@ -7,6 +7,8 @@ import android.graphics.Matrix;
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
 
+import java.security.MessageDigest;
+
 public class RotateTransformation extends BitmapTransformation {
 
     private float rotateRotationAngle = 0f;
@@ -24,7 +26,8 @@ public class RotateTransformation extends BitmapTransformation {
     }
 
     @Override
-    public String getId() {
-        return "rotate" + rotateRotationAngle;
+    public void updateDiskCacheKey(MessageDigest messageDigest) {
+        String key = "rotate " + rotateRotationAngle;
+        messageDigest.update(key.getBytes());
     }
 }

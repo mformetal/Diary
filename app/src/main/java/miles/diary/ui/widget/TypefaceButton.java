@@ -11,7 +11,6 @@ import android.support.v7.widget.AppCompatButton;
 import android.util.AttributeSet;
 
 import miles.diary.R;
-import miles.diary.ui.PreDrawer;
 import miles.diary.util.TextUtils;
 
 /**

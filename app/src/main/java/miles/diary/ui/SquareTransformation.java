@@ -7,9 +7,7 @@ import android.graphics.Matrix;
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
 
-import java.util.UUID;
-
-import miles.diary.util.Logg;
+import java.security.MessageDigest;
 
 /**
  * Created by mbpeele on 3/8/16.
@@ -37,7 +35,7 @@ public class SquareTransformation extends BitmapTransformation {
     }
 
     @Override
-    public String getId() {
-        return UUID.randomUUID().toString();
+    public void updateDiskCacheKey(MessageDigest messageDigest) {
+
     }
 }

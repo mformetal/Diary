@@ -11,17 +11,11 @@ import android.graphics.drawable.Drawable;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.util.Property;
 import android.view.View;
-import android.view.ViewAnimationUtils;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.request.animation.ViewPropertyAnimation;
-
 import java.lang.ref.SoftReference;
-
-import miles.diary.ui.PreDrawer;
 
 /**
  * Created by mbpeele on 2/2/16.
@@ -185,51 +179,6 @@ public class AnimUtils {
         });
         return color;
     }
-
-    public final static ViewPropertyAnimation.Animator REVEAL = new ViewPropertyAnimation.Animator() {
-        @Override
-        public void animate(View view) {
-            if (view.isAttachedToWindow()) {
-                doAnimation(view);
-            } else {
-                view.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
-                    @Override
-                    public void onViewAttachedToWindow(View v) {
-                        doAnimation(v);
-                    }
-
-                    @Override
-                    public void onViewDetachedFromWindow(View v) {
-
-                    }
-                });
-            }
-        }
-
-        private void doAnimation(View view) {
-            if (view.getWidth() == 0 || view.getHeight() == 0) {
-                PreDrawer.addPreDrawer(view, new PreDrawer.OnPreDrawListener<View>() {
-                    @Override
-                    public boolean onPreDraw(View view) {
-                        Animator reveal = ViewAnimationUtils.createCircularReveal(view,
-                                view.getWidth() / 2, view.getHeight() / 2, 0,
-                                Math.max(view.getWidth(), view.getHeight()));
-                        reveal.setDuration(longAnim(view.getContext()));
-                        reveal.setInterpolator(new DecelerateInterpolator());
-                        reveal.start();
-                        return true;
-                    }
-                });
-            } else {
-                Animator reveal = ViewAnimationUtils.createCircularReveal(view,
-                        view.getWidth() / 2, view.getHeight() / 2, 0,
-                        Math.max(view.getWidth(), view.getHeight()));
-                reveal.setDuration(longAnim(view.getContext()));
-                reveal.setInterpolator(new DecelerateInterpolator());
-                reveal.start();
-            }
-        }
-    };
 
     public static abstract class FloatProperty<T> extends Property<T, Float> {
         public FloatProperty(String name) {

@@ -52,6 +52,11 @@
             android:theme="@style/AppTheme.EntryActivity" >
         </activity>
 
+        <activity
+            android:name=".ui.activity.LocationActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="0868d9b0c625e6e7444fd594124826702c89255d" />

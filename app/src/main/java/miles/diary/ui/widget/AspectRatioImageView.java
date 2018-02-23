@@ -2,18 +2,18 @@ package miles.diary.ui.widget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
-import android.widget.ImageView;
 
 import miles.diary.R;
 
-public class AspectRatioImageView extends ImageView {
+public class AspectRatioImageView extends AppCompatImageView {
 
     public static final int MEASUREMENT_WIDTH = 0;
     public static final int MEASUREMENT_HEIGHT = 1;
 
     private static final float DEFAULT_ASPECT_RATIO = 1f;
-    private static final boolean DEFAULT_ASPECT_RATIO_ENABLED = false;
+    private static final boolean DEFAULT_ASPECT_RATIO_ENABLED = true;
     private static final int DEFAULT_DOMINANT_MEASUREMENT = MEASUREMENT_WIDTH;
 
     private float aspectRatio;

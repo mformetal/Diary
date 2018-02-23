@@ -12,7 +12,8 @@ import mformetal.kodi.core.api.builder.bind
 import mformetal.kodi.core.api.builder.get
 import mformetal.kodi.core.provider.component
 import mformetal.kodi.core.provider.singleton
-import miles.diary.data.api.Weather
+import miles.diary.data.api.EntryRepository
+import miles.diary.data.api.RealmEntryRepository
 import miles.diary.util.Storage
 import miles.diary.util.StorageImpl
 
@@ -27,7 +28,7 @@ class App : KodiApp() {
 
             bind<Context>() using component(app)
             bind<App>() using component(app)
-            bind<Weather>() using singleton { Weather(get()) }
+            bind<EntryRepository>() using singleton { RealmEntryRepository() }
             bind<Storage>() using singleton { StorageImpl(get()) }
         }
     }

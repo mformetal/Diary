@@ -9,7 +9,7 @@ import miles.diary.data.model.realm.Entry;
 /**
  * Created by mbpeele on 3/2/16.
  */
-public class RepositoryImpl implements Repository {
+public class RealmEntryRepository implements EntryRepository {
 
     private Realm realm;
 

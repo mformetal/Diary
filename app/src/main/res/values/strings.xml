@@ -18,7 +18,7 @@
 
     <string name="new_entry_location_hint">Add Location</string>
     <string name="new_entry_no_input_error">Your Entry must not be empty</string>
-    <string name="new_entry_body_hint">Memorialize your thoughts</string>
+    <string name="new_entry_body_hint">Penny for your thoughts</string>
 
     <string name="no_camera_error">This device doesn\'t support Camera.</string>
 

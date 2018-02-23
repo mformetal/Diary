@@ -6,7 +6,7 @@ import miles.diary.data.model.realm.Entry
 /**
  * Created by mbpeele on 3/2/16.
  */
-interface Repository {
+interface EntryRepository {
 
     fun open()
 

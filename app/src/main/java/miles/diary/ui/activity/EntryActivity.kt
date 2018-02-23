@@ -6,32 +6,21 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.PorterDuff
-import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.style.RelativeSizeSpan
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
-import android.widget.TextView
 import android.widget.Toolbar
-import com.google.gson.Gson
 import mformetal.kodi.android.KodiActivity
 import mformetal.kodi.core.Kodi
 import mformetal.kodi.core.api.ScopeRegistry
 import miles.diary.R
 import miles.diary.data.model.realm.Entry
-import miles.diary.data.model.weather.WeatherResponse
-import miles.diary.ui.TypefacerSpan
 import miles.diary.ui.widget.RoundedImageView
 import miles.diary.ui.widget.TypefaceIconTextView
 import miles.diary.ui.widget.TypefaceTextView
-import miles.diary.util.TextUtils
-import miles.diary.util.ViewUtils
 import miles.diary.util.extensions.findView
 
 /**
@@ -61,7 +50,7 @@ class EntryActivity : KodiActivity() {
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_entry)
+        setContentView(R.layout.entry)
 
         toolbar.title = ""
         setActionBar(toolbar)
@@ -85,9 +74,7 @@ class EntryActivity : KodiActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_entry_edit -> {
-                val intent = Intent(this, NewEntryActivity::class.java)
-                intent.putExtra(EntryActivity.INTENT_KEY, entry.dateMillis)
-                startActivityForResult(intent, REQUEST_EDIT_ENTRY)
+
             }
             R.id.menu_entry_delete -> setResultAction(Action.DELETE)
             android.R.id.home -> finishAfterTransition()
@@ -97,12 +84,10 @@ class EntryActivity : KodiActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         when (requestCode) {
-            REQUEST_EDIT_ENTRY -> if (resultCode == Activity.RESULT_OK) {
-                val bundle = data.extras
-                val body = bundle.getString(NewEntryActivity.BODY)
-                val uri = bundle.getParcelable<Uri>(NewEntryActivity.URI)
-                val placeName = bundle.getString(NewEntryActivity.PLACE_NAME)
-                val placeId = bundle.getString(NewEntryActivity.PLACE_ID)
+            REQUEST_EDIT_ENTRY -> {
+                if (resultCode == Activity.RESULT_OK) {
+
+                }
             }
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
@@ -110,72 +95,72 @@ class EntryActivity : KodiActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun updateView(entry: Entry) {
-        ViewUtils.mutate(place, place.currentTextColor)
-        ViewUtils.mutate(date, place.currentTextColor)
-
-        val text = "Dear Diary, " +
-                TextUtils.repeat(2, TextUtils.LINE_SEPERATOR) +
-                TextUtils.repeat(5, TextUtils.TAB) +
-                entry.body
-
-        val spannableString = SpannableString(text)
-        spannableString.setSpan(RelativeSizeSpan(1.4f), 0, 12, Spanned.SPAN_INCLUSIVE_INCLUSIVE)
-        spannableString.setSpan(TypefacerSpan(TextUtils.getFont(this, getString(R.string.default_font))),
-                12, spannableString.length, Spanned.SPAN_INCLUSIVE_INCLUSIVE)
-        body.setText(spannableString, TextView.BufferType.SPANNABLE)
-
-        val placeName = entry.placeName
-        if (placeName != null) {
-            place.visibility = View.VISIBLE
-            place.text = placeName
-        } else {
-            photosFab.visibility = View.GONE
-            place.visibility = View.GONE
-        }
-
-        date.text = TextUtils.formatDate(entry.date) + TextUtils.LINE_SEPERATOR +
-                TextUtils.formatTime(entry.date)
-
-        val string = entry.weather
-        if (string != null) {
-            weatherView.visibility = View.VISIBLE
-            val weatherResponse = Gson().fromJson(string, WeatherResponse::class.java)
-            weatherView.text = weatherResponse.oneLineTemperatureString
-        } else {
-            weatherView.visibility = View.GONE
-        }
-
-        if (entry.uri != null) {
-            postponeEnterTransition()
-
-            image.visibility = View.VISIBLE
-
-//            Glide.with(this)
-//                    .fromString()
-//                    .asBitmap()
-//                    .load(entry.uri)
-//                    .centerCrop()
-//                    .listener(object : RequestListener<String, Bitmap> {
-//                        fun onException(e: Exception, model: String, target: Target<Bitmap>, isFirstResource: Boolean): Boolean {
-//                            Logg.log(e)
-//                            return false
-//                        }
+//        ViewUtils.mutate(place, place.currentTextColor)
+//        ViewUtils.mutate(date, place.currentTextColor)
 //
-//                        fun onResourceReady(resource: Bitmap, model: String, target: Target<Bitmap>,
-//                                            isFromMemoryCache: Boolean, isFirstResource: Boolean): Boolean {
-//                            Palette.from(resource)
-//                                    .maximumColorCount(3)
-//                                    .clearFilters()
-//                                    .generate(PaletteWindows(this@EntryActivity, resource))
+//        val text = "Dear Diary, " +
+//                TextUtils.repeat(2, TextUtils.LINE_SEPERATOR) +
+//                TextUtils.repeat(5, TextUtils.TAB) +
+//                entry.body
 //
-//                            startPostponedEnterTransition()
-//                            return false
-//                        }
-//                    })
-//                    .into(image)
-        } else {
-            image.visibility = View.GONE
-        }
+//        val spannableString = SpannableString(text)
+//        spannableString.setSpan(RelativeSizeSpan(1.4f), 0, 12, Spanned.SPAN_INCLUSIVE_INCLUSIVE)
+//        spannableString.setSpan(TypefacerSpan(TextUtils.getFont(this, getString(R.string.default_font))),
+//                12, spannableString.length, Spanned.SPAN_INCLUSIVE_INCLUSIVE)
+//        body.setText(spannableString, TextView.BufferType.SPANNABLE)
+//
+//        val placeName = entry.placeName
+//        if (placeName != null) {
+//            place.visibility = View.VISIBLE
+//            place.text = placeName
+//        } else {
+//            photosFab.visibility = View.GONE
+//            place.visibility = View.GONE
+//        }
+//
+//        date.text = TextUtils.formatDate(entry.date) + TextUtils.LINE_SEPERATOR +
+//                TextUtils.formatTime(entry.date)
+//
+//        val string = entry.weather
+//        if (string != null) {
+//            weatherView.visibility = View.VISIBLE
+//            val weatherResponse = Gson().fromJson(string, WeatherResponse::class.java)
+//            weatherView.text = weatherResponse.oneLineTemperatureString
+//        } else {
+//            weatherView.visibility = View.GONE
+//        }
+//
+//        if (entry.uri != null) {
+//            postponeEnterTransition()
+//
+//            image.visibility = View.VISIBLE
+//
+////            Glide.with(this)
+////                    .fromString()
+////                    .asBitmap()
+////                    .load(entry.uri)
+////                    .centerCrop()
+////                    .listener(object : RequestListener<String, Bitmap> {
+////                        fun onException(e: Exception, model: String, target: Target<Bitmap>, isFirstResource: Boolean): Boolean {
+////                            Logg.log(e)
+////                            return false
+////                        }
+////
+////                        fun onResourceReady(resource: Bitmap, model: String, target: Target<Bitmap>,
+////                                            isFromMemoryCache: Boolean, isFirstResource: Boolean): Boolean {
+////                            Palette.from(resource)
+////                                    .maximumColorCount(3)
+////                                    .clearFilters()
+////                                    .generate(PaletteWindows(this@EntryActivity, resource))
+////
+////                            startPostponedEnterTransition()
+////                            return false
+////                        }
+////                    })
+////                    .into(image)
+//        } else {
+//            image.visibility = View.GONE
+//        }
     }
 
     private fun slideUpView(root: ViewGroup, duration: Int) {
@@ -198,11 +183,11 @@ class EntryActivity : KodiActivity() {
     }
 
     private fun setResultAction(action: Action) {
-        val intent = Intent()
-        intent.putExtra(INTENT_KEY, action)
-        intent.putExtra(INTENT_ACTION, entry.dateMillis)
-        setResult(Activity.RESULT_OK, intent)
-        finish()
+//        val intent = Intent()
+//        intent.putExtra(INTENT_KEY, action)
+//        intent.putExtra(INTENT_ACTION, entry.dateMillis)
+//        setResult(Activity.RESULT_OK, intent)
+//        finish()
     }
 
     protected fun fabClick() {
@@ -217,7 +202,7 @@ class EntryActivity : KodiActivity() {
 
         fun newIntent(context: Context, entry: Entry): Intent {
             val intent = Intent(context, EntryActivity::class.java)
-            intent.putExtra(EntryActivity.INTENT_KEY, entry.dateMillis)
+//            intent.putExtra(EntryActivity.INTENT_KEY, entry.dateMillis)
             return intent
         }
     }

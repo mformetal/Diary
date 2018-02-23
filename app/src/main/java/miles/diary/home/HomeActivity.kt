@@ -1,4 +1,4 @@
-package miles.diary.ui.activity
+package miles.diary.home
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -23,14 +23,11 @@ import android.widget.Toolbar
 import mformetal.kodi.android.KodiActivity
 import mformetal.kodi.core.Kodi
 import mformetal.kodi.core.api.ScopeRegistry
-import mformetal.kodi.core.api.builder.bind
 import mformetal.kodi.core.api.injection.register
-import mformetal.kodi.core.api.scoped
-import mformetal.kodi.core.provider.component
 import miles.diary.R
 import miles.diary.data.adapter.EntryAdapter
-import miles.diary.data.api.Repository
-import miles.diary.data.api.RepositoryImpl
+import miles.diary.data.api.EntryRepository
+import miles.diary.newentry.NewEntryActivity
 import miles.diary.ui.TintingSearchListener
 import miles.diary.ui.addPreDrawer
 import miles.diary.ui.transition.FabContainerTransition
@@ -43,7 +40,9 @@ import miles.diary.util.extensions.root
 class HomeActivity : KodiActivity() {
 
     internal val storage: Storage by injector.register()
-    internal val repository: Repository by injector.register()
+    internal val entryRepository: EntryRepository by injector.register {
+        it.open()
+    }
 
     val recyclerView: RecyclerView by findView(R.id.activity_home_recycler)
     val toolbar: Toolbar by findView(R.id.activity_home_toolbar)
@@ -57,18 +56,15 @@ class HomeActivity : KodiActivity() {
     var emptyView: View? = null
 
     override fun installModule(kodi: Kodi): ScopeRegistry {
-        return kodi.scopeBuilder()
-                .build(scoped<HomeActivity>()) {
-                    bind<Repository>() using component(RepositoryImpl())
-                }
+        return Kodi.EMPTY_REGISTRY
     }
 
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home)
+        setContentView(R.layout.home)
 
-        repository.open()
+        entryRepository.open()
 
         runEnterAnimation()
 
@@ -89,7 +85,7 @@ class HomeActivity : KodiActivity() {
             storage.setBoolean("firstTime", false)
         }
 
-        entryAdapter = EntryAdapter(this, repository.getAllEntries())
+        entryAdapter = EntryAdapter(this, entryRepository.getAllEntries())
         val layoutManager = LinearLayoutManager(this)
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = entryAdapter
@@ -99,10 +95,11 @@ class HomeActivity : KodiActivity() {
         addSearchListener()
     }
 
+    @SuppressLint("MissingSuperCall")
     override fun onDestroy() {
         super.onDestroy()
 
-        repository.close()
+        entryRepository.close()
     }
 
     override fun onBackPressed() {
@@ -127,9 +124,9 @@ class HomeActivity : KodiActivity() {
         when (item.itemId) {
             R.id.menu_home_search -> {
                 val pos = IntArray(2)
-                val search = toolbar!!.findViewById<View>(R.id.menu_home_search)
+                val search = toolbar.findViewById<View>(R.id.menu_home_search)
                 search.getLocationOnScreen(pos)
-                searchWidget!!.toggle(pos)
+                searchWidget.toggle(pos)
             }
         }
         return super.onOptionsItemSelected(item)
@@ -177,11 +174,6 @@ class HomeActivity : KodiActivity() {
             override fun onSearchDismiss(position: IntArray) {
                 super.onSearchDismiss(position)
                 fab.animate().alpha(1f).duration = 350
-            }
-
-            override fun onSearchTextChanged(text: String) {
-                super.onSearchTextChanged(text)
-
             }
         }
 

@@ -13,8 +13,8 @@ import io.realm.RealmRecyclerViewAdapter
 import miles.diary.R
 import miles.diary.data.model.realm.Entry
 import miles.diary.data.model.weather.WeatherResponse
+import miles.diary.home.HomeActivity
 import miles.diary.ui.activity.EntryActivity
-import miles.diary.ui.activity.HomeActivity
 import miles.diary.ui.widget.TypefaceIconTextView
 import miles.diary.ui.widget.TypefaceTextView
 import miles.diary.util.TextUtils
@@ -41,10 +41,10 @@ class EntryAdapter(private val host: Activity,
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             TYPE_IMAGE -> {
-                ImageViewHolder(inflater.inflate(R.layout.adapter_entry_image, parent, false))
+                ImageViewHolder(inflater.inflate(R.layout.vh_entry_image, parent, false))
             }
             TYPE_TEXT -> {
-                TextViewHolder(inflater.inflate(R.layout.adapter_entry_text, parent, false))
+                TextViewHolder(inflater.inflate(R.layout.vh_entry_text, parent, false))
             }
             else -> {
                 throw IllegalArgumentException("Unknown type $viewType")
@@ -75,7 +75,7 @@ class EntryAdapter(private val host: Activity,
             }
 
             body.text = model.body
-            time.text = TextUtils.formatDate(model.date)
+            time.text = TextUtils.formatDate(model.createdAt)
 
             val temperature = model.weather
             if (temperature != null) {
@@ -109,7 +109,7 @@ class EntryAdapter(private val host: Activity,
                         HomeActivity.RESULT_CODE_ENTRY, options.toBundle())
             }
 
-            time.text = TextUtils.formatDate(model.date)
+            time.text = TextUtils.formatDate(model.createdAt)
             body.text = model.body
 
             val temperature = model.weather
@@ -124,13 +124,6 @@ class EntryAdapter(private val host: Activity,
             } else {
                 location.visibility = View.GONE
             }
-
-            //            Glide.with(getHost())
-            //                    .fromString()
-            //                    .load(entry.getUri())
-            //                    .animate(AnimUtils.REVEAL)
-            //                    .centerCrop()
-            //                    .into(image);
         }
     }
 

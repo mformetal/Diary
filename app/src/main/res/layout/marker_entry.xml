@@ -7,7 +7,7 @@
     android:layout_width="@dimen/marker_entry_view_size"
     android:layout_height="@dimen/marker_entry_view_size">
 
-    <miles.diary.ui.widget.CircleImageView
+    <mformetal.diary.ui.widget.CircleImageView
         android:id="@+id/marker_entry_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -15,7 +15,7 @@
         app:civ_border_color="@android:color/white"
         app:civ_border_width="2dp" />
 
-    <miles.diary.ui.widget.TypefaceTextView
+    <mformetal.diary.ui.widget.TypefaceTextView
         android:id="@+id/marker_entry_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

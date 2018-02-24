@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<miles.diary.ui.widget.SquareImageView
+<mformetal.diary.ui.widget.SquareImageView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/adapter_gallery_image"
@@ -8,4 +8,4 @@
     android:scaleType="centerCrop"
     android:elevation="@dimen/fab_elevation" >
 
-</miles.diary.ui.widget.SquareImageView>
+</mformetal.diary.ui.widget.SquareImageView>

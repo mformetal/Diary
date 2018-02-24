@@ -9,7 +9,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content" >
 
-    <miles.diary.ui.widget.TypefaceTextView
+    <mformetal.diary.ui.widget.TypefaceTextView
         android:id="@+id/adapter_entry_image_time"
         android:gravity="start"
         android:layout_alignParentStart="true"
@@ -19,7 +19,7 @@
         android:maxLines="1"
         tools:text="MOUNTAIN BIKING" />
 
-    <miles.diary.ui.widget.TypefaceIconTextView
+    <mformetal.diary.ui.widget.TypefaceIconTextView
         android:id="@+id/adapter_entry_image_temperature"
         android:gravity="center"
         android:layout_alignParentEnd="true"
@@ -30,7 +30,7 @@
         android:maxLines="1"
         tools:text="MOUNTAIN BIKING" />
 
-    <miles.diary.ui.widget.CircleImageView
+    <mformetal.diary.ui.widget.CircleImageView
         android:id="@+id/adapter_entry_image_view"
         android:layout_width="@dimen/adapter_image_dimens"
         android:layout_height="@dimen/adapter_image_dimens"
@@ -41,7 +41,7 @@
         android:layout_below="@id/adapter_entry_image_time"
         tools:text="MOUNTAIN BIKING" />
 
-    <miles.diary.ui.widget.TypefaceTextView
+    <mformetal.diary.ui.widget.TypefaceTextView
         android:id="@+id/adapter_entry_image_location"
         android:gravity="center"
         android:drawableStart="@drawable/ic_place_24dp"
@@ -53,7 +53,7 @@
         android:layout_below="@id/adapter_entry_image_view"
         tools:text="MOUNTAIN BIKING" />
 
-    <miles.diary.ui.widget.TypefaceTextView
+    <mformetal.diary.ui.widget.TypefaceTextView
         android:id="@+id/adapter_entry_image_body"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

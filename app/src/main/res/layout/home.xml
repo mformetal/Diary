@@ -23,7 +23,7 @@
                 app:layout_scrollFlags="scroll|enterAlways"
                 style="@style/AppTheme.Widget.Toolbar" >
 
-                <miles.diary.ui.widget.SearchWidget
+                <mformetal.diary.ui.widget.SearchWidget
                     android:id="@+id/activity_home_search_widget"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"
             android:src="@drawable/ic_add_24dp"
-            app:layout_behavior="miles.diary.ui.ScrollVisibilityBehavior"
+            app:layout_behavior="mformetal.diary.ui.ScrollVisibilityBehavior"
             app:layout_anchor="@id/activity_home_recycler"
             app:layout_anchorGravity="bottom|end" />
 

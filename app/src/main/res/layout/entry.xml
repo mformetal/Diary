@@ -23,7 +23,7 @@
             android:clipToPadding="false"
             app:layout_scrollFlags="scroll|exitUntilCollapsed" >
 
-            <miles.diary.ui.widget.SquareRoundedImageView
+            <mformetal.diary.ui.widget.SquareRoundedImageView
                 android:id="@+id/activity_entry_image"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -65,7 +65,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_margin="@dimen/fab_margin" />
 
-            <miles.diary.ui.widget.TypefaceIconTextView
+            <mformetal.diary.ui.widget.TypefaceIconTextView
                 android:id="@+id/activity_entry_weather"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -77,7 +77,7 @@
                 android:layout_alignParentEnd="true"
                 tools:text="Icon Weather" />
 
-            <miles.diary.ui.widget.TypefaceTextView
+            <mformetal.diary.ui.widget.TypefaceTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/activity_entry_place"
@@ -91,7 +91,7 @@
                 android:maxLines="1"
                 tools:text="Swem Library" />
 
-            <miles.diary.ui.widget.TypefaceTextView
+            <mformetal.diary.ui.widget.TypefaceTextView
                 android:id="@+id/activity_entry_date"
                 android:drawableStart="@drawable/ic_access_time_24dp"
                 android:layout_width="wrap_content"
@@ -105,7 +105,7 @@
                 android:layout_below="@id/activity_entry_place"
                 tools:text="10:59AM" />
 
-            <miles.diary.ui.widget.TypefaceTextView
+            <mformetal.diary.ui.widget.TypefaceTextView
                 android:id="@+id/activity_entry_body"
                 android:textSize="@dimen/medium_large_text_size"
                 android:layout_marginStart="@dimen/activity_horizontal_margin"

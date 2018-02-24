@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <miles.diary.ui.widget.TypefaceTextView
+    <mformetal.diary.ui.widget.TypefaceTextView
         android:id="@+id/activity_place_name_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

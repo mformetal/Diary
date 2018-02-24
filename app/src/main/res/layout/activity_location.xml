@@ -12,7 +12,7 @@
     android:transitionName="@string/transition_location"
     android:focusableInTouchMode="true" >
 
-    <miles.diary.ui.widget.SquareImageView
+    <mformetal.diary.ui.widget.SquareImageView
         android:id="@+id/activity_location_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -27,7 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
-        <miles.diary.ui.widget.TypefaceAutoCompleteTextView
+        <mformetal.diary.ui.widget.TypefaceAutoCompleteTextView
             android:id="@+id/activity_location_autocomplete"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -42,7 +42,7 @@
 
     </android.support.design.widget.TextInputLayout>
 
-    <miles.diary.ui.widget.TypefaceButton
+    <mformetal.diary.ui.widget.TypefaceButton
         android:id="@+id/activity_location_pos_button"
         android:layout_margin="@dimen/activity_vertical_margin"
         android:drawableEnd="@drawable/ic_check_24dp"

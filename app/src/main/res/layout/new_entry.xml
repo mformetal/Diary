@@ -20,7 +20,7 @@
             app:titleEnabled="false"
             app:layout_scrollFlags="scroll|exitUntilCollapsed" >
 
-            <miles.diary.ui.widget.AspectRatioImageView
+            <mformetal.diary.ui.widget.AspectRatioImageView
                 android:id="@+id/photo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -50,7 +50,7 @@
             android:layout_marginBottom="@dimen/spacing_normal"
             android:orientation="horizontal" >
 
-            <Button
+            <com.joanzapata.iconify.widget.IconButton
                 android:id="@+id/weather"
                 android:layout_weight="1"
                 android:layout_width="0dp"
@@ -59,7 +59,7 @@
                 style="@style/Widget.AppCompat.Button.Borderless" />
 
             <Button
-                android:id="@+id/location"
+                android:id="@+id/place"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -76,7 +76,7 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" >
 
-        <miles.diary.ui.widget.NotebookEditText
+        <mformetal.diary.ui.widget.NotebookEditText
             android:id="@+id/body"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

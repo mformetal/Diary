@@ -13,15 +13,15 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.Toolbar
-import mformetal.kodi.android.KodiActivity
-import mformetal.kodi.core.Kodi
-import mformetal.kodi.core.api.ScopeRegistry
 import mformetal.diary.R
 import mformetal.diary.data.model.realm.Entry
 import mformetal.diary.ui.widget.RoundedImageView
 import mformetal.diary.ui.widget.TypefaceIconTextView
 import mformetal.diary.ui.widget.TypefaceTextView
 import mformetal.diary.util.extensions.findView
+import mformetal.kodi.android.KodiActivity
+import mformetal.kodi.core.Kodi
+import mformetal.kodi.core.api.ScopeRegistry
 
 /**
  * Created by mbpeele on 2/8/16.
@@ -64,7 +64,7 @@ class EntryActivity : KodiActivity() {
         (0 until menu.size())
                 .map { menu.getItem(it) }
                 .forEach {
-                    if (entry.uri == null) {
+                    if (entry.media == null) {
                         it.icon.mutate().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN)
                     }
                 }

@@ -5,6 +5,6 @@ import io.realm.RealmObject
 open class Entry(
         var createdAtSeconds: Long = 0L,
         var body: String = "",
-        var uri: String ?= null,
+        var media: EntryMedia ?= null,
         var weather: String ?= null,
         var address: EntryAddress ?= null) : RealmObject()

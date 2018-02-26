@@ -16,14 +16,15 @@ import android.support.v7.widget.Toolbar
 import android.transition.ArcMotion
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.TextView
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
 import mformetal.diary.R
 import mformetal.diary.entry.EntryActivity
+import mformetal.diary.ui.GlideApp
 import mformetal.diary.ui.addPreDrawer
 import mformetal.diary.ui.transition.ContainerFabTransition
 import mformetal.diary.ui.transition.FabContainerTransition
@@ -46,8 +47,8 @@ class NewEntryActivity : KodiActivity() {
     val toolbar: Toolbar by findView(R.id.toolbar)
     val bodyInput: EditText by findView(R.id.body)
     val photo: ImageView by findView(R.id.photo)
-    val address: Button by findView(R.id.address)
-    val weather: Button by findView(R.id.weather)
+    val address: TextView by findView(R.id.address)
+    val weather: TextView by findView(R.id.weather)
     val nestedScroll: NestedScrollView by findView(R.id.nested_scroll)
 
     val viewModel: NewEntryViewModel by injector.register()
@@ -93,6 +94,13 @@ class NewEntryActivity : KodiActivity() {
             }
         }
 
+        photo.setOnClickListener {
+            val intent = Intent()
+            intent.type = "image/* video/*"
+            intent.action = Intent.ACTION_GET_CONTENT
+            startActivityForResult(Intent.createChooser(intent, getString(R.string.prompt_choose_media)), RESULT_IMAGE)
+        }
+
         requestActivityPermissions(
                 permissions = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION,
                         Manifest.permission.ACCESS_FINE_LOCATION),
@@ -100,13 +108,13 @@ class NewEntryActivity : KodiActivity() {
                     observeWeatherAndLocation()
                 },
                 doIfDenied = {
-                    ActivityCompat.requestPermissions(this, it, REQUEST_LOCATION_PERMISSION)
+                    ActivityCompat.requestPermissions(this, it, PERMISSION_LOCATION)
                 })
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         when (requestCode) {
-            REQUEST_LOCATION_PERMISSION -> {
+            PERMISSION_LOCATION -> {
                 if (permissionsGranted(grantResults)) {
                     observeWeatherAndLocation()
                 } else {
@@ -120,14 +128,12 @@ class NewEntryActivity : KodiActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         when (requestCode) {
-            RESULT_LOCATION -> {
-                if (resultCode == Activity.RESULT_OK) {
-
-                }
-            }
             RESULT_IMAGE -> {
                 if (resultCode == Activity.RESULT_OK) {
-
+                    GlideApp.with(this)
+                            .load(data.data)
+                            .centerCrop()
+                            .into(photo)
                 }
             }
             else -> super.onActivityResult(requestCode, resultCode, data)
@@ -200,8 +206,7 @@ class NewEntryActivity : KodiActivity() {
 
     companion object {
 
-        private val RESULT_LOCATION = 1
-        private val RESULT_IMAGE = 2
-        private val REQUEST_LOCATION_PERMISSION = 3
+        private val RESULT_IMAGE = 1001
+        private val PERMISSION_LOCATION = 2001
     }
 }

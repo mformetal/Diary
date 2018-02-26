@@ -29,8 +29,6 @@
                 android:minHeight="?android:attr/actionBarSize"
                 android:src="@drawable/ic_photo_24dp"
                 app:aspectRatio=".7"
-                app:dominantMeasurement="width"
-                app:aspectRatioEnabled="true"
                 app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"
                 app:layout_collapseMode="parallax" />
 
@@ -51,25 +49,25 @@
             android:divider="@drawable/recycler_divider"
             android:orientation="horizontal" >
 
-            <com.joanzapata.iconify.widget.IconButton
+            <com.joanzapata.iconify.widget.IconTextView
                 android:id="@+id/weather"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:drawableTop="@drawable/ic_world_24dp"
                 android:maxLines="1"
-                tools:text="43* F"
-                style="@style/Widget.AppCompat.Button.Borderless" />
+                android:gravity="center"
+                tools:text="43* F" />
 
-            <Button
+            <TextView
                 android:id="@+id/address"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:drawableTop="@drawable/ic_place_24dp"
+                android:gravity="center"
                 android:maxLines="1"
-                tools:text="More than one \n Line"
-                style="@style/Widget.AppCompat.Button.Borderless" />
+                tools:text="More than one \n Line" />
 
         </LinearLayout>
 

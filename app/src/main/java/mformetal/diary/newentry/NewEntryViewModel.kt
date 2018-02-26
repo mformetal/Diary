@@ -4,10 +4,12 @@ import android.annotation.SuppressLint
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import android.net.Uri
 import io.reactivex.disposables.Disposable
 import io.realm.Realm
 import mformetal.diary.data.model.realm.Entry
 import mformetal.diary.data.model.realm.EntryAddress
+import mformetal.diary.data.model.realm.EntryMedia
 import mformetal.diary.data.model.weather.WeatherResponse
 import org.threeten.bp.Instant
 
@@ -21,6 +23,7 @@ class NewEntryViewModel(
     private val realm = Realm.getDefaultInstance()
     private val addressLiveData : MutableLiveData<EntryAddress> = MutableLiveData()
     private val weatherLiveData : MutableLiveData<WeatherResponse> = MutableLiveData()
+    private val uriLiveData : MutableLiveData<Uri> = MutableLiveData()
 
     private var addressRequest: Disposable ?= null
     private var weatherRequest : Disposable ?= null
@@ -33,13 +36,19 @@ class NewEntryViewModel(
         realm.close()
     }
 
+    fun notifyMediaChosen(uri: Uri) {
+        uriLiveData.value = uri
+    }
+
     fun saveEntry(bodyInput: String) : LiveData<Unit> {
         val realmLiveData = MutableLiveData<Unit>()
 
         realm.executeTransactionAsync(Realm.Transaction { realm ->
             val entry = Entry(createdAtSeconds = Instant.now().epochSecond,
                     body = bodyInput,
-                    uri = null,
+                    media = uriLiveData.value?.run {
+                        EntryMedia(filePath = toString())
+                    },
                     weather = weatherLiveData.value?.oneLineTemperatureString,
                     address = addressLiveData.value)
             realm.insert(entry)

@@ -30,8 +30,8 @@ class EntryAdapter(private val host: Activity,
                    data: OrderedRealmCollection<Entry>) : RealmRecyclerViewAdapter<Entry, TypedViewHolder<Entry>>(data, true, true) {
 
     override fun getItemViewType(position: Int): Int {
-        val entry = getItem(position)
-        return if (entry!!.uri == null) {
+        val entry = getItem(position)!!
+        return if (entry.media == null) {
             TYPE_TEXT
         } else {
             TYPE_IMAGE

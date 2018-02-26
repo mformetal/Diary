@@ -158,7 +158,7 @@ class NewEntryActivity : KodiActivity() {
 
     private fun observeWeatherAndLocation() {
         viewModel.getPlace().observe(this, safeObserver {
-            address.text = it.getAddressLine(1)
+            address.text = it.shortStateAddress
         })
 
         viewModel.getWeather().observe(this, safeObserver {

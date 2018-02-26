@@ -4,8 +4,6 @@ import android.annotation.SuppressLint
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
-import android.location.Address
-import com.google.gson.Gson
 import io.reactivex.disposables.Disposable
 import io.realm.Realm
 import mformetal.diary.data.model.realm.Entry
@@ -21,7 +19,7 @@ class NewEntryViewModel(
         private val getAddress: GetAddress) : ViewModel() {
 
     private val realm = Realm.getDefaultInstance()
-    private val addressLiveData : MutableLiveData<Address> = MutableLiveData()
+    private val addressLiveData : MutableLiveData<EntryAddress> = MutableLiveData()
     private val weatherLiveData : MutableLiveData<WeatherResponse> = MutableLiveData()
 
     private var addressRequest: Disposable ?= null
@@ -42,12 +40,8 @@ class NewEntryViewModel(
             val entry = Entry(createdAtSeconds = Instant.now().epochSecond,
                     body = bodyInput,
                     uri = null,
-                    weather = weatherLiveData.value?.run {
-                        Gson().toJson(this)
-                    },
-                    address = addressLiveData.value?.run {
-                        EntryAddress.fromAddress(this)
-                    })
+                    weather = weatherLiveData.value?.oneLineTemperatureString,
+                    address = addressLiveData.value)
             realm.insert(entry)
         }, Realm.Transaction.OnSuccess {
             realmLiveData.postValue(Unit)
@@ -72,11 +66,12 @@ class NewEntryViewModel(
     }
 
     @SuppressLint("MissingPermission")
-    fun getPlace() : LiveData<Address> {
+    fun getPlace() : LiveData<EntryAddress> {
         if (addressLiveData.value == null) {
             addressRequest = getAddress.getCurrentAddress()
                     .subscribe({
-                        addressLiveData.postValue(it)
+                        val entryAddress = EntryAddress.fromAddress(it)
+                        addressLiveData.postValue(entryAddress)
                     },  {
                         // Ignore error for now
                         it

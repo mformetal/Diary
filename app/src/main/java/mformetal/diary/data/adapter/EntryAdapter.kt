@@ -7,12 +7,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import com.google.gson.Gson
 import io.realm.OrderedRealmCollection
 import io.realm.RealmRecyclerViewAdapter
 import mformetal.diary.R
 import mformetal.diary.data.model.realm.Entry
-import mformetal.diary.data.model.weather.WeatherResponse
 import mformetal.diary.entry.EntryActivity
 import mformetal.diary.home.HomeActivity
 import mformetal.diary.ui.widget.TypefaceIconTextView
@@ -30,8 +28,6 @@ import org.threeten.bp.ZoneId
  */
 class EntryAdapter(private val host: Activity,
                    data: OrderedRealmCollection<Entry>) : RealmRecyclerViewAdapter<Entry, TypedViewHolder<Entry>>(data, true, true) {
-
-    private val gson = Gson()
 
     override fun getItemViewType(position: Int): Int {
         val entry = getItem(position)
@@ -86,14 +82,10 @@ class EntryAdapter(private val host: Activity,
                 location.gone()
             } else {
                 location.visible()
-                location.text = model.address?.stateAddress
+                location.text = model.address?.shortStateAddress
             }
 
-            val temperature = model.weather
-            if (temperature != null) {
-                val weatherResponse = gson.fromJson(temperature, WeatherResponse::class.java)
-                weather.text = weatherResponse.oneLineTemperatureString
-            }
+            weather.text = model.weather
         }
     }
 
@@ -121,14 +113,10 @@ class EntryAdapter(private val host: Activity,
                 location.gone()
             } else {
                 location.visible()
-                location.text = model.address?.stateAddress
+                location.text = model.address?.shortStateAddress
             }
 
-            val temperature = model.weather
-            if (temperature != null) {
-                val weatherResponse = gson.fromJson(temperature, WeatherResponse::class.java)
-                weather.text = weatherResponse.oneLineTemperatureString
-            }
+            weather.text = model.weather
         }
     }
 

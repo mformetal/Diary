@@ -2,12 +2,11 @@ package mformetal.diary
 
 import android.annotation.SuppressLint
 import android.content.Context
+import com.jakewharton.threetenabp.AndroidThreeTen
 import com.joanzapata.iconify.Iconify
 import com.joanzapata.iconify.fonts.WeathericonsModule
 import io.realm.Realm
 import io.realm.RealmConfiguration
-import mformetal.diary.data.api.EntryRepository
-import mformetal.diary.data.api.RealmEntryRepository
 import mformetal.diary.util.SharedPreferencesStorage
 import mformetal.diary.util.Storage
 import mformetal.kodi.android.KodiApp
@@ -28,7 +27,6 @@ class App : KodiApp() {
 
             bind<Context>() using component(app)
             bind<App>() using component(app)
-            bind<EntryRepository>() using singleton { RealmEntryRepository() }
             bind<Storage>() using singleton { SharedPreferencesStorage(get()) }
         }
     }
@@ -36,6 +34,8 @@ class App : KodiApp() {
     @SuppressLint("MissingSuperCall")
     override fun onCreate() {
         super.onCreate()
+
+        AndroidThreeTen.init(this)
 
         Iconify.with(WeathericonsModule())
 

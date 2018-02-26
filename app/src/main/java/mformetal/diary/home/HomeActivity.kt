@@ -3,6 +3,7 @@ package mformetal.diary.home
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityOptions
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
@@ -17,16 +18,10 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.animation.AnimationUtils
-import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toolbar
-import mformetal.kodi.android.KodiActivity
-import mformetal.kodi.core.Kodi
-import mformetal.kodi.core.api.ScopeRegistry
-import mformetal.kodi.core.api.injection.register
 import mformetal.diary.R
 import mformetal.diary.data.adapter.EntryAdapter
-import mformetal.diary.data.api.EntryRepository
 import mformetal.diary.newentry.NewEntryActivity
 import mformetal.diary.ui.TintingSearchListener
 import mformetal.diary.ui.addPreDrawer
@@ -36,17 +31,21 @@ import mformetal.diary.util.AnimUtils
 import mformetal.diary.util.Storage
 import mformetal.diary.util.extensions.findView
 import mformetal.diary.util.extensions.root
+import mformetal.kodi.android.KodiActivity
+import mformetal.kodi.core.Kodi
+import mformetal.kodi.core.api.ScopeRegistry
+import mformetal.kodi.core.api.builder.bind
+import mformetal.kodi.core.api.injection.register
+import mformetal.kodi.core.api.scoped
+import mformetal.kodi.core.provider.provider
 
 class HomeActivity : KodiActivity() {
 
-    internal val storage: Storage by injector.register()
-    internal val entryRepository: EntryRepository by injector.register {
-        it.open()
-    }
+    private val viewModel : HomeViewModel by injector.register()
+    private val storage: Storage by injector.register()
 
     val recyclerView: RecyclerView by findView(R.id.activity_home_recycler)
     val toolbar: Toolbar by findView(R.id.activity_home_toolbar)
-    val progressBar: ProgressBar by findView(R.id.activity_home_loading)
     val fab: FloatingActionButton by findView(R.id.activity_home_fab)
     val searchWidget: SearchWidget by findView(R.id.activity_home_search_widget)
     val drawerLayout: DrawerLayout by findView(R.id.activity_home_drawer)
@@ -56,15 +55,18 @@ class HomeActivity : KodiActivity() {
     var emptyView: View? = null
 
     override fun installModule(kodi: Kodi): ScopeRegistry {
-        return Kodi.EMPTY_REGISTRY
+        return kodi.scopeBuilder()
+                .build(scoped<HomeActivity>(), {
+                    bind<HomeViewModel>() using provider {
+                        ViewModelProviders.of(this@HomeActivity)[HomeViewModel::class.java]
+                    }
+                })
     }
 
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.home)
-
-        entryRepository.open()
 
         runEnterAnimation()
 
@@ -85,21 +87,22 @@ class HomeActivity : KodiActivity() {
             storage.setBoolean("firstTime", false)
         }
 
-        entryAdapter = EntryAdapter(this, entryRepository.getAllEntries())
+        entryAdapter = EntryAdapter(this, viewModel.entries)
         val layoutManager = LinearLayoutManager(this)
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = entryAdapter
 
-        fab.setOnClickListener { startNewEntryActivity() }
+        fab.setOnClickListener {
+            val intent = Intent(this, NewEntryActivity::class.java)
+            intent.putExtra(FabContainerTransition.START_COLOR, ContextCompat.getColor(this, R.color.accent))
+            intent.putExtra(FabContainerTransition.END_COLOR, ContextCompat.getColor(this, R.color.window_background))
+            val options = ActivityOptions.makeSceneTransitionAnimation(this, fab,
+                    getString(R.string.transition_fab_dialog_new_entry))
+            ActivityCompat.startActivityForResult(this, intent, RESULT_CODE_ENTRY,
+                    options.toBundle())
+        }
 
         addSearchListener()
-    }
-
-    @SuppressLint("MissingSuperCall")
-    override fun onDestroy() {
-        super.onDestroy()
-
-        entryRepository.close()
     }
 
     override fun onBackPressed() {
@@ -199,32 +202,6 @@ class HomeActivity : KodiActivity() {
 
             AnimUtils.alpha(textView, 0f, 1f)
                     .setDuration(AnimUtils.longAnim(it.context).toLong())
-                    .start()
-        }
-    }
-
-    private fun startNewEntryActivity() {
-        val intent = Intent(this, NewEntryActivity::class.java)
-        intent.putExtra(FabContainerTransition.START_COLOR, ContextCompat.getColor(this, R.color.accent))
-        intent.putExtra(FabContainerTransition.END_COLOR, ContextCompat.getColor(this, R.color.window_background))
-        val options = ActivityOptions.makeSceneTransitionAnimation(this, fab,
-                getString(R.string.transition_fab_dialog_new_entry))
-        ActivityCompat.startActivityForResult(this, intent, RESULT_CODE_ENTRY,
-                options.toBundle())
-    }
-
-    private fun dismissLoading() {
-        if (progressBar.visibility != View.GONE) {
-            AnimUtils.gone(progressBar)
-                    .setDuration(AnimUtils.longAnim(this).toLong())
-                    .start()
-        }
-    }
-
-    private fun showLoading() {
-        if (progressBar.visibility != View.VISIBLE) {
-            AnimUtils.visible(progressBar)
-                    .setDuration(AnimUtils.longAnim(this).toLong())
                     .start()
         }
     }

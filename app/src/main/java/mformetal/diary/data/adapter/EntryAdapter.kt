@@ -13,12 +13,17 @@ import io.realm.RealmRecyclerViewAdapter
 import mformetal.diary.R
 import mformetal.diary.data.model.realm.Entry
 import mformetal.diary.data.model.weather.WeatherResponse
-import mformetal.diary.home.HomeActivity
 import mformetal.diary.entry.EntryActivity
+import mformetal.diary.home.HomeActivity
 import mformetal.diary.ui.widget.TypefaceIconTextView
 import mformetal.diary.ui.widget.TypefaceTextView
 import mformetal.diary.util.TextUtils
 import mformetal.diary.util.extensions.findView
+import mformetal.diary.util.extensions.gone
+import mformetal.diary.util.extensions.visible
+import org.threeten.bp.Instant
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.ZoneId
 
 /**
  * Created by mbpeele on 1/14/16.
@@ -75,19 +80,19 @@ class EntryAdapter(private val host: Activity,
             }
 
             body.text = model.body
-            time.text = TextUtils.formatDate(model.createdAt)
+            time.text = TextUtils.formatDate(LocalDateTime.ofInstant(Instant.ofEpochSecond(model.createdAtSeconds), ZoneId.systemDefault()))
+
+            if (model.address == null) {
+                location.gone()
+            } else {
+                location.visible()
+                location.text = model.address?.stateAddress
+            }
 
             val temperature = model.weather
             if (temperature != null) {
                 val weatherResponse = gson.fromJson(temperature, WeatherResponse::class.java)
                 weather.text = weatherResponse.oneLineTemperatureString
-            }
-
-            val placeName = model.placeName
-            if (placeName != null) {
-                location.text = model.placeName
-            } else {
-                location.visibility = View.GONE
             }
         }
     }
@@ -109,20 +114,20 @@ class EntryAdapter(private val host: Activity,
                         HomeActivity.RESULT_CODE_ENTRY, options.toBundle())
             }
 
-            time.text = TextUtils.formatDate(model.createdAt)
+            time.text = TextUtils.formatDate(LocalDateTime.ofInstant(Instant.ofEpochSecond(model.createdAtSeconds), ZoneId.systemDefault()))
             body.text = model.body
+
+            if (model.address == null) {
+                location.gone()
+            } else {
+                location.visible()
+                location.text = model.address?.stateAddress
+            }
 
             val temperature = model.weather
             if (temperature != null) {
                 val weatherResponse = gson.fromJson(temperature, WeatherResponse::class.java)
                 weather.text = weatherResponse.oneLineTemperatureString
-            }
-
-            val placeName = model.placeName
-            if (placeName != null) {
-                location.text = placeName
-            } else {
-                location.visibility = View.GONE
             }
         }
     }

@@ -39,7 +39,7 @@ class GetWeatherUseCase(
             }
         }.flatMap {
             fetchWeather(it)
-        }
+        }.subscribeOn(Schedulers.io())
     }
 
     private fun fetchWeather(location: Location): Single<WeatherResponse> {

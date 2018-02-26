@@ -6,6 +6,9 @@ import android.graphics.Typeface;
 
 import com.joanzapata.iconify.fonts.WeathericonsIcons;
 
+import org.threeten.bp.LocalDateTime;
+import org.threeten.bp.format.DateTimeFormatter;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -74,10 +77,8 @@ public final class TextUtils {
         return stringBuilder.toString();
     }
 
-    public static String formatDate(Date date) {
-        SimpleDateFormat dateFormatter
-                = new SimpleDateFormat("MMMM d, yyyy", Locale.getDefault());
-        return dateFormatter.format(date);
+    public static String formatDate(LocalDateTime date) {
+        return DateTimeFormatter.ofPattern("MMMM d, yyyy").format(date);
     }
 
     public static String formatTime(Date date) {

@@ -6,6 +6,7 @@ import android.location.Geocoder
 import android.location.Location
 import com.google.android.gms.location.FusedLocationProviderClient
 import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 
 /**
  * @author - mbpeele on 2/22/18.
@@ -33,6 +34,6 @@ class GetAddressUseCase(private val locationProvider: FusedLocationProviderClien
             }
         }.map {
             geocoder.getFromLocation(it.latitude, it.longitude, 1).first()
-        }
+        }.subscribeOn(Schedulers.io())
     }
 }

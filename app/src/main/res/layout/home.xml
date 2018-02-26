@@ -40,12 +40,6 @@
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-        <ProgressBar
-            android:id="@+id/activity_home_loading"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_anchorGravity="center" />
-
         <ViewStub
             android:id="@+id/activity_home_stub"
             android:layout_width="match_parent"

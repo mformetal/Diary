@@ -3,6 +3,7 @@ package mformetal.diary.newentry
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.graphics.Color
 import android.location.Geocoder
@@ -143,7 +144,9 @@ class NewEntryActivity : KodiActivity() {
             R.id.menu_new_entry_done -> {
                 val body = bodyInput.textAsString
                 if (body.isNotEmpty()) {
-                    TODO("add Entry to Realm")
+                    viewModel.saveEntry(body).observe(this, Observer {
+                        finish()
+                    })
                 } else {
                     Snackbar.make(root, R.string.new_entry_no_input_error,
                             Snackbar.LENGTH_SHORT).show()

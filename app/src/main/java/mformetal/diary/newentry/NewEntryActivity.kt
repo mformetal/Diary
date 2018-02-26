@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
+import android.location.Geocoder
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
@@ -17,8 +18,8 @@ import android.view.MenuItem
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.places.Places
 import com.google.gson.Gson
 import mformetal.diary.R
 import mformetal.diary.entry.EntryActivity
@@ -35,6 +36,7 @@ import mformetal.kodi.core.api.builder.bind
 import mformetal.kodi.core.api.builder.get
 import mformetal.kodi.core.api.injection.register
 import mformetal.kodi.core.api.scoped
+import mformetal.kodi.core.provider.component
 import mformetal.kodi.core.provider.provider
 import okhttp3.OkHttpClient
 
@@ -43,7 +45,7 @@ class NewEntryActivity : KodiActivity() {
     val toolbar: Toolbar by findView(R.id.toolbar)
     val bodyInput: EditText by findView(R.id.body)
     val photo: ImageView by findView(R.id.photo)
-    val place: Button by findView(R.id.place)
+    val address: Button by findView(R.id.address)
     val weather: Button by findView(R.id.weather)
     val nestedScroll: NestedScrollView by findView(R.id.nested_scroll)
 
@@ -52,14 +54,16 @@ class NewEntryActivity : KodiActivity() {
     override fun installModule(kodi: Kodi): ScopeRegistry {
         return kodi.scopeBuilder()
                 .build(scoped<NewEntryActivity>()) {
-                    bind<WeatherApiContract>() using provider {
-                        WeatherApi(
-                                LocationServices.getFusedLocationProviderClient(this@NewEntryActivity),
-                                OkHttpClient(), Gson(), getString(R.string.weather_base),
+                    bind<Activity>() using component(this@NewEntryActivity)
+                    bind<FusedLocationProviderClient>() using component(LocationServices.getFusedLocationProviderClient(get()))
+                    bind<GetWeather>() using provider {
+                        GetWeatherUseCase(
+                                get(), OkHttpClient(), Gson(),
+                                getString(R.string.weather_base),
                                 getString(R.string.weather_api_key))
                     }
-                    bind<PlaceDetectionContract>() using provider {
-                        PlaceDetectionApi(Places.getPlaceDetectionClient(this@NewEntryActivity, null))
+                    bind<GetAddress>() using provider {
+                        GetAddressUseCase(get(), Geocoder(get()))
                     }
                     bind<NewEntryViewModel>() using provider {
                         NewEntryViewModel(get(), get())
@@ -106,7 +110,7 @@ class NewEntryActivity : KodiActivity() {
                     observeWeatherAndLocation()
                 } else {
                     weather.gone()
-                    place.gone()
+                    address.gone()
                 }
             }
             else -> super.onRequestPermissionsResult(requestCode, permissions, grantResults)
@@ -151,7 +155,7 @@ class NewEntryActivity : KodiActivity() {
 
     private fun observeWeatherAndLocation() {
         viewModel.getPlace().observe(this, safeObserver {
-            place.text = it.name
+            address.text = it.getAddressLine(1)
         })
 
         viewModel.getWeather().observe(this, safeObserver {

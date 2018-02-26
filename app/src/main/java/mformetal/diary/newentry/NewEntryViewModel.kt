@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
-import com.google.android.gms.location.places.Place
+import android.location.Address
 import io.reactivex.disposables.Disposable
 import mformetal.diary.data.model.weather.WeatherResponse
 
@@ -12,10 +12,10 @@ import mformetal.diary.data.model.weather.WeatherResponse
  * @author - mbpeele on 2/22/18.
  */
 class NewEntryViewModel(
-        private val weatherApi: WeatherApiContract,
-        private val placeDetectionContract: PlaceDetectionContract) : ViewModel() {
+        private val weatherApi: GetWeather,
+        private val getAddress: GetAddress) : ViewModel() {
 
-    private val placeLiveData: MutableLiveData<Place> = MutableLiveData()
+    private val addressLiveData : MutableLiveData<Address> = MutableLiveData()
     private val weatherLiveData : MutableLiveData<WeatherResponse> = MutableLiveData()
 
     private var placeRequest : Disposable ?= null
@@ -44,17 +44,17 @@ class NewEntryViewModel(
     }
 
     @SuppressLint("MissingPermission")
-    fun getPlace() : LiveData<Place> {
-        if (placeLiveData.value == null) {
-            placeRequest = placeDetectionContract.getCurrentPlace()
+    fun getPlace() : LiveData<Address> {
+        if (addressLiveData.value == null) {
+            placeRequest = getAddress.getCurrentAddress()
                     .subscribe({
-                        placeLiveData.postValue(it)
+                        addressLiveData.postValue(it)
                     },  {
                         // Ignore error for now
                         it
                     })
         }
 
-        return placeLiveData
+        return addressLiveData
     }
 }

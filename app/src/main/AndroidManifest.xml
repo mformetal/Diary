@@ -46,5 +46,4 @@
             android:value="@string/google_api_key" />
     </application>
 
-
 </manifest>

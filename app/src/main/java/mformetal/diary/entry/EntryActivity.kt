@@ -95,8 +95,8 @@ class EntryActivity : KodiActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun updateView(entry: Entry) {
-//        ViewUtils.mutate(place, place.currentTextColor)
-//        ViewUtils.mutate(date, place.currentTextColor)
+//        ViewUtils.mutate(address, address.currentTextColor)
+//        ViewUtils.mutate(date, address.currentTextColor)
 //
 //        val text = "Dear Diary, " +
 //                TextUtils.repeat(2, TextUtils.LINE_SEPERATOR) +
@@ -111,11 +111,11 @@ class EntryActivity : KodiActivity() {
 //
 //        val placeName = entry.placeName
 //        if (placeName != null) {
-//            place.visibility = View.VISIBLE
-//            place.text = placeName
+//            address.visibility = View.VISIBLE
+//            address.text = placeName
 //        } else {
 //            photosFab.visibility = View.GONE
-//            place.visibility = View.GONE
+//            address.visibility = View.GONE
 //        }
 //
 //        date.text = TextUtils.formatDate(entry.date) + TextUtils.LINE_SEPERATOR +

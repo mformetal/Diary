@@ -56,14 +56,18 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:drawableTop="@drawable/ic_world_24dp"
+                android:maxLines="1"
+                tools:text="43* F"
                 style="@style/Widget.AppCompat.Button.Borderless" />
 
             <Button
-                android:id="@+id/place"
+                android:id="@+id/address"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:drawableTop="@drawable/ic_place_24dp"
+                android:maxLines="1"
+                tools:text="More than one \n Line"
                 style="@style/Widget.AppCompat.Button.Borderless" />
 
         </LinearLayout>

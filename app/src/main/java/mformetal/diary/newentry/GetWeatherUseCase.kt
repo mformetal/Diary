@@ -13,28 +13,29 @@ import okhttp3.OkHttpClient
 /**
  * @author - mbpeele on 2/22/18.
  */
-interface WeatherApiContract {
+interface GetWeather {
 
     fun getCurrentWeather(): Single<WeatherResponse>
 
 }
 
-class WeatherApi(
+class GetWeatherUseCase(
         private val locationProvider: FusedLocationProviderClient,
         private val okHttpClient: OkHttpClient,
         private val gson: Gson,
         private val baseUrl: String,
-        private val apikey: String) : WeatherApiContract {
+        private val apikey: String) : GetWeather {
 
     @SuppressLint("MissingPermission")
     override fun getCurrentWeather(): Single<WeatherResponse> {
         return Single.create<Location> { emitter ->
-            locationProvider.lastLocation.addOnCompleteListener {
-                if (it.isSuccessful) {
-                    emitter.onSuccess(it.result)
-                } else {
-                    emitter.onError(NoSuchElementException())
-                }
+            val task = locationProvider.lastLocation
+            task.addOnSuccessListener {
+                emitter.onSuccess(it)
+            }
+
+            task.addOnFailureListener {
+                emitter.onError(it)
             }
         }.flatMap {
             fetchWeather(it)
